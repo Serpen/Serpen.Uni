@@ -1,8 +1,0 @@
-{
-  "runtimeOptions": {
-    "additionalProbingPaths": [
-      "C:\\Users\\serpe\\.dotnet\\store\\|arch|\\|tfm|",
-      "C:\\Users\\serpe\\.nuget\\packages"
-    ]
-  }
-}

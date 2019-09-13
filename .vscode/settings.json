@@ -1,8 +1,0 @@
-{
-    "files.exclude": {
-        "**/.vscode": true,
-        "**/bin": true,
-        "**/obj": true,
-        "**/omnisharp.json": true
-    }
-}
