@@ -39,6 +39,18 @@ namespace Serpen.Uni.Automat {
                 States[i] = i.ToString(); 
         }
 
+        public AutomatBase(string[] states, char[] alphabet, uint startState, string name) {
+            this.States = states;
+
+            var sortAlp = alphabet.ToList();
+            sortAlp.Sort();
+            this.Alphabet = sortAlp.ToArray();
+
+            this.StartState = startState;
+            this.Name = name;
+            
+        }
+
 
         public abstract bool AcceptWord(string w);
 

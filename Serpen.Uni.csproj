@@ -6,6 +6,9 @@
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="4.5.1" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Program.cs" />
     <Content Include="Automat\Converter.cs" />
     <Content Include="Automat\Utils.cs" />
@@ -37,14 +40,13 @@
     <Content Include="Automat\Finite\EATuple.cs" />
     <Content Include="Automat\Finite\NFABase.cs" />
     <Content Include="Automat\Turing\TuringMachine.cs" />
+    <Content Include="Automat\Turing\TuringTransform.cs" />
     <Content Include="SortAlg.cs" />
     <Content Include="AlgorithmAttributes.cs" />
     <Content Include="Graph\Tree.cs" />
     <Content Include="Graph\EdgeBase.cs" />
     <Content Include="Matrix\Matrix.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.Drawing.Common" Version="4.5.1" />
-    <Content Include="Automat\Turing\TuringTransform.cs" />
+    <Content Include="Automat\Turing\TuringConfig.cs" />
+    <Content Include="Automat\Turing\TuringMachineSingleBand.cs" />
   </ItemGroup>
 </Project>

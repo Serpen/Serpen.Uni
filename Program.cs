@@ -11,15 +11,17 @@ namespace Serpen.Uni
     {
         static void Main(string[] args)
         {
-            var tm = KnownAutomat.TM_EFAK_A810_B84_Monus;
+            var tm = KnownAutomat.TM_EFAK_B86;
             Visualization.DrawAutomat(tm).Save(System.Environment.ExpandEnvironmentVariables($@"%temp%\{tm.Name}.png"));
-            // Utils.AcceptWordConsoleLine(tm, "00001111");
+            Utils.AcceptWordConsoleLine(tm, "01111");
+            Utils.AcceptWordConsoleLine(tm, "01");
             var rnd = Utils.RND;
             for (int i = 0; i < 20; i++)
             {
                 string w = new string('0', rnd.Next(2,20));
                 w = w.Insert(rnd.Next(0, w.Length), "1");
-                System.Console.WriteLine($"{tm.Name}({w})={tm.GetBandOutput(w)}");
+                Utils.AcceptWordConsoleLine(tm, w);
+                // System.Console.WriteLine($"{tm.Name}({w})={tm.AcceptWord(w)}");
             }
 
             // Tests.ExportAllAutomatBitmaps();

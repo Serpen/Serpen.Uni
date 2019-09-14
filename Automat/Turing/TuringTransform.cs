@@ -10,6 +10,10 @@ namespace Serpen.Uni.Automat.Turing {
             }
             return sw.ToString();
         }
+
+        public void AddByStateStore(string[] states, string q, char c, string qNext, char c2, TMDirection dir) {
+            base.Add(new TuringKey(Utils.ArrayIndex(states, q), c), new TuringVal(Utils.ArrayIndex(states, qNext), c2, dir));
+        }
     } 
     
     public struct TuringKey {

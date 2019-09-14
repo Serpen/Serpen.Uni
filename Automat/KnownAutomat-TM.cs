@@ -1,3 +1,4 @@
+using System.Linq;
 using Serpen.Uni.Automat.Turing;
 
 namespace Serpen.Uni.Automat {
@@ -12,7 +13,7 @@ namespace Serpen.Uni.Automat {
                 t.Add(new TuringKey(1, 'a'), new TuringVal(2, 'a', TMDirection.Left));
                 t.Add(new TuringKey(2, 'b'), new TuringVal(0, 'b', TMDirection.Left));
                 t.Add(new TuringKey(2, 'a'), new TuringVal(4, 'a', TMDirection.Right));
-                return new TuringMachineBase(nameof(TM_1659_A44_M1), 5, new char[] {'a', 'b'}, new char[] {'a', 'b', ' '}, t, 0, ' ', new uint[] {3});
+                return new TuringMachineSingleBand(nameof(TM_1659_A44_M1), 5, new char[] {'a', 'b'}, new char[] {'a', 'b', ' '}, t, 0, ' ', new uint[] {3});
             }
         }
 
@@ -29,11 +30,11 @@ namespace Serpen.Uni.Automat {
                 t.Add(new TuringKey(0, 'Y'), new TuringVal(3, 'Y', TMDirection.Right));
                 t.Add(new TuringKey(3, 'Y'), new TuringVal(3, 'Y', TMDirection.Right));
                 t.Add(new TuringKey(3, 'B'), new TuringVal(4, 'B', TMDirection.Right));
-                return new TuringMachineBase(nameof(TM_EFAK_A89_B82_T81), 5, binAlp, new char[] {'0', '1', 'X', 'Y', 'B'}, t, 0, 'B', new uint[] {4});
+                return new TuringMachineSingleBand(nameof(TM_EFAK_A89_B82_T81), 5, binAlp, new char[] {'0', '1', 'X', 'Y', 'B'}, t, 0, 'B', new uint[] {4});
             }
         }
 
-        public static TuringMachineBase TM_EFAK_A810_B84_Monus {
+        public static TuringMachineSingleBand TM_EFAK_A810_B84_Monus {
             get {
                 var t = new TuringTransform();
                 t.Add(new TuringKey(0, '0'), new TuringVal(1, 'B', TMDirection.Right));
@@ -52,7 +53,23 @@ namespace Serpen.Uni.Automat {
                 t.Add(new TuringKey(5, '0'), new TuringVal(5, 'B', TMDirection.Right));
                 t.Add(new TuringKey(5, '1'), new TuringVal(5, 'B', TMDirection.Right));
                 t.Add(new TuringKey(5, 'B'), new TuringVal(6, 'B', TMDirection.Right));
-                return new TuringMachineBase(nameof(TM_EFAK_A810_B84_Monus), 7, binAlp, new char[] {'0', '1', 'B'}, t, 0, 'B', new uint[] {});
+                return new TuringMachineSingleBand(nameof(TM_EFAK_A810_B84_Monus), 7, binAlp, new char[] {'0', '1', 'B'}, t, 0, 'B', new uint[] {});
+            }
+        }
+
+        public static TuringMachineBase TM_EFAK_B86 {
+            get {
+                string[] states = new string[] {"0,0", "0,1", "0,B", "1,0", "1,1", "1,B"};
+                
+                var t = new TuringTransform();
+                t.AddByStateStore(states, "0,B", '0', "1,0", '0', TMDirection.Right);
+                t.AddByStateStore(states, "0,B", '1', "1,1", '1', TMDirection.Right);
+                t.AddByStateStore(states, "1,0", '1', "1,0", '1', TMDirection.Right);
+                t.AddByStateStore(states, "1,1", '0', "1,1", '1', TMDirection.Right);
+                t.AddByStateStore(states, "1,0", 'B', "1,B", 'B', TMDirection.Right);
+                t.AddByStateStore(states, "1,1", 'B', "1,B", 'B', TMDirection.Right);
+
+                return new TuringMachineSingleBand(nameof(TM_EFAK_B86), states, binAlp, new char[] {'0','1','B'}, t, 2, 'B', new uint[] {5});
             }
         }
     }
