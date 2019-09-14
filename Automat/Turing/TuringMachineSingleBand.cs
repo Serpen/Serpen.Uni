@@ -24,11 +24,23 @@ namespace Serpen.Uni.Automat.Turing {
                 return null;
         }
 
+        internal System.Collections.Generic.Dictionary<char,string> RealBandAlphabet;
+        internal System.Collections.Generic.Dictionary<string,char> RealBandAlphabetRev;
+        
         public override bool AcceptWord(string w) {
+            if (RealBandAlphabet != null) {
+                foreach (var a in RealBandAlphabet)
+                    w = w.Replace(a.Key.ToString(), a.Value);
+            }
+            string way = "";
+            w = w.Replace("0", RealBandAlphabetRev["B,0"].ToString());
+            w = w.Replace("1", RealBandAlphabetRev["B,1"].ToString());
+            w = w.Replace("c", RealBandAlphabetRev["B,c"].ToString());
             var tcfg = new TuringConfigSingleBand(BlankSymbol, w, 0) {q=StartState};
             int runs = 0;
             uint lastQ = tcfg.q;
             while (tcfg != null && !AcceptedStates.Contains(tcfg.q)) {
+                way += $"({lastQ.ToString()}/{States[lastQ]}/{tcfg.Band}),";
                 tcfg = GoChar(tcfg);
                 if (tcfg != null)
                     lastQ = tcfg.q;
@@ -61,7 +73,7 @@ namespace Serpen.Uni.Automat.Turing {
             var tcol = new System.Collections.Generic.List<System.Tuple<int, int, string>>();
             foreach (var t in Transform) {
                 var vt = new System.Tuple<int, int, string>((int)t.Key.q, (int)t.Value.qNext, 
-                 $"{t.Key.c}|{t.Value.c2} {t.Value.Direction}");
+                 $"{RealBandAlphabet[t.Key.c]}|{RealBandAlphabet[t.Value.c2]} {t.Value.Direction}");
                  tcol.Add(vt);
             }
             return tcol.ToArray();

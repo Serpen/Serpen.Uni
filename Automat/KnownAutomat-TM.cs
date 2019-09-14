@@ -78,73 +78,82 @@ namespace Serpen.Uni.Automat {
 
                 string[] states = new string[] {"1,0","1,1","1,B","2,0","2,1","2,B","3,0","3,1","3,B","4,0","4,1","4,B","5,0","5,1","5,B","6,0","6,1","6,B","7,0","7,1","7,B","8,0","8,1","8,B","9,0","9,1","9,B"};
                 // string[] states = new string[] {"1,0", "1,1", "2,0", "2,1", "3,0", "3,1", "4,0", "4,1", "5,0", "5,1", "6,0", "6,1", "7,0", "7,1", "8,0", "8,1", "9,0", "9,1"};
-                string[] band  = new string[] {"B,0", "*,0", "B,1", "*,1", "B,c", "*,c", "B,B", "*,B"};
+                string[] bandSymbols  = new string[] {"B,0", "*,0", "B,1", "*,1", "B,c", "*,c", "B,B", "*,B"};
                 // char[] bandAlphabetEx = new char[] {'B','*','B','*','B','*','B','*'};
                 // char[] bandAlphabetEx = new char[] {'0','O','1','l','C','c','b','B'};
-                // var bandAlphabetTranslate = new System.Collections.Generic.Dictionary<char, string>();
-                // for (int i = 0; i < bandAlphabetEx.Length; i++)
-                //     bandAlphabetTranslate.Add(bandAlphabetEx[i], band[i]);
+                var bandAlphabetTranslate = new System.Collections.Generic.Dictionary<char, string>();
+                for (int i = 0; i < bandSymbols.Length; i++)
+                    bandAlphabetTranslate.Add((char)(67+i), bandSymbols[i]);
+                var bandAlphabetTranslateRev = new System.Collections.Generic.Dictionary<string, char>();
+                for (int i = 0; i < bandSymbols.Length; i++)
+                    bandAlphabetTranslateRev.Add(bandSymbols[i], (char)(67+i));
+
+
+                char[] bandSymbols2 = new char[bandSymbols.Length];
+                for (int i = 0; i < bandSymbols2.Length; i++)
+                    bandSymbols2[i] = (char)(67+i);
                 
-                var t = new TuringTransformMultiTrack();
-                t.AddByStateStoreAndBand(states, "1,B", "B,0", "2,0", "*,0", TMDirection.Right);
-                t.AddByStateStoreAndBand(states, "1,B", "B,1", "2,1", "*,1", TMDirection.Right);
+                var t = new TuringTransformSingleBand();
+                t.AddByStateStoreAndBand(states, bandSymbols, "1,B", "B,0", "2,0", "*,0", TMDirection.Right);
+                t.AddByStateStoreAndBand(states, bandSymbols, "1,B", "B,1", "2,1", "*,1", TMDirection.Right);
 
                 // 2
-                t.AddByStateStoreAndBand(states, "2,0", "B,0", "2,0", "*,0", TMDirection.Right);
-                t.AddByStateStoreAndBand(states, "2,0", "B,1", "2,0", "*,1", TMDirection.Right);
-                t.AddByStateStoreAndBand(states, "2,1", "B,0", "2,1", "*,0", TMDirection.Right);
-                t.AddByStateStoreAndBand(states, "2,1", "B,1", "2,1", "*,1", TMDirection.Right);
+                t.AddByStateStoreAndBand(states, bandSymbols, "2,0", "B,0", "2,0", "B,0", TMDirection.Right);
+                t.AddByStateStoreAndBand(states, bandSymbols, "2,0", "B,1", "2,0", "B,1", TMDirection.Right);
+                t.AddByStateStoreAndBand(states, bandSymbols, "2,1", "B,0", "2,1", "B,0", TMDirection.Right);
+                t.AddByStateStoreAndBand(states, bandSymbols, "2,1", "B,1", "2,1", "B,1", TMDirection.Right);
 
                 // 3
-                t.AddByStateStoreAndBand(states, "2,0", "B,c", "3,0", "B,c", TMDirection.Right);
-                t.AddByStateStoreAndBand(states, "2,1", "B,c", "3,1", "B,c", TMDirection.Right);
+                t.AddByStateStoreAndBand(states, bandSymbols, "2,0", "B,c", "3,0", "B,c", TMDirection.Right);
+                t.AddByStateStoreAndBand(states, bandSymbols, "2,1", "B,c", "3,1", "B,c", TMDirection.Right);
 
                 // 4
-                t.AddByStateStoreAndBand(states, "3,0", "*,0", "3,0", "*,0", TMDirection.Right);
-                t.AddByStateStoreAndBand(states, "3,0", "*,1", "3,0", "*,1", TMDirection.Right);
-                t.AddByStateStoreAndBand(states, "3,1", "*,0", "3,1", "*,0", TMDirection.Right);
-                t.AddByStateStoreAndBand(states, "3,1", "*,1", "3,1", "*,1", TMDirection.Right);
+                t.AddByStateStoreAndBand(states, bandSymbols, "3,0", "*,0", "3,0", "*,0", TMDirection.Right);
+                t.AddByStateStoreAndBand(states, bandSymbols, "3,0", "*,1", "3,0", "*,1", TMDirection.Right);
+                t.AddByStateStoreAndBand(states, bandSymbols, "3,1", "*,0", "3,1", "*,0", TMDirection.Right);
+                t.AddByStateStoreAndBand(states, bandSymbols, "3,1", "*,1", "3,1", "*,1", TMDirection.Right);
 
                 // 5
-                t.AddByStateStoreAndBand(states, "3,0", "B,0", "4,B", "*,0", TMDirection.Left);
-                t.AddByStateStoreAndBand(states, "3,1", "B,1", "4,B", "*,1", TMDirection.Left);
+                t.AddByStateStoreAndBand(states, bandSymbols, "3,0", "B,0", "4,B", "*,0", TMDirection.Left);
+                t.AddByStateStoreAndBand(states, bandSymbols, "3,1", "B,1", "4,B", "*,1", TMDirection.Left);
 
                 // 6
-                t.AddByStateStoreAndBand(states, "4,B", "*,0", "4,B", "*,0", TMDirection.Left);
-                t.AddByStateStoreAndBand(states, "4,B", "*,1", "4,B", "*,1", TMDirection.Left);
+                t.AddByStateStoreAndBand(states, bandSymbols, "4,B", "*,0", "4,B", "*,0", TMDirection.Left);
+                t.AddByStateStoreAndBand(states, bandSymbols, "4,B", "*,1", "4,B", "*,1", TMDirection.Left);
 
                 // 7
-                t.AddByStateStoreAndBand(states, "4,B", "B,c", "5,B", "B,c", TMDirection.Left);
+                t.AddByStateStoreAndBand(states, bandSymbols, "4,B", "B,c", "5,B", "B,c", TMDirection.Left);
 
                 //8
-                t.AddByStateStoreAndBand(states, "5,B", "B,0", "6,B", "B,0", TMDirection.Left);
-                t.AddByStateStoreAndBand(states, "5,B", "B,1", "6,B", "B,1", TMDirection.Left);
+                t.AddByStateStoreAndBand(states, bandSymbols, "5,B", "B,0", "6,B", "B,0", TMDirection.Left);
+                t.AddByStateStoreAndBand(states, bandSymbols, "5,B", "B,1", "6,B", "B,1", TMDirection.Left);
 
                 //9
-                t.AddByStateStoreAndBand(states, "6,B", "B,0", "6,B", "B,0", TMDirection.Left);
-                t.AddByStateStoreAndBand(states, "6,B", "B,1", "6,B", "B,1", TMDirection.Left);
+                t.AddByStateStoreAndBand(states, bandSymbols, "6,B", "B,0", "6,B", "B,0", TMDirection.Left);
+                t.AddByStateStoreAndBand(states, bandSymbols, "6,B", "B,1", "6,B", "B,1", TMDirection.Left);
 
                 //10
-                t.AddByStateStoreAndBand(states, "6,B", "*,0", "1,B", "*,0", TMDirection.Right);
-                t.AddByStateStoreAndBand(states, "6,B", "*,1", "1,B", "*,1", TMDirection.Right);
+                t.AddByStateStoreAndBand(states, bandSymbols, "6,B", "*,0", "1,B", "*,0", TMDirection.Right);
+                t.AddByStateStoreAndBand(states, bandSymbols, "6,B", "*,1", "1,B", "*,1", TMDirection.Right);
 
                 //11
-                t.AddByStateStoreAndBand(states, "5,B", "*,0", "7,B", "*,0", TMDirection.Right);
-                t.AddByStateStoreAndBand(states, "5,B", "*,1", "7,B", "*,1", TMDirection.Right);
+                t.AddByStateStoreAndBand(states, bandSymbols, "5,B", "*,0", "7,B", "*,0", TMDirection.Right);
+                t.AddByStateStoreAndBand(states, bandSymbols, "5,B", "*,1", "7,B", "*,1", TMDirection.Right);
 
                 //12
-                t.AddByStateStoreAndBand(states, "7,B", "B,c", "8,B", "B,c", TMDirection.Right);
+                t.AddByStateStoreAndBand(states, bandSymbols, "7,B", "B,c", "8,B", "B,c", TMDirection.Right);
 
                 //13
-                t.AddByStateStoreAndBand(states, "8,B", "*,0", "8,B", "*,0", TMDirection.Right);
-                t.AddByStateStoreAndBand(states, "8,B", "*,1", "8,B", "*,1", TMDirection.Right);
+                t.AddByStateStoreAndBand(states, bandSymbols, "8,B", "*,0", "8,B", "*,0", TMDirection.Right);
+                t.AddByStateStoreAndBand(states, bandSymbols, "8,B", "*,1", "8,B", "*,1", TMDirection.Right);
 
                 //14
-                t.AddByStateStoreAndBand(states, "8,B", "B,B", "9,B", "B,B", TMDirection.Right);
+                t.AddByStateStoreAndBand(states, bandSymbols, "8,B", "B,B", "9,B", "B,B", TMDirection.Right);
 
 
-                var tm = new TuringMachineMultiTrack(nameof(TM_EFAK_B87_wcw), states, binAlp, bandAlphabetEx.Distinct().ToArray(), t, Utils.ArrayIndex(states,"1,B"), 'B', new uint[] {Utils.ArrayIndex(states,"9,B")});
-                // tm.RealBandAlphabet = bandAlphabetTranslate;
+                var tm = new TuringMachineSingleBand(nameof(TM_EFAK_B87_wcw), states, new char[] {'0','1','c'}, bandSymbols2 , t, Utils.ArrayIndex(states,"1,B"), 'I', new uint[] {Utils.ArrayIndex(states,"9,B")});
+                tm.RealBandAlphabet = bandAlphabetTranslate;
+                tm.RealBandAlphabetRev = bandAlphabetTranslateRev;
                 return tm;
             }
         }
