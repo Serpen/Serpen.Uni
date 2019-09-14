@@ -48,7 +48,11 @@ namespace Serpen.Uni.Automat {
         }
 
         internal static void AcceptWordConsoleLine(IAutomat A, string w) {
-            System.Console.WriteLine($"{nameof(A)} accepts '{w}': {A.AcceptWord(w)}");
+            try {
+                System.Console.WriteLine($"{A.Name} accepts '{w}': {A.AcceptWord(w)}");
+            } catch (Serpen.Uni.Automat.Turing.TuringCycleException e) {
+                System.Console.WriteLine($"{A.Name} {e.Message}");
+            }
         }
 
         internal static char NextFreeCapitalLetter(ICollection<char> alphabet, char inputChar) => NextFreeCapitalLetter(alphabet, inputChar, new char[] { });

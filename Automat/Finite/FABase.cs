@@ -21,6 +21,20 @@ namespace Serpen.Uni.Automat.Finite {
 
         protected abstract uint[] GoChar(uint q, char c); //maybe return only uint
 
+        public override System.Tuple<int, int, string>[] VisualizationLines() {
+            var tcol = new System.Collections.Generic.List<System.Tuple<int, int, string>>();
+            foreach (var t in Transform) {
+                string desc = t.Key.c.ToString();
+                if (desc == "")
+                    desc = Utils.EPSILON.ToString();
+                foreach (uint v in t.Value) {
+                    var vt = new System.Tuple<int, int, string>((int)t.Key.q, (int)v, desc);
+                    tcol.Add(vt);
+                }
+            }
+            return tcol.ToArray();
+        }
+
         public FABase Complement() {
             var Dc = this.MemberwiseClone() as FABase;
             var accStates = new List<uint>();

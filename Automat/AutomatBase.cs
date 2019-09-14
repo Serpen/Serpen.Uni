@@ -13,6 +13,7 @@ namespace Serpen.Uni.Automat {
 
         string GetRandomWord();
         bool AcceptWord(string w);
+        System.Tuple<int, int, string>[] VisualizationLines();
     }
 
     public abstract class AutomatBase<TKey, TVal> : IAutomat {
@@ -40,6 +41,8 @@ namespace Serpen.Uni.Automat {
 
 
         public abstract bool AcceptWord(string w);
+
+        public abstract System.Tuple<int, int, string>[] VisualizationLines();
 
         public abstract override string ToString();
 

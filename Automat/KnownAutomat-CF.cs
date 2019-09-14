@@ -14,38 +14,6 @@ namespace Serpen.Uni.Automat {
             }
         }
 
-
-        public static TuringMachineBase TM_1659_A44_M1 {
-            get {
-                var t = new TuringMachineBase.TuringTransform();
-                t.Add(new TuringMachineBase.TuringKey(0, 'a', TuringMachineBase.Direction.Right), new TuringMachineBase.TuringVal(0, 'b'));
-                t.Add(new TuringMachineBase.TuringKey(0, 'b', TuringMachineBase.Direction.Right), new TuringMachineBase.TuringVal(0, 'a'));
-                t.Add(new TuringMachineBase.TuringKey(0, ' ', TuringMachineBase.Direction.Left), new TuringMachineBase.TuringVal(1, 'b'));
-                t.Add(new TuringMachineBase.TuringKey(1, 'b', TuringMachineBase.Direction.Right), new TuringMachineBase.TuringVal(3, 'b'));
-                t.Add(new TuringMachineBase.TuringKey(1, 'a', TuringMachineBase.Direction.Left), new TuringMachineBase.TuringVal(2, 'a'));
-                t.Add(new TuringMachineBase.TuringKey(2, 'b', TuringMachineBase.Direction.Left), new TuringMachineBase.TuringVal(0, 'b'));
-                t.Add(new TuringMachineBase.TuringKey(2, 'a', TuringMachineBase.Direction.Right), new TuringMachineBase.TuringVal(4, 'a'));
-                return new TuringMachineBase(nameof(TM_1659_A44_M1), 5, new char[] {'a', 'b'}, new char[] {'a', 'b', ' '}, t, 0, ' ', new uint[] {3});
-            }
-        }
-
-        public static TuringMachineBase TM_EFAK_A89_B82_T81 {
-            get {
-                var t = new TuringMachineBase.TuringTransform();
-                t.Add(new TuringMachineBase.TuringKey(0, '0', TuringMachineBase.Direction.Right), new TuringMachineBase.TuringVal(1, 'X'));
-                t.Add(new TuringMachineBase.TuringKey(1, 'Y', TuringMachineBase.Direction.Right), new TuringMachineBase.TuringVal(1, 'Y'));
-                t.Add(new TuringMachineBase.TuringKey(1, '0', TuringMachineBase.Direction.Right), new TuringMachineBase.TuringVal(1, '0'));
-                t.Add(new TuringMachineBase.TuringKey(1, '1', TuringMachineBase.Direction.Left),  new TuringMachineBase.TuringVal(2, 'Y'));
-                t.Add(new TuringMachineBase.TuringKey(2, 'Y', TuringMachineBase.Direction.Left),  new TuringMachineBase.TuringVal(2, 'Y'));
-                t.Add(new TuringMachineBase.TuringKey(2, '0', TuringMachineBase.Direction.Left),  new TuringMachineBase.TuringVal(2, '0'));
-                t.Add(new TuringMachineBase.TuringKey(2, 'X', TuringMachineBase.Direction.Right), new TuringMachineBase.TuringVal(0, 'X'));
-                t.Add(new TuringMachineBase.TuringKey(0, 'Y', TuringMachineBase.Direction.Right), new TuringMachineBase.TuringVal(3, 'Y'));
-                t.Add(new TuringMachineBase.TuringKey(3, 'Y', TuringMachineBase.Direction.Right), new TuringMachineBase.TuringVal(3, 'Y'));
-                t.Add(new TuringMachineBase.TuringKey(3, 'B', TuringMachineBase.Direction.Right), new TuringMachineBase.TuringVal(4, 'B'));
-                return new TuringMachineBase(nameof(TM_EFAK_A89_B82_T81), 5, binAlp, new char[] {'0', '1', 'X', 'Y', 'B'}, t, 0, 'B', new uint[] {4});
-            }
-        }
-
         public static PDA PDA_EAFK_A62_wwr_Palindrom {
             get {
                 var pdaT = new PDATransform();

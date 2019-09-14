@@ -18,6 +18,7 @@
     <Content Include="Automat\KnownAutomat.cs" />
     <Content Include="Automat\KnownAutomat-CF.cs" />
     <Content Include="Automat\KnownAutomat-FA.cs" />
+    <Content Include="Automat\KnownAutomat-TM.cs" />
     <Content Include="Automat\Tests.cs" />
     <Content Include="Automat\ContextFree\DPDA.cs" />
     <Content Include="Automat\ContextFree\PDA.cs" />
@@ -34,15 +35,16 @@
     <Content Include="Automat\Finite\FATransform.cs" />
     <Content Include="Automat\Finite\NFAeTransform.cs" />
     <Content Include="Automat\Finite\EATuple.cs" />
+    <Content Include="Automat\Finite\NFABase.cs" />
+    <Content Include="Automat\Turing\TuringMachine.cs" />
+    <Content Include="SortAlg.cs" />
+    <Content Include="AlgorithmAttributes.cs" />
     <Content Include="Graph\Tree.cs" />
     <Content Include="Graph\EdgeBase.cs" />
     <Content Include="Matrix\Matrix.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Drawing.Common" Version="4.5.1" />
-    <Content Include="Automat\Finite\NFABase.cs" />
-    <Content Include="Automat\Turing\TuringMachine.cs" />
-    <Content Include="SortAlg.cs" />
-    <Content Include="AlgorithmAttributes.cs" />
+    <Content Include="Automat\Turing\TuringTransform.cs" />
   </ItemGroup>
 </Project>

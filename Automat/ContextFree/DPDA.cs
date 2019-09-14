@@ -123,6 +123,16 @@ namespace Serpen.Uni.Automat.ContextFree {
                     return false;
         }
 
+        public override System.Tuple<int, int, string>[] VisualizationLines() {
+            var tcol = new System.Collections.Generic.List<System.Tuple<int, int, string>>();
+            foreach (var t in Transform) {
+                string desc = $"{(t.Key.ci.HasValue ? t.Key.ci.Value : Utils.EPSILON)}|{(t.Key.cw.HasValue ? t.Key.cw.Value : Utils.EPSILON)}->{(!string.IsNullOrEmpty(t.Value.cw2) ? t.Value.cw2 : Utils.EPSILON.ToString())}";
+                var vt = new System.Tuple<int, int, string>((int)t.Key.q, (int)t.Value.qNext, desc);
+                 tcol.Add(vt);
+            }
+            return tcol.ToArray();
+        }
+
         public override string ToString() => $"{Name} DPDA(|{States.Length}|={string.Join(";", States)}), {{{string.Join(',', Alphabet)}}},{{{string.Join(',', WorkAlphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {StartSymbol} {{{string.Join(',', AcceptedStates)}}})".Trim();
         
     } //end class

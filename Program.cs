@@ -11,18 +11,18 @@ namespace Serpen.Uni
     {
         static void Main(string[] args)
         {
-            int[] a = new int[20];
-            for (int i = 0; i < a.Length; i++)
-                a[i] = i;
-            a = Utils.RandomizeArray(a);
-            System.Console.WriteLine($"unsorted A: {string.Join(',', (a))}");
-            System.Console.WriteLine($"SeleSort A: {string.Join(',', SortingAlgorithms.SelectionSort(a))}");
-            System.Console.WriteLine($"InsertSo A: {string.Join(',', SortingAlgorithms.InsertionSort(a))}");
-            System.Console.WriteLine($"BubbleSo A: {string.Join(',', SortingAlgorithms.BubbleSort(a))}");
+            var tm = KnownAutomat.TM_EFAK_A810_B84_Monus;
+            Visualization.DrawAutomat(tm).Save(System.Environment.ExpandEnvironmentVariables($@"%temp%\{tm.Name}.png"));
+            // Utils.AcceptWordConsoleLine(tm, "00001111");
+            var rnd = Utils.RND;
+            for (int i = 0; i < 20; i++)
+            {
+                string w = new string('0', rnd.Next(2,20));
+                w = w.Insert(rnd.Next(0, w.Length), "1");
+                System.Console.WriteLine($"{tm.Name}({w})={tm.GetBandOutput(w)}");
+            }
 
-            return;
-
-            Tests.ExportAllAutomatBitmaps();
+            // Tests.ExportAllAutomatBitmaps();
             return;
             // {
             //     PDA qpda = KnownAutomat.PDA_1659_A33_K1;

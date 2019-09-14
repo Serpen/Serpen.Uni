@@ -179,6 +179,18 @@ namespace Serpen.Uni.Automat.ContextFree {
             return false;
         }
 
+        public override System.Tuple<int, int, string>[] VisualizationLines() {
+            var tcol = new System.Collections.Generic.List<System.Tuple<int, int, string>>();
+            foreach (var t in Transform) {
+                foreach (var v in t.Value) {
+                    string desc = $"{(t.Key.ci.HasValue ? t.Key.ci.Value : Utils.EPSILON)}|{(t.Key.cw.HasValue ? t.Key.cw.Value : Utils.EPSILON)}->{(!string.IsNullOrEmpty(v.cw2) ? v.cw2 : Utils.EPSILON.ToString())}";
+                    var vt = new System.Tuple<int, int, string>((int)t.Key.q, (int)v.qNext, desc);
+                    tcol.Add(vt);
+                }
+            }
+            return tcol.ToArray();
+        }
+
         public override string ToString() => $"{Name} PDA(|{States.Length}|={string.Join(";", States)}), {{{string.Join(',', Alphabet)}}},{{{string.Join(',', WorkAlphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {StartStackSymbol}, {{{string.Join(',', AcceptedStates)}}})".Trim();
     } //end class
 
