@@ -40,13 +40,15 @@
     <Content Include="Automat\Finite\EATuple.cs" />
     <Content Include="Automat\Finite\NFABase.cs" />
     <Content Include="Automat\Turing\TuringMachine.cs" />
-    <Content Include="Automat\Turing\TuringTransform.cs" />
+    <Content Include="Automat\Turing\TuringConfig.cs" />
+    <Content Include="Automat\Turing\TuringMachineSingleBand.cs" />
+    <Content Include="Automat\Turing\TuringMachineMultiTrack.cs" />
+    <Content Include="Automat\Turing\TuringTransformMultiTrack.cs" />
+    <Content Include="Automat\Turing\TuringTransformSingleBand.cs" />
     <Content Include="SortAlg.cs" />
     <Content Include="AlgorithmAttributes.cs" />
     <Content Include="Graph\Tree.cs" />
     <Content Include="Graph\EdgeBase.cs" />
     <Content Include="Matrix\Matrix.cs" />
-    <Content Include="Automat\Turing\TuringConfig.cs" />
-    <Content Include="Automat\Turing\TuringMachineSingleBand.cs" />
   </ItemGroup>
 </Project>

@@ -1,17 +1,21 @@
 using System.Linq;
 
 namespace Serpen.Uni.Automat.Turing {
-    public class TuringMachineSingleBand : TuringMachineBase {
+    public class TuringMachineMultiTrack : TuringMachineBase {
 
-        public new readonly TuringTransformSingleBand Transform;
+        public new readonly TuringTransformMultiTrack Transform;
+        System.Collections.Generic.Dictionary<char,string> RealBandAlphabet;
+        System.Collections.Generic.Dictionary<string,char> RealBandAlphabetRev;
 
-        public TuringMachineSingleBand(string name, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, TuringTransformSingleBand transform, uint startState, char blankSymbol, uint[] acceptedStates)
-            : base(name, stateCount, inputAlphabet, bandAlphabet, startState, blankSymbol, acceptedStates) {
-            Transform = transform;
-        }
-        public TuringMachineSingleBand(string name, string[] states, char[] inputAlphabet, char[] bandAlphabet, TuringTransformSingleBand transform, uint startState, char blankSymbol, uint[] acceptedStates)
+        public TuringMachineMultiTrack(string name, string[] states, char[] inputAlphabet, char[] bandAlphabet, TuringTransformMultiTrack transform, uint startState, char blankSymbol, uint[] acceptedStates)
             : base(name, states, inputAlphabet, bandAlphabet, startState, blankSymbol, acceptedStates) {
             Transform = transform;
+            RealBandAlphabet = new System.Collections.Generic.Dictionary<char, string>();
+            RealBandAlphabetRev = new System.Collections.Generic.Dictionary<string, char>();
+            for (int i = 0; i < bandAlphabet.Length; i++) {
+                RealBandAlphabet.Add(bandAlphabet[i], Transform.BandTracks[i]);
+                RealBandAlphabetRev.Add(Transform.BandTracks[i], bandAlphabet[i]);
+            }
         }
 
         TuringConfigSingleBand GoChar(TuringConfigSingleBand tcfg) {
@@ -25,10 +29,13 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         public override bool AcceptWord(string w) {
+            string way = "";
+                
             var tcfg = new TuringConfigSingleBand(BlankSymbol, w, 0) {q=StartState};
             int runs = 0;
             uint lastQ = tcfg.q;
             while (tcfg != null && !AcceptedStates.Contains(tcfg.q)) {
+                way += $"({lastQ.ToString()}/{States[lastQ]}/{tcfg.Band}),";
                 tcfg = GoChar(tcfg);
                 if (tcfg != null)
                     lastQ = tcfg.q;
@@ -61,7 +68,7 @@ namespace Serpen.Uni.Automat.Turing {
             var tcol = new System.Collections.Generic.List<System.Tuple<int, int, string>>();
             foreach (var t in Transform) {
                 var vt = new System.Tuple<int, int, string>((int)t.Key.q, (int)t.Value.qNext, 
-                 $"{t.Key.c}|{t.Value.c2} {t.Value.Direction}");
+                 $"{RealBandAlphabet[t.Key.c]}|{RealBandAlphabet[t.Value.c2]} {t.Value.Direction}");
                  tcol.Add(vt);
             }
             return tcol.ToArray();
