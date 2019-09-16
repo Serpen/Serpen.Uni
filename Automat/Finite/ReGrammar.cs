@@ -188,7 +188,7 @@ namespace Serpen.Uni.Automat.Finite {
                     char toChar = stateChars[eat.Value[i]];
                     newVals.Add($"{eat.Key.c}{toChar}");
                 }
-                if (A.AcceptedStates.Contains(eat.Key.q))
+                if (A.IsAcceptedState(eat.Key.q))
                     newVals.Add("");
 
                 rs.AddM(fromChar, newVals.ToArray());

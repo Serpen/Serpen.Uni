@@ -46,7 +46,7 @@ namespace Serpen.Uni.Automat.Finite {
             } else
                 q = cachedExtendTransform[extTuple];
 
-            return AcceptedStates.Contains(q);
+            return IsAcceptedState(q);
         } //end AcceptWord
 
         public bool CheckConstraints() {
@@ -63,7 +63,7 @@ namespace Serpen.Uni.Automat.Finite {
             foreach (var t in (FATransform)Transform) {
                 if (t.Key.q > StatesCount | t.Value[0] > StatesCount) //to high state
                     throw new Automat.StateNotFoundException(t.Key.q);
-                if (!this.Alphabet.Contains(t.Key.c.Value)) //char not in alphabet
+                if (!Alphabet.Contains(t.Key.c.Value)) //char not in alphabet
                     throw new Automat.NotInAlphabetException(t.Key.c.Value);
             }
             return true;
@@ -113,7 +113,7 @@ namespace Serpen.Uni.Automat.Finite {
                 processed.Add(x);
 
                 //not in same Group, devider is e
-                if (AcceptedStates.Contains(x) != AcceptedStates.Contains(y)) return false;
+                if (IsAcceptedState(x) != IsAcceptedState(y)) return false;
 
                 //check for every char
                 foreach (char c in Alphabet) {
@@ -122,7 +122,7 @@ namespace Serpen.Uni.Automat.Finite {
                     uint y_next = GoChar(y, c)[0];
 
                     //if this char is okay, other may not be
-                    if (AcceptedStates.Contains(x_next) != AcceptedStates.Contains(y_next))
+                    if (IsAcceptedState(x_next) != IsAcceptedState(y_next))
                         //c is devider, ending
                         return false;
                     else {
@@ -245,15 +245,15 @@ namespace Serpen.Uni.Automat.Finite {
 
                             if (mode == eProductDeaMode.Intersect) {
                                 //add to accStates if one dea state ist acc
-                                if (D1.AcceptedStates.Contains(i) & D2.AcceptedStates.Contains(j))
+                                if (D1.IsAcceptedState(i) & D2.IsAcceptedState(j))
                                     accStates.Add(index);
                             } else if (mode == eProductDeaMode.Union) {
                                 //add to accStates if both dea state ist acc
-                                if (D1.AcceptedStates.Contains(i) | D2.AcceptedStates.Contains(j))
+                                if (D1.IsAcceptedState(i) | D2.IsAcceptedState(j))
                                     accStates.Add(index);
                             } else if (mode == eProductDeaMode.Diff) {
                                 //add to accStates if both dea state ist acc
-                                if (D1.AcceptedStates.Contains(i) & !D2.AcceptedStates.Contains(j))
+                                if (D1.IsAcceptedState(i) & !D2.IsAcceptedState(j))
                                     accStates.Add(index);
                             }
                         }
@@ -304,7 +304,7 @@ namespace Serpen.Uni.Automat.Finite {
             //first, mark all states which differ between accepted and not
             for (uint x = 0; x < t.GetLength(0); x++)
                 for (uint y = 0; y < t.GetLength(0); y++)
-                    if (D.AcceptedStates.Contains(x) != D.AcceptedStates.Contains(y))
+                    if (D.IsAcceptedState(x) != D.IsAcceptedState(y))
                         t[x, y] = true;
 
             bool found; //loop while found something new

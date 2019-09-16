@@ -44,7 +44,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                     newt.AddM(t.Key.q+1, t.Key.ci, t.Key.cw, t.Value[j].cw2, t.Value[j].qNext+1);
 
                     //accepted state goes to qPump
-                    if (pda.AcceptedStates.Contains(t.Key.q)) {
+                    if (pda.IsAcceptedState(t.Key.q)) {
                         newt.Add(t.Key.q+1, null, null, null, qPump);
                     }
                 }

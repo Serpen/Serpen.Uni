@@ -41,7 +41,7 @@ namespace Serpen.Uni.Automat.Finite {
             }
             
             foreach (var q2 in q)
-                if (AcceptedStates.Contains(q2))
+                if (IsAcceptedState(q2))
                     return true;
             return false;
         }

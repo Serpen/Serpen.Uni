@@ -165,7 +165,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                 //check if a cfg has word and stack cleared and ends in accepted states
                 foreach (var p in pcfg) {
                     if (p.Stack.Count() == 0 && p.word.Length == 0) {
-                        if (AcceptedStates.Contains(p.q)) {
+                        if (IsAcceptedState(p.q)) {
                             return true;
                         } else {
                             System.Console.WriteLine($"{pcfg} seems useless");

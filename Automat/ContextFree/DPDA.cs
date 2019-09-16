@@ -117,7 +117,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             if (pcfg == null || pcfg.word.Length > 0)
                 return false;
             else
-                if (AcceptedStates.Contains(pcfg.q))
+                if (IsAcceptedState(pcfg.q))
                     return true;
                 else
                     return false;

@@ -10,6 +10,7 @@ namespace Serpen.Uni.Automat {
         char[] Alphabet { get; }
         string Name { get;}
         uint[] AcceptedStates { get; }
+        bool IsAcceptedState(uint q);
 
         string GetRandomWord();
         bool AcceptWord(string w);
@@ -60,6 +61,10 @@ namespace Serpen.Uni.Automat {
 
 
         public abstract bool AcceptWord(string w);
+
+        public bool IsAcceptedState(uint q) {
+            return AcceptedStates.Contains(q);
+        }
 
         public abstract System.Tuple<int, int, string>[] VisualizationLines();
 

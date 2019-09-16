@@ -40,7 +40,7 @@ namespace Serpen.Uni.Automat.Finite {
             var accStates = new List<uint>();
 
             for (uint i = 0; i < this.States.Length; i++)
-                if (!this.AcceptedStates.Contains(i))
+                if (!this.IsAcceptedState(i))
                     accStates.Add(i);    
             
             Dc.AcceptedStates = accStates.ToArray();
@@ -166,15 +166,15 @@ namespace Serpen.Uni.Automat.Finite {
 
                             if (mode==DFA.eProductDeaMode.Intersect) {
                                 //add to accStates if one dea state ist acc
-                                if (this.AcceptedStates.Contains(i) & A.AcceptedStates.Contains(j))
+                                if (this.IsAcceptedState(i) & A.IsAcceptedState(j))
                                     accStates.Add(index);
                             } else if (mode==DFA.eProductDeaMode.Union) {
                                 //add to accStates if both dea state ist acc
-                                if (this.AcceptedStates.Contains(i) | A.AcceptedStates.Contains(j))
+                                if (this.IsAcceptedState(i) | A.IsAcceptedState(j))
                                     accStates.Add(index);
                             } else if (mode==DFA.eProductDeaMode.Diff) {
                                 //add to accStates if both dea state ist acc
-                                if (this.AcceptedStates.Contains(i) & !A.AcceptedStates.Contains(j))
+                                if (this.IsAcceptedState(i) & !A.IsAcceptedState(j))
                                     accStates.Add(index);
                             }
                         }

@@ -109,7 +109,7 @@ namespace Serpen.Uni.Automat {
                 g.DrawString(A.States[iq], FONT, Brushes.Black, qPos(iq) + STATE_DIAMETER / 2 - strSize.Width / 2, vCenter - strSize.Height / 2);
 
                 var ellipsePen = PEN;
-                if (A.AcceptedStates.Contains(iq))
+                if (A.IsAcceptedState(iq))
                     ellipsePen = PEN_DOUBLE;
                 g.DrawEllipse(ellipsePen, qPos(iq), vCenter - STATE_DIAMETER / 2, STATE_DIAMETER, STATE_DIAMETER);
             }

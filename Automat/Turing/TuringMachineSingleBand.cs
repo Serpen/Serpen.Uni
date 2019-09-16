@@ -1,4 +1,3 @@
-using System.Linq;
 
 namespace Serpen.Uni.Automat.Turing {
     public class TuringMachineSingleBand : TuringMachineBase {
@@ -28,7 +27,7 @@ namespace Serpen.Uni.Automat.Turing {
             var tcfg = new TuringConfigSingleBand(BlankSymbol, w, 0) {q=StartState};
             int runs = 0;
             uint lastQ = tcfg.q;
-            while (tcfg != null && !AcceptedStates.Contains(tcfg.q)) {
+            while (tcfg != null && !IsAcceptedState(tcfg.q)) {
                 tcfg = GoChar(tcfg);
                 if (tcfg != null)
                     lastQ = tcfg.q;
@@ -36,7 +35,7 @@ namespace Serpen.Uni.Automat.Turing {
                     throw new TuringCycleException($"possible Turing cycle at {runs} with {w} now is: {tcfg.Band.Trim(BlankSymbol)}");
                 runs++;
             }
-            if (AcceptedStates.Contains(lastQ))
+            if (IsAcceptedState(lastQ))
                 return true;
             else
                 return false;
@@ -46,7 +45,7 @@ namespace Serpen.Uni.Automat.Turing {
             var tcfg = new TuringConfigSingleBand(BlankSymbol, w, 0);
             int runs = 0;
             string lastBand = tcfg.Band;
-            while (tcfg != null && !AcceptedStates.Contains(tcfg.q)) {
+            while (tcfg != null && !IsAcceptedState(tcfg.q)) {
                 tcfg = GoChar(tcfg);
                 if (tcfg != null)
                     lastBand = tcfg.Band;
