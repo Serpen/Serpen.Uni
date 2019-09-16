@@ -18,7 +18,7 @@ namespace Serpen.Uni
             Utils.AcceptWordConsoleLine(tm, "00c00");
             Utils.AcceptWordConsoleLine(tm, "01c01");
             var rnd = Utils.RND;
-            for (int i = 0; i < 300; i++)
+            for (int i = 0; i < 30; i++)
             {
                 string w = tm.GetRandomWord();
                 Utils.AcceptWordConsoleLine(tm, w);
