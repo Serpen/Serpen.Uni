@@ -37,7 +37,7 @@ namespace Serpen.Uni.Automat {
 
         protected List<char> VarAndTerm;
 
-        public virtual bool CheckConstraints() {
+        protected virtual void CheckConstraints() {
             if (this.Variables.Intersect(this.Terminals).Any()) {
                 throw new System.ArgumentOutOfRangeException("Variables", "var intersect term");
             }
@@ -50,8 +50,6 @@ namespace Serpen.Uni.Automat {
                     }
                 }
             }
-
-            return true;
         }
 
 
@@ -197,27 +195,25 @@ namespace Serpen.Uni.Automat.Finite {
             return new ReGrammer($"{A.Name}-NFA", stateChars, A.Alphabet, rs, stateChars[A.StartState]);
         }
 
-        public override bool CheckConstraints() {
-            var ret = base.CheckConstraints();
-            if (!ret) return false;
+        protected override void CheckConstraints() {
+            base.CheckConstraints();
 
             foreach (var r in Rules) {
                 foreach (string body in r.Value) {
                     if (body.Length > 2)
-                        return false;
-                    else if (body.Length == 0) { } else if (body.Length == 1) {
+                        throw new Uni.Exception($"body {body} longer than 2");
+                    else if (body.Length == 0) { } 
+                    else if (body.Length == 1) {
                         if (Variables.Contains(body[0]))
-                            return false;
+                            throw new Uni.Exception($"only body {body} is Var");
                     } else {
                         if (Variables.Contains(body[0]))
-                            return false;
+                            throw new Uni.Exception($"first char in {body} isn't var");
                         if (!Variables.Contains(body[1]))
-                            return false;
+                            throw new Uni.Exception($"second char in {body} isn't terminal");
                     }
                 }
             }
-
-            return ret;
         }
     }
 }

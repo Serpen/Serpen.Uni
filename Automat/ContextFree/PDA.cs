@@ -33,29 +33,29 @@ namespace Serpen.Uni.Automat.ContextFree {
             this.StartStackSymbol = Startstacksymbol;
             this.AcceptedStates = AcceptedStates;
 
-            checkConstraints();
+            CheckConstraints();
         }
 
 
-        protected void checkConstraints() {
+        protected override void CheckConstraints() {
             foreach (var t in Transform)
             {
                 for (int i = 0; i < t.Value.Length; i++)
                 {
                     if (t.Key.q > StatesCount | t.Value[i].qNext > StatesCount)
-                        throw new System.ArgumentOutOfRangeException("State not in states");
+                        throw new StateException(t.Key.q);
                     else if (t.Key.ci.HasValue && !Alphabet.Contains(t.Key.ci.Value))
-                        throw new System.ArgumentOutOfRangeException("char not in InputAlphabet");
+                        throw new AlphabetException(t.Key.ci.Value);
                     else if (t.Key.cw.HasValue && !WorkAlphabet.Contains(t.Key.cw.Value))
-                        throw new System.ArgumentOutOfRangeException("char not in WorkAlphabet");
+                        throw new AlphabetException(t.Key.cw.Value);
                     else if (t.Value[i].cw2 != null && t.Value[i].cw2 != "" && !WorkAlphabet.Contains(t.Value[i].cw2[0]))
-                        throw new System.ArgumentOutOfRangeException("char2 not in WorkAlphabet");
+                        throw new AlphabetException(t.Value[i].cw2[0]);
                     
                 }
             }
             for (int i = 0; i < AcceptedStates.Length; i++)
                 if (AcceptedStates[i] > StatesCount)
-                        throw new System.ArgumentOutOfRangeException("Accepted State not in states");
+                        throw new StateException(AcceptedStates[i]);
             
         }
 

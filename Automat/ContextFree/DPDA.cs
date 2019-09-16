@@ -14,8 +14,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             this.StartSymbol = Startsymbol;
             this.AcceptedStates = AcceptedStates;
 
-            if (!checkConstraints()) {}
-                // throw new System.ArgumentOutOfRangeException();
+            CheckConstraints();
         }
 
         public static explicit operator DPDA(Finite.DFA D) {
@@ -26,30 +25,29 @@ namespace Serpen.Uni.Automat.ContextFree {
                 t.Add(D.AcceptedStates[i], null, DPDA.START, null, D.StatesCount);
             }
 
-            return new DPDA($"DPDA_({D.Name})", D.StatesCount + 1, D.Alphabet, new char[] { }, t, D.StartState, DPDA.START, new uint[] { D.StatesCount });
+            return new DPDA($"DPDA_({D.Name})", D.StatesCount + 1, D.Alphabet, new char[] {DPDA.START}, t, D.StartState, DPDA.START, new uint[] { D.StatesCount });
         }
 
 
-        bool checkConstraints() {
+        protected override void CheckConstraints() {
+            base.CheckConstraints();
             foreach (var t in Transform)
             {
                 if (t.Key.q > StatesCount | t.Value.qNext > StatesCount) //transform states within states
-                    return false;
+                    throw new StateException(t.Key.q);
                 else if (t.Key.ci.HasValue && !Alphabet.Contains(t.Key.ci.Value)) //input alphabet of transform key
-                    return false;
+                    throw new AlphabetException(t.Key.ci.Value);
                 else if (t.Key.cw.HasValue && !WorkAlphabet.Contains(t.Key.cw.Value)) //work alphabet of transform key
-                    return false;
+                    throw new AlphabetException(t.Key.cw.Value);
                 //BUG: contains string
                 else if (t.Value.cw2 != null && !WorkAlphabet.Contains(t.Value.cw2[0])) //work alphabet of transform value
-                    return false;
+                    throw new AlphabetException(t.Value.cw2[0]);
             }
 
             //accepted States in States
             for (int i = 0; i < AcceptedStates.Length; i++)
                 if (AcceptedStates[i] > StatesCount)
-                    return false;
-            
-            return true;
+                    throw new StateException(AcceptedStates[i]);   
         }
 
         public const char START = '$';

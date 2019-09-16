@@ -39,7 +39,6 @@ namespace Serpen.Uni.Automat {
             for (int i = 0; i < stateCount; i++)
                 States[i] = i.ToString(); 
             
-            checkConstrains();
         }
 
         public AutomatBase(string[] states, char[] alphabet, uint startState, string name) {
@@ -52,11 +51,10 @@ namespace Serpen.Uni.Automat {
             this.StartState = startState;
             this.Name = name;
             
-            checkConstrains();
         }
-        public virtual void checkConstrains() {
+        protected virtual void CheckConstraints() {
             if (StartState > StatesCount)
-                throw new Automat.StateNotFoundException(StartState);
+                throw new Automat.StateException(StartState);
         }
 
 

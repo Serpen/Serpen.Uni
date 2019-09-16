@@ -13,21 +13,22 @@ namespace Serpen.Uni.Automat.Turing {
             BandAlphabet = bandAlphabet;
             BlankSymbol = blankSymbol;
             AcceptedStates = acceptedStates;
-            checkConstraints();
+            CheckConstraints();
         }
         public TuringMachineBase(string name, string[] states, char[] inputAlphabet, char[] bandAlphabet, uint startState, char blankSymbol, uint[] acceptedStates)
             : base(states, inputAlphabet, startState, name) {
             BandAlphabet = bandAlphabet;
             BlankSymbol = blankSymbol;
             AcceptedStates = acceptedStates;
-            checkConstraints();
+            CheckConstraints();
         }
 
-        public void checkConstraints() {
+        protected override void CheckConstraints() {
+            base.CheckConstraints();
             if (base.Alphabet.Intersect(BandAlphabet).Count() != base.Alphabet.Length)
                 throw new Uni.Exception("Inputalphabet not in Bandalphabet");
             if (!BandAlphabet.Contains(BlankSymbol))
-                throw new Automat.NotInAlphabetException(BlankSymbol);
+                throw new Automat.AlphabetException(BlankSymbol);
         }
 
         protected const int MAX_TURING_RUNS = 10000;

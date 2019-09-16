@@ -34,7 +34,7 @@ namespace Serpen.Uni.Automat.Finite {
             //check if word is valid
             for (int i = 0; i < w.Length; i++)
                 if (!Alphabet.Contains(w[i]))
-                    throw new ArgumentOutOfRangeException(nameof(w), $"Symbol {w[i]} not within alphabet {String.Join(',', Alphabet)}");
+                    throw new AlphabetException(w[i]);
 
             var extTuple = new Tuple<uint, string>(StartState, w);
 
@@ -49,7 +49,8 @@ namespace Serpen.Uni.Automat.Finite {
             return IsAcceptedState(q);
         } //end AcceptWord
 
-        public bool CheckConstraints() {
+        protected override void CheckConstraints() {
+            base.CheckConstraints();
             //basic length check
             if (Transform.Count != StatesCount * Alphabet.Length)
                 throw new Automat.DeterministicException($"Tranformation Count missmatch State*Alphabet");
@@ -62,11 +63,10 @@ namespace Serpen.Uni.Automat.Finite {
 
             foreach (var t in (FATransform)Transform) {
                 if (t.Key.q > StatesCount | t.Value[0] > StatesCount) //to high state
-                    throw new Automat.StateNotFoundException(t.Key.q);
+                    throw new Automat.StateException(t.Key.q);
                 if (!Alphabet.Contains(t.Key.c.Value)) //char not in alphabet
-                    throw new Automat.NotInAlphabetException(t.Key.c.Value);
+                    throw new Automat.AlphabetException(t.Key.c.Value);
             }
-            return true;
         } // end checkTransFormComplete
 
         public DFA MinimizeTF() {

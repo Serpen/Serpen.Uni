@@ -7,15 +7,16 @@ namespace Serpen.Uni {
 namespace Serpen.Uni.Automat {
 
     [System.Serializable]
-    public class NotInAlphabetException : Serpen.Uni.Exception {
-        public NotInAlphabetException(char c) : base($"{c} not in Alphabet") => Char = c;
+    public class AlphabetException : Serpen.Uni.Exception {
+        public AlphabetException(char c) : base($"{c} not in Alphabet") => Char = c;
         public char Char;
+        public char[] Alphabet;
 
     }
 
     [System.Serializable]
-    public class StateNotFoundException : Serpen.Uni.Exception {
-        public StateNotFoundException(uint q) : base($"{q} not in States") => State = q;
+    public class StateException : Serpen.Uni.Exception {
+        public StateException(uint q) : base($"{q} not in States") => State = q;
         public uint State { get; }
     }
 
