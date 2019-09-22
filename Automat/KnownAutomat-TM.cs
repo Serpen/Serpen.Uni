@@ -3,7 +3,7 @@ using Serpen.Uni.Automat.Turing;
 
 namespace Serpen.Uni.Automat {
     public partial class KnownAutomat {
-        public static TuringMachineBase TM_1659_A44_M1 {
+        public static TuringMachineSingleBand TM_1659_A44_M1 {
             get {
                 var t = new TuringTransformSingleBand();
                 t.Add(new TuringTransformSingleBand.TuringKey(0, 'a'), new TuringTransformSingleBand.TuringVal(0, 'b', TMDirection.Right));
@@ -17,7 +17,7 @@ namespace Serpen.Uni.Automat {
             }
         }
 
-        public static TuringMachineBase TM_EFAK_A89_B82_T81 {
+        public static TuringMachineSingleBand TM_EFAK_A89_B82_T81 {
             get {
                 var t = new TuringTransformSingleBand();
                 t.Add(new TuringTransformSingleBand.TuringKey(0, '0'), new TuringTransformSingleBand.TuringVal(1, 'X', TMDirection.Right));
@@ -57,7 +57,7 @@ namespace Serpen.Uni.Automat {
             }
         }
 
-        public static TuringMachineBase TM_EFAK_B86 {
+        public static TuringMachineSingleBand TM_EFAK_B86 {
             get {
                 string[] states = new string[] { "0,0", "0,1", "0,B", "1,0", "1,1", "1,B" };
 
@@ -73,7 +73,7 @@ namespace Serpen.Uni.Automat {
             }
         }
 
-        public static TuringMachineBase TMk_EFAK_B87_wcw {
+        public static TuringMachineMultiTrack TMk_EFAK_B87_wcw {
             get {
                 string[] stateTracks = { "1,0", "1,1", "1,B", "2,0", "2,1", "2,B", "3,0", "3,1", "3,B", "4,0", "4,1", "4,B", "5,0", "5,1", "5,B", "6,0", "6,1", "6,B", "7,0", "7,1", "7,B", "8,0", "8,1", "8,B", "9,0", "9,1", "9,B" };
 

@@ -58,8 +58,6 @@ namespace Serpen.Uni.Automat {
 
                     list.Add(SPDA);
                     list.Add(QPDAfromSPDA);
-                } else if (A is Turing.TuringMachineBase tm) {
-                    
                 }
                 Automates.Add(list.ToArray());
             }

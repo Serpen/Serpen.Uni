@@ -52,7 +52,6 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         public const char START = '$';
         public readonly char[] WorkAlphabet;
-        // public new readonly DPDATransform Transform;
         public readonly char StartSymbol;
 
         public PDAConfig GoChar(PDAConfig pcfg) {

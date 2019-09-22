@@ -1,13 +1,12 @@
 
 namespace Serpen.Uni.Automat.Turing {
-    public class TuringMachineMultiTrack : TuringMachineBase {
+    public class TuringMachineMultiTrack : TuringMachineBase<TuringTransformMultiTrack.TuringKey, TuringTransformMultiTrack.TuringVal> {
 
-        public new readonly TuringTransformMultiTrack Transform;
         public uint Tracks { get; }
 
         public TuringMachineMultiTrack(string name, uint tracks, string[] states, char[] inputAlphabet, char[] bandAlphabet, TuringTransformMultiTrack transform, uint startState, char blankSymbol, uint[] acceptedStates)
             : base(name, states, inputAlphabet, bandAlphabet, startState, blankSymbol, acceptedStates) {
-            Transform = transform;
+            // Transform = transform;
             Tracks = tracks;
         }
 
