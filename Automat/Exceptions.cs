@@ -26,7 +26,10 @@ namespace Serpen.Uni.Automat {
         public DeterministicException(string message) : base(message) { }
     }
 
-    
+    [System.Serializable]
+    public sealed class TuringCycleException : Serpen.Uni.Exception {
+        public TuringCycleException(string msg) : base(msg) { }
+    }
 
 
 }

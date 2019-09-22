@@ -1,40 +1,36 @@
 
 namespace Serpen.Uni.Automat.Turing {
-    public class TuringMachineMultiTrack : TuringMachineBase {
+    public class TuringMachineSingleBand : TuringMachineBase {
 
-        public new readonly TuringTransformMultiTrack Transform;
-        System.Collections.Generic.Dictionary<char,string> RealBandAlphabet;
+        public new readonly TuringTransformSingleBand Transform;
 
-        public TuringMachineMultiTrack(string name, string[] states, char[] inputAlphabet, char[] bandAlphabet, TuringTransformMultiTrack transform, uint startState, char blankSymbol, uint[] acceptedStates)
+        public TuringMachineSingleBand(string name, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, TuringTransformSingleBand transform, uint startState, char blankSymbol, uint[] acceptedStates)
+            : base(name, stateCount, inputAlphabet, bandAlphabet, startState, blankSymbol, acceptedStates) {
+            Transform = transform;
+        }
+        public TuringMachineSingleBand(string name, string[] states, char[] inputAlphabet, char[] bandAlphabet, TuringTransformSingleBand transform, uint startState, char blankSymbol, uint[] acceptedStates)
             : base(name, states, inputAlphabet, bandAlphabet, startState, blankSymbol, acceptedStates) {
             Transform = transform;
-            RealBandAlphabet = new System.Collections.Generic.Dictionary<char, string>();
-            for (int i = 0; i < bandAlphabet.Length; i++) {
-                RealBandAlphabet.Add(bandAlphabet[i], Transform.BandTracks[i]);
-            }
         }
 
         TuringConfigSingleBand GoChar(TuringConfigSingleBand tcfg) {
             TuringTransformSingleBand.TuringVal tva;
-            if (Transform.TryGetValue(new TuringTransformSingleBand.TuringKey(tcfg.q, tcfg.CurSymbol), out tva)) {
+            if (Transform.TryGetValue(new TuringTransformSingleBand.TuringKey(tcfg.State, tcfg.CurSymbol), out tva)) {
                 tcfg.ReplaceChar(tva.c2, tva.Direction);
-                tcfg.q = tva.qNext;
+                tcfg.State = tva.qNext;
                 return tcfg;
             } else
                 return null;
         }
 
         public override bool AcceptWord(string w) {
-            string way = "";
-                
-            var tcfg = new TuringConfigSingleBand(BlankSymbol, w, 0) {q=StartState};
+            var tcfg = new TuringConfigSingleBand(BlankSymbol, w, 0) {State=StartState};
             int runs = 0;
-            uint lastQ = tcfg.q;
-            while (tcfg != null && !IsAcceptedState(tcfg.q)) {
-                way += $"({lastQ.ToString()}/{States[lastQ]}/{tcfg.Band}),";
+            uint lastQ = tcfg.State;
+            while (tcfg != null && !IsAcceptedState(tcfg.State)) {
                 tcfg = GoChar(tcfg);
                 if (tcfg != null)
-                    lastQ = tcfg.q;
+                    lastQ = tcfg.State;
                 if (runs > MAX_TURING_RUNS)
                     throw new TuringCycleException($"possible Turing cycle at {runs} with {w} now is: {tcfg.Band.Trim(BlankSymbol)}");
                 runs++;
@@ -49,7 +45,7 @@ namespace Serpen.Uni.Automat.Turing {
             var tcfg = new TuringConfigSingleBand(BlankSymbol, w, 0);
             int runs = 0;
             string lastBand = tcfg.Band;
-            while (tcfg != null && !IsAcceptedState(tcfg.q)) {
+            while (tcfg != null && !IsAcceptedState(tcfg.State)) {
                 tcfg = GoChar(tcfg);
                 if (tcfg != null)
                     lastBand = tcfg.Band;
@@ -64,7 +60,7 @@ namespace Serpen.Uni.Automat.Turing {
             var tcol = new System.Collections.Generic.List<System.Tuple<int, int, string>>();
             foreach (var t in Transform) {
                 var vt = new System.Tuple<int, int, string>((int)t.Key.q, (int)t.Value.qNext, 
-                 $"{RealBandAlphabet[t.Key.c]}|{RealBandAlphabet[t.Value.c2]} {t.Value.Direction}");
+                 $"{t.Key.c}|{t.Value.c2} {t.Value.Direction}");
                  tcol.Add(vt);
             }
             return tcol.ToArray();

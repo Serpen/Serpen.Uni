@@ -13,7 +13,7 @@ namespace Serpen.Uni.Automat {
                 t.Add(new TuringTransformSingleBand.TuringKey(1, 'a'), new TuringTransformSingleBand.TuringVal(2, 'a', TMDirection.Left));
                 t.Add(new TuringTransformSingleBand.TuringKey(2, 'b'), new TuringTransformSingleBand.TuringVal(0, 'b', TMDirection.Left));
                 t.Add(new TuringTransformSingleBand.TuringKey(2, 'a'), new TuringTransformSingleBand.TuringVal(4, 'a', TMDirection.Right));
-                return new TuringMachineSingleBand(nameof(TM_1659_A44_M1), 5, new char[] {'a', 'b'}, new char[] {'a', 'b', ' '}, t, 0, ' ', new uint[] {3});
+                return new TuringMachineSingleBand(nameof(TM_1659_A44_M1), 5, new char[] { 'a', 'b' }, new char[] { 'a', 'b', ' ' }, t, 0, ' ', new uint[] { 3 });
             }
         }
 
@@ -23,14 +23,14 @@ namespace Serpen.Uni.Automat {
                 t.Add(new TuringTransformSingleBand.TuringKey(0, '0'), new TuringTransformSingleBand.TuringVal(1, 'X', TMDirection.Right));
                 t.Add(new TuringTransformSingleBand.TuringKey(1, 'Y'), new TuringTransformSingleBand.TuringVal(1, 'Y', TMDirection.Right));
                 t.Add(new TuringTransformSingleBand.TuringKey(1, '0'), new TuringTransformSingleBand.TuringVal(1, '0', TMDirection.Right));
-                t.Add(new TuringTransformSingleBand.TuringKey(1, '1'), new TuringTransformSingleBand.TuringVal(2, 'Y', TMDirection.Left ));
-                t.Add(new TuringTransformSingleBand.TuringKey(2, 'Y'), new TuringTransformSingleBand.TuringVal(2, 'Y', TMDirection.Left ));
-                t.Add(new TuringTransformSingleBand.TuringKey(2, '0'), new TuringTransformSingleBand.TuringVal(2, '0', TMDirection.Left ));
+                t.Add(new TuringTransformSingleBand.TuringKey(1, '1'), new TuringTransformSingleBand.TuringVal(2, 'Y', TMDirection.Left));
+                t.Add(new TuringTransformSingleBand.TuringKey(2, 'Y'), new TuringTransformSingleBand.TuringVal(2, 'Y', TMDirection.Left));
+                t.Add(new TuringTransformSingleBand.TuringKey(2, '0'), new TuringTransformSingleBand.TuringVal(2, '0', TMDirection.Left));
                 t.Add(new TuringTransformSingleBand.TuringKey(2, 'X'), new TuringTransformSingleBand.TuringVal(0, 'X', TMDirection.Right));
                 t.Add(new TuringTransformSingleBand.TuringKey(0, 'Y'), new TuringTransformSingleBand.TuringVal(3, 'Y', TMDirection.Right));
                 t.Add(new TuringTransformSingleBand.TuringKey(3, 'Y'), new TuringTransformSingleBand.TuringVal(3, 'Y', TMDirection.Right));
                 t.Add(new TuringTransformSingleBand.TuringKey(3, 'B'), new TuringTransformSingleBand.TuringVal(4, 'B', TMDirection.Right));
-                return new TuringMachineSingleBand(nameof(TM_EFAK_A89_B82_T81), 5, binAlp, new char[] {'0', '1', 'X', 'Y', 'B'}, t, 0, 'B', new uint[] {4});
+                return new TuringMachineSingleBand(nameof(TM_EFAK_A89_B82_T81), 5, binAlp, new char[] { '0', '1', 'X', 'Y', 'B' }, t, 0, 'B', new uint[] { 4 });
             }
         }
 
@@ -53,14 +53,14 @@ namespace Serpen.Uni.Automat {
                 t.Add(new TuringTransformSingleBand.TuringKey(5, '0'), new TuringTransformSingleBand.TuringVal(5, 'B', TMDirection.Right));
                 t.Add(new TuringTransformSingleBand.TuringKey(5, '1'), new TuringTransformSingleBand.TuringVal(5, 'B', TMDirection.Right));
                 t.Add(new TuringTransformSingleBand.TuringKey(5, 'B'), new TuringTransformSingleBand.TuringVal(6, 'B', TMDirection.Right));
-                return new TuringMachineSingleBand(nameof(TM_EFAK_A810_B84_Monus), 7, binAlp, new char[] {'0', '1', 'B'}, t, 0, 'B', new uint[] {});
+                return new TuringMachineSingleBand(nameof(TM_EFAK_A810_B84_Monus), 7, binAlp, new char[] { '0', '1', 'B' }, t, 0, 'B', new uint[] { });
             }
         }
 
         public static TuringMachineBase TM_EFAK_B86 {
             get {
-                string[] states = new string[] {"0,0", "0,1", "0,B", "1,0", "1,1", "1,B"};
-                
+                string[] states = new string[] { "0,0", "0,1", "0,B", "1,0", "1,1", "1,B" };
+
                 var t = new TuringTransformSingleBand();
                 t.AddByStateStore(states, "0,B", '0', "1,0", '0', TMDirection.Right);
                 t.AddByStateStore(states, "0,B", '1', "1,1", '1', TMDirection.Right);
@@ -69,23 +69,23 @@ namespace Serpen.Uni.Automat {
                 t.AddByStateStore(states, "1,0", 'B', "1,B", 'B', TMDirection.Right);
                 t.AddByStateStore(states, "1,1", 'B', "1,B", 'B', TMDirection.Right);
 
-                return new TuringMachineSingleBand(nameof(TM_EFAK_B86), states, binAlp, new char[] {'0','1','B'}, t, 2, 'B', new uint[] {5});
+                return new TuringMachineSingleBand(nameof(TM_EFAK_B86), states, binAlp, new char[] { '0', '1', 'B' }, t, 2, 'B', new uint[] { 5 });
             }
         }
 
-        public static TuringMachineBase TM_EFAK_B87_wcw {
+        public static TuringMachineBase TMk_EFAK_B87_wcw {
             get {
-                string[] stateTracks = {"1,0","1,1","1,B","2,0","2,1","2,B","3,0","3,1","3,B","4,0","4,1","4,B","5,0","5,1","5,B","6,0","6,1","6,B","7,0","7,1","7,B","8,0","8,1","8,B","9,0","9,1","9,B"};
-                
-                string[] bandTracks  = {"B,0", "*,0", "B,1", "*,1", "B,c", "*,c", "B,B", "*,B"};
-                char[] bandSymbols   = {'0',   'A',   '1',   'D',   'c',   'E',   'B',   'F'};
-                
-                char[] inpAlph = {'0','1','c'};
+                string[] stateTracks = { "1,0", "1,1", "1,B", "2,0", "2,1", "2,B", "3,0", "3,1", "3,B", "4,0", "4,1", "4,B", "5,0", "5,1", "5,B", "6,0", "6,1", "6,B", "7,0", "7,1", "7,B", "8,0", "8,1", "8,B", "9,0", "9,1", "9,B" };
 
-                uint[] acceptedStates = {Utils.ArrayIndex(stateTracks,"9,B")};
-                uint startState = Utils.ArrayIndex(stateTracks,"1,B");
-                
-                var t = new TuringTransformMultiTrack(stateTracks, bandTracks, bandSymbols);
+                // string[] bandTracks = { "B,0", "*,0", "B,1", "*,1", "B,c", "*,c", "B,B", "*,B" };
+                char[] bandSymbols = { '0', 'A', '1', 'D', 'c', 'E', 'B', 'F' };
+
+                char[] inpAlph = { '0', '1', 'c' };
+
+                uint[] acceptedStates = { Utils.ArrayIndex(stateTracks, "9,B") };
+                uint startState = Utils.ArrayIndex(stateTracks, "1,B");
+
+                var t = new TuringTransformMultiTrack(stateTracks);
                 t.AddByStateStoreAndTracks("1,B", "B,0", "2,0", "*,0", TMDirection.Right);
                 t.AddByStateStoreAndTracks("1,B", "B,1", "2,1", "*,1", TMDirection.Right);
 
@@ -142,7 +142,7 @@ namespace Serpen.Uni.Automat {
                 //14
                 t.AddByStateStoreAndTracks("8,B", "B,B", "9,B", "B,B", TMDirection.Right);
 
-                var tm = new TuringMachineMultiTrack(nameof(TM_EFAK_B87_wcw), stateTracks, inpAlph, bandSymbols, t, startState, 'B', acceptedStates);
+                var tm = new TuringMachineMultiTrack(nameof(TMk_EFAK_B87_wcw), 2, stateTracks, inpAlph, bandSymbols, t, startState, 'B', acceptedStates);
                 return tm;
             }
         }

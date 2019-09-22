@@ -47,10 +47,19 @@ namespace Serpen.Uni.Automat {
             return true;
         }
 
+        internal static void DebugMessage(string message) {
+            var stack = new System.Diagnostics.StackTrace();
+            System.Diagnostics.Debug.WriteLine("DBG: " + 
+                stack.GetFrame(1).GetMethod().DeclaringType.Name + "." +
+                stack.GetFrame(1).GetMethod().Name + 
+                ":" + stack.GetFrame(1).GetILOffset() + " " +
+                message);
+        }
+
         internal static void AcceptWordConsoleLine(IAutomat A, string w) {
             try {
                 System.Console.WriteLine($"{A.Name} accepts '{w}': {A.AcceptWord(w)}");
-            } catch (Serpen.Uni.Automat.Turing.TuringCycleException e) {
+            } catch (Serpen.Uni.Automat.TuringCycleException e) {
                 System.Console.WriteLine($"{A.Name} {e.Message}");
             }
         }

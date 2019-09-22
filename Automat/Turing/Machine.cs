@@ -38,10 +38,6 @@ namespace Serpen.Uni.Automat.Turing {
 
     }
     
-    public sealed class TuringCycleException : Serpen.Uni.Exception {
-        public TuringCycleException(string msg) : base(msg) { }
-    }
-
     public enum TMDirection { Left, Right, Halt }
 
 }

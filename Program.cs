@@ -11,17 +11,21 @@ namespace Serpen.Uni
     {
         static void Main(string[] args)
         {
-            var tm = KnownAutomat.TM_EFAK_B87_wcw;
-            Visualization.DrawAutomat(tm).Save(System.Environment.ExpandEnvironmentVariables($@"%temp%\{tm.Name}.png"));
-            Utils.AcceptWordConsoleLine(tm, "0c0");
-            Utils.AcceptWordConsoleLine(tm, "1c1");
-            Utils.AcceptWordConsoleLine(tm, "00c00");
-            Utils.AcceptWordConsoleLine(tm, "01c01");
+            // Tests.ExportAllAutomatBitmaps(Tests.CastToEveryPossibility(KnownAutomat.GetAllAutomats()));
+            // var tm1 = KnownAutomat.TM1_EFAK_B87_wcw;
+            var tm2 = KnownAutomat.TMk_EFAK_B87_wcw;
+            // Visualization.DrawAutomat(tm1).Save(@"c:\temp\tm1.png");
+            // Visualization.DrawAutomat(tm2).Save(@"c:\temp\tm2.png");
+            Utils.AcceptWordConsoleLine(tm2, "0c0");
+            Utils.AcceptWordConsoleLine(tm2, "1c1");
+            Utils.AcceptWordConsoleLine(tm2, "00c00");
+            Utils.AcceptWordConsoleLine(tm2, "01c01");
+            return;
             var rnd = Utils.RND;
             for (int i = 0; i < 30; i++)
             {
-                string w = tm.GetRandomWord();
-                Utils.AcceptWordConsoleLine(tm, w);
+                string w = tm2.GetRandomWord();
+                Utils.AcceptWordConsoleLine(tm2, w);
                 // System.Console.WriteLine($"{tm.Name}({w})={tm.AcceptWord(w)}");
             }
 
@@ -92,7 +96,7 @@ namespace Serpen.Uni
 
                 // if (nr.Alphabet.Length == 2 && drmin.StatesCount>1 && drmin.StatesCount < nr.StatesCount/2) {
                     Visualization.DrawAutomat(nr).Save($@"{System.Environment.GetEnvironmentVariable("TEMP")}\automat\rnd\{nr.Name}.png");
-                    var nrmin1 = nr.RemoveUnreachable();
+                    var nrmin1 = nr;  //.RemoveUnreachable();
                     Visualization.DrawAutomat(nrmin1).Save($@"{System.Environment.GetEnvironmentVariable("TEMP")}\automat\rnd\{nr.Name}-entf.png");
                     var drmin = Converter.Nea2TeilmengenDea(nr);
                     drmin = drmin.MinimizeTF();
@@ -104,7 +108,6 @@ namespace Serpen.Uni
             //return;
 
             // return;
-            // Tests.ExportAllAutomatBitmaps(Tests.CastToEveryPossibility(KnownAutomat.GetAllAutomats()));
             // return;
             // {
             // var cfg = KnownAutomat.CFG_1659_G1;
@@ -182,7 +185,6 @@ namespace Serpen.Uni
             {
             var D = Automat.KnownAutomat.DEA_ContainsOnes(4);
             // D = DeaModel.Empty;
-            Console.WriteLine($"DEA  TransformComplete: {D.CheckConstraints()}");
             var Dm= D.MinimizeTF();
             var N = (NFA)D;
             var Ne= (NFAe)(N);
