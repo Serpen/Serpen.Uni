@@ -3,6 +3,8 @@ using System.Linq;
 namespace Serpen.Uni.Automat.ContextFree {
     public class StackPDA : PDA {
 
+        public int MAX_RUNS_OR_STACK = 10000;
+
         /// <summary>
         /// Create PDA which accepts by empty stack
         /// </summary>
@@ -50,8 +52,6 @@ namespace Serpen.Uni.Automat.ContextFree {
                 }
             }
 
-            
-
             foreach (char c in pda.Alphabet)
             {
                 if (!spdaWorkAlphabet.Contains(c))
@@ -76,20 +76,21 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             //while any pcfg exists
             while (pcfgs.Length > 0) { //&& (pcfg.Where((a) => a.Stack.Length>0).Any())
+                foreach (var p in pcfgs) {
+                    if ((p.Stack.Count() == 0 || (p.Stack[p.Stack.Count()-1] == this.StartStackSymbol && p.Stack.Count() == 1)) && p.word.Length == 0) {
+                        return true;
+                    }
+                }
                 pcfgs = GoChar(pcfgs);
 
                 runCount++;
 
-                if (pcfgs.Length > 10000000 || runCount > 10000) {
-                    System.Console.WriteLine($"{runCount}: Stack >= {pcfgs.Length}, abort");
+                if (pcfgs.Length > MAX_RUNS_OR_STACK || runCount > MAX_RUNS_OR_STACK) {
+                    Utils.DebugMessage($"{runCount}: Stack >= {pcfgs.Length}, abort", this);
                     return false;
                 }
                 //check if a cfg has word and stack cleared and ends in accepted states
-                foreach (var p in pcfgs) {
-                    if (p.Stack.Count() == 0 && p.word.Length == 0) {
-                        return true;
-                    }
-                }
+                
             }
 
             return false;

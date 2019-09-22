@@ -28,12 +28,12 @@ namespace Serpen.Uni.Automat.Turing {
             for (int i = 1; i < Tracks; i++)
                 newW[i] = new string(BlankSymbol, w.Length);
             string way = "";
-            Utils.DebugMessage($"w: {w}=>{string.Join(',', newW)}");
+            Utils.DebugMessage($"w: {w}=>{string.Join(',', newW)}", this);
             var tcfg = new TuringConfigMultiTrack(BlankSymbol, newW, 0) { q = StartState };
             int runs = 0;
             uint lastQ = tcfg.q;
             while (tcfg != null && !IsAcceptedState(tcfg.q)) {
-                Utils.DebugMessage(tcfg.ToString());
+                Utils.DebugMessage(tcfg.ToString(), this);
                 way += $"({lastQ.ToString()}/{States[lastQ]}/{tcfg.Band[0]}|{tcfg.Band[1]}/{tcfg.Position}),";
                 tcfg = GoChar(tcfg);
                 if (tcfg != null)

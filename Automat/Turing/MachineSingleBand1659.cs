@@ -2,7 +2,7 @@
 namespace Serpen.Uni.Automat.Turing {
     public class TuringMachineSingleBand1659 : TuringMachineBase {
 
-        public new readonly TuringTransformSingleBand Transform;
+        //public new readonly TuringTransformSingleBand Transform;
 
         public TuringMachineSingleBand1659(string name, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, TuringTransformSingleBand transform, uint startState, char blankSymbol, uint acceptedState, uint discardState)
             : base(name, stateCount, inputAlphabet, bandAlphabet, startState, blankSymbol, new uint[] {acceptedState}) {

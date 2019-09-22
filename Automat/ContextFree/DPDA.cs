@@ -52,7 +52,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         public const char START = '$';
         public readonly char[] WorkAlphabet;
-        public new readonly DPDATransform Transform;
+        // public new readonly DPDATransform Transform;
         public readonly char StartSymbol;
 
         public PDAConfig GoChar(PDAConfig pcfg) {
@@ -68,7 +68,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             PDATransformValue qNext;
 
             //get all possible (e-)transforms
-            if (Transform.TryGetValue(ref qStart, out qNext)) {
+            if (((DPDATransform)Transform).TryGetValue(ref qStart, out qNext)) {
                 var newStack = new Stack<char>(pcfg.Stack); //new stack vor pcfg
 
                 //stack symbol cw2 replaces cw

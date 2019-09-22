@@ -6,12 +6,13 @@ public class TuringTransformMultiTrack : TransformBase<TuringTransformMultiTrack
         public TuringTransformMultiTrack(string[] states) {
             States = states;
         }
+        
         public void AddByStateStoreAndTracks(string q, string c1, string qNext, string c2, TMDirection dir) {
             Add(new TuringTransformMultiTrack.TuringKey(Utils.ArrayIndex(States, q), c1.Replace(",", "").ToCharArray().Reverse().ToArray()),
                 new TuringTransformMultiTrack.TuringVal(Utils.ArrayIndex(States, qNext), c2.Replace(",", "").ToCharArray().Reverse().ToArray(), dir));
 
         }
-        //"1,B", "B,0", "2,0", "*,0", TMDirection.Right);
+        
         public struct TuringKey {
             public TuringKey(uint q, char[] c) {
                 this.q = q;

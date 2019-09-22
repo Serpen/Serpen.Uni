@@ -15,12 +15,6 @@ namespace Serpen.Uni.Automat {
 
     public enum RuleConstaint {None, Left, Right}
     public interface IConfig {}
+    
 
-    public class DFAConfig : IConfig {
-        public uint State;
-    }
-
-    public class NFAConfig : IConfig {
-        public uint[] States;
-    }
 }

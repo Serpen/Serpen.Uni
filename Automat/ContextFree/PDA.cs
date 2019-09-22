@@ -11,7 +11,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         protected static readonly char[] EXTRASYMBOLS =  new char[] {'§','$','%','&'};
         public const char START = '$';
         public readonly char[] WorkAlphabet;
-        public new readonly PDATransform Transform;
+        //public readonly PDATransform Transform;
         public readonly char StartStackSymbol;
         
         /// <summary>
@@ -63,6 +63,11 @@ namespace Serpen.Uni.Automat.ContextFree {
         public PDAConfig[] GoChar(PDAConfig[] pcfgs) {
             var retCfgs = new List<PDAConfig>();
 
+            if (pcfgs.Length > 100000) {
+                Utils.DebugMessage($"Stack >= {pcfgs.Length}, abort", this);
+                return new PDAConfig[0];
+            }
+
             foreach (var pcfg in pcfgs)
             {
                 PDATransformKey[] qStart = new PDATransformKey[1];
@@ -87,7 +92,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                 PDATransformValue[] qNext;
                 
                 //get all possible (e-)transforms
-                if (Transform.TryGetValue(ref qStart, out qNext)) {
+                if (((PDATransform)Transform).TryGetValue(ref qStart, out qNext)) {
                     //iterate each cuple of start and next transform
                     for (int j = 0; j < qNext.Length; j++)
                     {

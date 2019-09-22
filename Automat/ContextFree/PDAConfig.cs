@@ -31,6 +31,6 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         public override int GetHashCode() => ToString().GetHashCode();
 
-        public override string ToString() => $"({q},'{word}','{string.Join("", Stack)}'";
+        public override string ToString() => $"({q},'{word}','{string.Join("", Stack)}')";
     }
 }

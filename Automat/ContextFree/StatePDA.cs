@@ -114,21 +114,24 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             //while any pcfg exists
             while (pcfgs.Length > 0) { //&& (pcfg.Where((a) => a.Stack.Length>0).Any())
-                pcfgs = GoChar(pcfgs);
-
-                runCount++;
-                if (pcfgs.Length > 10000000 || runCount > 10000) {
-                    System.Console.WriteLine($"{runCount}: Stack >= {pcfgs.Length}, abort");
-                    return false;
-                }
-
-                //check if a cfg has word and stack cleared and ends in accepted states
+                Utils.DebugMessage(string.Join(',', (from a in pcfgs select a.ToString())), this);
                 foreach (var p in pcfgs) {
                     if (p.word.Length == 0)
                         if (IsAcceptedState(p.q))
                             return true;
-                        
                 } //next p
+
+                pcfgs = GoChar(pcfgs);
+
+                runCount++;
+                if (pcfgs.Length > 100000 || runCount > 1000) {
+                    Utils.DebugMessage($"{runCount}: Stack >= {pcfgs.Length}, abort", this);
+                    return false;
+                }
+
+                //check if a cfg has word and stack cleared and ends in accepted states
+                        
+                
             }
 
             return false;

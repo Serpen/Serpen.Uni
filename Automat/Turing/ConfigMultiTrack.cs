@@ -1,6 +1,6 @@
 namespace Serpen.Uni.Automat.Turing {
 
-    public class TuringConfigMultiTrack : TuringConfigBase<char[]> {
+    internal class TuringConfigMultiTrack : TuringConfigBase<char[]> {
 
         public TuringConfigMultiTrack(char blankSymbol, string[] band, int bandPos) : base(blankSymbol) {
             base.band = band;

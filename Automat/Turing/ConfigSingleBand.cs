@@ -1,5 +1,5 @@
 namespace Serpen.Uni.Automat.Turing {
-    public sealed class TuringConfigSingleBand : TuringConfigBase<char> {
+    internal class TuringConfigSingleBand : TuringConfigBase<char> {
 
         public TuringConfigSingleBand(char blankSymbol, string band, int bandPos) : base(blankSymbol) {
             base.band = new string[] { band };

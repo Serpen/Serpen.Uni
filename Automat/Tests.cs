@@ -1,18 +1,21 @@
 using Serpen.Uni.Automat.Finite;
 using Serpen.Uni.Automat.ContextFree;
+using Serpen.Uni.Automat.Turing;
 
 namespace Serpen.Uni.Automat {
     public static class Tests {
 
-        public static IAutomat[] CastToEveryPossibility(IAutomat[] As) {
-            var list = new System.Collections.Generic.List<IAutomat>();
+        public static IAutomat[][] CastToEveryPossibility(IAutomat[] As) {
+            var Automates = new System.Collections.Generic.List<IAutomat[]>(); 
 
             foreach (IAutomat A in As) {
+                var list = new System.Collections.Generic.List<IAutomat>();
                 if (A is DFA D) {
                     NFA NfromD = (NFA)D;
                     NFAe NEfromD = (NFAe)D;
                     NFAe NEfromN = (NFAe)NfromD;
                     StatePDA QPDAfromNe = (StatePDA)NEfromD;
+                    TuringMachineSingleBand TMfromD = (TuringMachineSingleBand)D;
 
                     list.Add(D);
                     list.Add(NfromD);
@@ -23,6 +26,7 @@ namespace Serpen.Uni.Automat {
                         list.Add(DPDAFromD);
                     } catch {}
                     list.Add(QPDAfromNe);
+                    list.Add(TMfromD);
                 } else if (A is NFA N) {
                     DFA DfromN = Converter.Nea2TeilmengenDea(N);
                     NFAe NEfromD = (NFAe)DfromN;
@@ -54,10 +58,13 @@ namespace Serpen.Uni.Automat {
 
                     list.Add(SPDA);
                     list.Add(QPDAfromSPDA);
+                } else if (A is Turing.TuringMachineBase tm) {
+                    
                 }
+                Automates.Add(list.ToArray());
             }
 
-            return list.ToArray();
+            return Automates.ToArray();
         }
 
         public static bool CastingEquality() {

@@ -287,7 +287,6 @@ namespace Serpen.Uni.Automat.Finite {
 
         public static explicit operator DFA(NFA N) => Converter.Nea2TeilmengenDea(N);
         public static explicit operator DFA(NFAe Ne) => Converter.Nea2TeilmengenDea(Ne);
-
         
         public override int GetHashCode() => ToString().GetHashCode();
 

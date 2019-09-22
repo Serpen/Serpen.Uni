@@ -1,3 +1,3 @@
 namespace Serpen.Uni.Automat {
-    public class TransformBase<TKey, TVal> : Graph.EdgeBase<TKey, TVal> {}
+    public class TransformBase<TKey, TVal> : Graph.EdgeBase<TKey, TVal>  where TKey : struct {}
 }

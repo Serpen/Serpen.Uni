@@ -96,10 +96,11 @@ namespace Serpen.Uni.Automat {
             if (toStringSize.Width < bmpwidth)
                 g.DrawString(toString, FONT, Brushes.Black, 20, bmp.Height - toStringSize.Height * 2);
             else {
-                int toStringSplits = (int)Math.Ceiling(bmpwidth / toStringSize.Width) + 1;
+                int toStringSplits = (int)Math.Ceiling(bmpwidth-30 / toStringSize.Width) + 1;
                 int toStringSplitFactor = toString.Length / toStringSplits;
                 for (int i = 0; i < toStringSplits; i++) {
-                    g.DrawString(toString.Substring(i * toStringSplitFactor, toStringSplitFactor), FONT, Brushes.Black, 20, bmp.Height - toStringSplits * toStringSize.Height + i * toStringSize.Height);
+                    g.DrawString(toString.Substring(i * toStringSplitFactor, toStringSplitFactor),
+                        FONT, Brushes.Black, 15, bmp.Height - toStringSplits * toStringSize.Height + i * toStringSize.Height);
                 }
             }
 

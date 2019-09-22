@@ -13,11 +13,12 @@ namespace Serpen.Uni.Automat {
         bool IsAcceptedState(uint q);
 
         string GetRandomWord();
+        string[] GetRandomWords(int count);
         bool AcceptWord(string w);
         System.Tuple<int, int, string>[] VisualizationLines();
     }
 
-    public abstract class AutomatBase<TKey, TVal> : IAutomat {
+    public abstract class AutomatBase<TKey, TVal> : IAutomat where TKey : struct {
         public TransformBase<TKey, TVal> Transform { get; protected set;}
         public string[] States {get;}
         public uint StatesCount => (uint)States.Length;
@@ -76,6 +77,27 @@ namespace Serpen.Uni.Automat {
                 w = w.Insert(k, Alphabet[rnd.Next(0, Alphabet.Length)].ToString());
 
             return w;
+        }
+
+        public string[] GetRandomWords(int count) {
+            var words = new System.Collections.Specialized.StringCollection();
+            string[] wordArray = new string[count];
+
+            var rnd = Utils.RND;
+
+            while (words.Count < count)
+            {
+                string w = "";
+                var wLen = rnd.Next(0, System.Math.Max(10, count));
+                for (int k = 0; k < wLen; k++)
+                    w = w.Insert(k, Alphabet[rnd.Next(0, Alphabet.Length)].ToString());
+
+                if (!words.Contains(w))
+                    words.Add(w);
+            }
+            words.CopyTo(wordArray, 0);
+            return wordArray;
+            
         }
     }
 }

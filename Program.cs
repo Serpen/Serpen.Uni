@@ -5,13 +5,29 @@ using Serpen.Uni.Automat.ContextFree;
 
 #pragma warning disable CS0162
 
-namespace Serpen.Uni
-{
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            // Tests.ExportAllAutomatBitmaps(Tests.CastToEveryPossibility(KnownAutomat.GetAllAutomats()));
+namespace Serpen.Uni {
+    class Program {
+        static void Main(string[] args) {
+
+            var eqAutomats = Tests.CastToEveryPossibility(KnownAutomat.GetAllAutomats());
+            foreach (var a in eqAutomats) {
+                if (a.Length > 0) {
+                    foreach (string w in a[0].GetRandomWords(20)) {
+                        // string w = a[0].GetRandomWord();
+                        bool result0 = a[0].AcceptWord(w);
+                        foreach (var a2 in a) {
+                            if (a2.AcceptWord(w) != result0) {
+                                Tests.ExportAllAutomatBitmaps(a);
+                                System.Console.WriteLine($"{a2.Name} not equal {a[0].Name}");
+                                a2.AcceptWord(w);
+                            }
+                        }
+                    }
+
+                }
+            }
+            return;
+
             // var tm1 = KnownAutomat.TM1_EFAK_B87_wcw;
             var tm2 = KnownAutomat.TMk_EFAK_B87_wcw;
             // Visualization.DrawAutomat(tm1).Save(@"c:\temp\tm1.png");
@@ -20,12 +36,11 @@ namespace Serpen.Uni
             Utils.AcceptWordConsoleLine(tm2, "1c1");
             Utils.AcceptWordConsoleLine(tm2, "00c00");
             Utils.AcceptWordConsoleLine(tm2, "01c01");
-            return;
             var rnd = Utils.RND;
-            for (int i = 0; i < 30; i++)
-            {
+            for (int i = 0; i < 3000; i++) {
                 string w = tm2.GetRandomWord();
-                Utils.AcceptWordConsoleLine(tm2, w);
+                if (tm2.AcceptWord(w))
+                    Utils.AcceptWordConsoleLine(tm2, w);
                 // System.Console.WriteLine($"{tm.Name}({w})={tm.AcceptWord(w)}");
             }
 
@@ -58,7 +73,7 @@ namespace Serpen.Uni
             //     var ccfg = cfg.toChomskyNF();
             //     // Utils.AcceptWordConsoleLine(cfg, "babb");
             //     Utils.AcceptWordConsoleLine(ccfg, "babb");
-                
+
             // }
 
             // {
@@ -83,26 +98,25 @@ namespace Serpen.Uni
             //     return;
             // }
 
-            for (int i = 0; i < 20; i++)
-            {
+            for (int i = 0; i < 20; i++) {
                 // var rcfg = (CFGrammer)CFGrammer.GenerateRandom();
                 // var rccfg = rcfg.toChomskyNF();
                 // Utils.AcceptWordConsoleLine(rccfg, rccfg.GetRandomWord());
                 var nr = (NFA)NFA.GenerateRandom();
-                
+
                 var txtwr = System.IO.File.CreateText($@"{System.Environment.GetEnvironmentVariable("TEMP")}\automat\rnd\{nr.Name}-z.txt");
-                txtwr.Write(nr.ToString().Replace(";",Environment.NewLine));
+                txtwr.Write(nr.ToString().Replace(";", Environment.NewLine));
                 txtwr.Close();
 
                 // if (nr.Alphabet.Length == 2 && drmin.StatesCount>1 && drmin.StatesCount < nr.StatesCount/2) {
-                    Visualization.DrawAutomat(nr).Save($@"{System.Environment.GetEnvironmentVariable("TEMP")}\automat\rnd\{nr.Name}.png");
-                    var nrmin1 = nr;  //.RemoveUnreachable();
-                    Visualization.DrawAutomat(nrmin1).Save($@"{System.Environment.GetEnvironmentVariable("TEMP")}\automat\rnd\{nr.Name}-entf.png");
-                    var drmin = Converter.Nea2TeilmengenDea(nr);
-                    drmin = drmin.MinimizeTF();
-                    Visualization.DrawAutomat(drmin).Save($@"{System.Environment.GetEnvironmentVariable("TEMP")}\automat\rnd\{nr.Name}-min.png");
+                Visualization.DrawAutomat(nr).Save($@"{System.Environment.GetEnvironmentVariable("TEMP")}\automat\rnd\{nr.Name}.png");
+                var nrmin1 = nr;  //.RemoveUnreachable();
+                Visualization.DrawAutomat(nrmin1).Save($@"{System.Environment.GetEnvironmentVariable("TEMP")}\automat\rnd\{nr.Name}-entf.png");
+                var drmin = Converter.Nea2TeilmengenDea(nr);
+                drmin = drmin.MinimizeTF();
+                Visualization.DrawAutomat(drmin).Save($@"{System.Environment.GetEnvironmentVariable("TEMP")}\automat\rnd\{nr.Name}-min.png");
                 // }
-                
+
             }
             return;
             //return;
@@ -150,22 +164,22 @@ namespace Serpen.Uni
             // var w9 = "(a1)*b";
             // System.Console.WriteLine($"dPDA accept '{w9}': {PDA2.AcceptWord(w9)}");
             // //System.Console.WriteLine($"spda accept '{w9}': {spda.AcceptWord(w9)}");
-            
+
             // }
             return;
 
             {
-            var qpda = KnownAutomat.QPDA_simple_10;
-            var spda = (StatePDA)qpda;
-            var qpda2 = (StatePDA)spda;
-            var w8 = "1010";
-            System.Console.WriteLine($"{nameof(qpda)} accept '{w8}': {qpda.AcceptWord(w8)}");
-            System.Console.WriteLine($"{nameof(spda)} accept '{w8}': {spda.AcceptWord(w8)}");
-            System.Console.WriteLine($"{nameof(qpda2)} accept '{w8}': {qpda2.AcceptWord(w8)}");
+                var qpda = KnownAutomat.QPDA_simple_10;
+                var spda = (StatePDA)qpda;
+                var qpda2 = (StatePDA)spda;
+                var w8 = "1010";
+                System.Console.WriteLine($"{nameof(qpda)} accept '{w8}': {qpda.AcceptWord(w8)}");
+                System.Console.WriteLine($"{nameof(spda)} accept '{w8}': {spda.AcceptWord(w8)}");
+                System.Console.WriteLine($"{nameof(qpda2)} accept '{w8}': {qpda2.AcceptWord(w8)}");
             }
 
             return;
-            
+
             // var D9 = (DFA)KnownAutomat.DEA_BinFreq(2,4);
             // var dPDA = KnownAutomat.DPDA_EAFK_A611_wcwr_Palindrom;
             // var PDA = KnownAutomat.PDA_EAFK_A62_wwr_Palindrom;
@@ -183,46 +197,45 @@ namespace Serpen.Uni
             // op();
             // Concat();
             {
-            var D = Automat.KnownAutomat.DEA_ContainsOnes(4);
-            // D = DeaModel.Empty;
-            var Dm= D.MinimizeTF();
-            var N = (NFA)D;
-            var Ne= (NFAe)(N);
-            var D2= Converter.Nea2TeilmengenDea(N);
+                var D = Automat.KnownAutomat.DEA_ContainsOnes(4);
+                // D = DeaModel.Empty;
+                var Dm = D.MinimizeTF();
+                var N = (NFA)D;
+                var Ne = (NFAe)(N);
+                var D2 = Converter.Nea2TeilmengenDea(N);
 
-            // var Ne = Automat.KnownAutomat.NEAe_1659_T_22_N3;;
-            // var D = Converter.Nea2TeilmengenDea(Ne);
-            // //var N = Converter.Nea2NeaE(Ne);
-            
-            
-            string[] words;
-            // words = new string[]{""};
+                // var Ne = Automat.KnownAutomat.NEAe_1659_T_22_N3;;
+                // var D = Converter.Nea2TeilmengenDea(Ne);
+                // //var N = Converter.Nea2NeaE(Ne);
 
-            if (D.Alphabet[0] == '0')
-                words = new string[] {"0","00","101","11010010",""};
-            else
-                words = new string[] {"a","aa","bab","aababbab",""};
-            
-            // Console.WriteLine($"RegExp {Converter.DEA2RegExp(D)}");
-            // Console.WriteLine();
-            // Console.WriteLine($"RegExp {Converter.DEA2RegExp(Dm)}");
-            
-            Console.WriteLine("Automat D |{0}| minimized to Automat Dm |{1}|", D.States.Length, Dm.States.Length);
-            Console.WriteLine("Automat D |{0}| minimized to Automat D2 |{1}|", D.States.Length, D2.States.Length);
 
-            Console.WriteLine("Automat D '{0}' equals Automat Dm '{1}': {2}", D, Dm, D.Equals(Dm));
-            Console.WriteLine("Automat D '{0}' equals Automat D2 '{1}': {2}", D, D2, D.Equals(D2));
-            
-            foreach (string word in words)
-            {
-                Console.WriteLine();
-                Console.WriteLine($"DEA  Accept Word '{word}': {D.AcceptWord(word)}");
-                Console.WriteLine($"DEAm Accept Word '{word}': {Dm.AcceptWord(word)}");
-                Console.WriteLine($"NEA  Accept Word '{word}': {N.AcceptWord(word)}");
-                Console.WriteLine($"NEAe Accept Word '{word}': {Ne.AcceptWord(word)}");
-                Console.WriteLine($"DEA2 Accept Word '{word}': {D2.AcceptWord(word)}");
-            }
-            // Console.WriteLine(String.Join(',',Ne.EpsilonHuelle(new uint[] {0,1})));
+                string[] words;
+                // words = new string[]{""};
+
+                if (D.Alphabet[0] == '0')
+                    words = new string[] { "0", "00", "101", "11010010", "" };
+                else
+                    words = new string[] { "a", "aa", "bab", "aababbab", "" };
+
+                // Console.WriteLine($"RegExp {Converter.DEA2RegExp(D)}");
+                // Console.WriteLine();
+                // Console.WriteLine($"RegExp {Converter.DEA2RegExp(Dm)}");
+
+                Console.WriteLine("Automat D |{0}| minimized to Automat Dm |{1}|", D.States.Length, Dm.States.Length);
+                Console.WriteLine("Automat D |{0}| minimized to Automat D2 |{1}|", D.States.Length, D2.States.Length);
+
+                Console.WriteLine("Automat D '{0}' equals Automat Dm '{1}': {2}", D, Dm, D.Equals(Dm));
+                Console.WriteLine("Automat D '{0}' equals Automat D2 '{1}': {2}", D, D2, D.Equals(D2));
+
+                foreach (string word in words) {
+                    Console.WriteLine();
+                    Console.WriteLine($"DEA  Accept Word '{word}': {D.AcceptWord(word)}");
+                    Console.WriteLine($"DEAm Accept Word '{word}': {Dm.AcceptWord(word)}");
+                    Console.WriteLine($"NEA  Accept Word '{word}': {N.AcceptWord(word)}");
+                    Console.WriteLine($"NEAe Accept Word '{word}': {Ne.AcceptWord(word)}");
+                    Console.WriteLine($"DEA2 Accept Word '{word}': {D2.AcceptWord(word)}");
+                }
+                // Console.WriteLine(String.Join(',',Ne.EpsilonHuelle(new uint[] {0,1})));
             }
         }
     }

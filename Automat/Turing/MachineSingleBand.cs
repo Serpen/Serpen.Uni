@@ -2,7 +2,7 @@
 namespace Serpen.Uni.Automat.Turing {
     public class TuringMachineSingleBand : TuringMachineBase {
 
-        public new readonly TuringTransformSingleBand Transform;
+        //public new readonly TuringTransformSingleBand Transform;
 
         public TuringMachineSingleBand(string name, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, TuringTransformSingleBand transform, uint startState, char blankSymbol, uint[] acceptedStates)
             : base(name, stateCount, inputAlphabet, bandAlphabet, startState, blankSymbol, acceptedStates) {
@@ -23,11 +23,13 @@ namespace Serpen.Uni.Automat.Turing {
                 return null;
         }
 
-        public override bool AcceptWord(string w) {
+        public override bool AcceptWord(string w) => AcceptWord(w, true);
+        public bool AcceptWord(string w, bool wordConsumed) {
             var tcfg = new TuringConfigSingleBand(BlankSymbol, w, 0) {State=StartState};
             int runs = 0;
             uint lastQ = tcfg.State;
-            while (tcfg != null && !IsAcceptedState(tcfg.State)) {
+            while (tcfg != null && (!IsAcceptedState(tcfg.State) || wordConsumed) && (!wordConsumed || tcfg.Band.Replace(BlankSymbol.ToString(), "") != "")) {
+                Utils.DebugMessage(tcfg.ToString(), this);
                 tcfg = GoChar(tcfg);
                 if (tcfg != null)
                     lastQ = tcfg.State;
@@ -35,7 +37,7 @@ namespace Serpen.Uni.Automat.Turing {
                     throw new TuringCycleException($"possible Turing cycle at {runs} with {w} now is: {tcfg.Band.Trim(BlankSymbol)}");
                 runs++;
             }
-            if (IsAcceptedState(lastQ))
+            if (tcfg != null && IsAcceptedState(lastQ) && (!wordConsumed || tcfg.Band.Replace(BlankSymbol.ToString(), "") == ""))
                 return true;
             else
                 return false;
@@ -69,5 +71,17 @@ namespace Serpen.Uni.Automat.Turing {
         public override string ToString()
             => $"{Name} TM(|{States.Length}|={string.Join(";", States)}), {{{string.Join(',', Alphabet)}}},{{{string.Join(',', BandAlphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {BlankSymbol}, {{{string.Join(',', AcceptedStates)}}})".Trim();
 
+        public static explicit operator TuringMachineSingleBand(Finite.DFA dfa) {
+            var tt = new TuringTransformSingleBand();
+            foreach (var dt in dfa.Transform) {
+                var tkey = new TuringTransformSingleBand.TuringKey(dt.Key.q, dt.Key.c.Value);
+                var tval = new TuringTransformSingleBand.TuringVal(dt.Value[0], BLANK, TMDirection.Right);
+                tt.Add(tkey, tval);
+            }
+            var bandAlphabet = new System.Collections.Generic.List<char>(dfa.Alphabet.Length+1);
+            bandAlphabet.AddRange(dfa.Alphabet);
+            bandAlphabet.Add(BLANK);
+            return new Turing.TuringMachineSingleBand($"TM_({dfa.Name})", dfa.States, dfa.Alphabet, bandAlphabet.ToArray(), tt, dfa.StartState, BLANK, dfa.AcceptedStates);
+        }
     }
 }

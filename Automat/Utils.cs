@@ -1,3 +1,6 @@
+#define VERBOSE
+// #undef VERBOSE
+
 using System.Collections.Generic;
 using System.Linq;
 
@@ -47,15 +50,21 @@ namespace Serpen.Uni.Automat {
             return true;
         }
 
-        internal static void DebugMessage(string message) {
+
+#if VERBOSE
+        internal static void DebugMessage(string message) => DebugMessage(message, null);
+        internal static void DebugMessage(string message, IAutomat a) {
             var stack = new System.Diagnostics.StackTrace();
             System.Diagnostics.Debug.WriteLine("DBG: " + 
                 stack.GetFrame(1).GetMethod().DeclaringType.Name + "." +
                 stack.GetFrame(1).GetMethod().Name + 
                 ":" + stack.GetFrame(1).GetILOffset() + " " +
+                (a != null ? "[" + a.Name + "] " : " ") +
                 message);
         }
-
+#else
+        internal static void DebugMessage(string message, IAutomat) {}
+#endif
         internal static void AcceptWordConsoleLine(IAutomat A, string w) {
             try {
                 System.Console.WriteLine($"{A.Name} accepts '{w}': {A.AcceptWord(w)}");
