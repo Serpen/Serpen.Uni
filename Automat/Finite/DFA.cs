@@ -265,6 +265,91 @@ namespace Serpen.Uni.Automat.Finite {
                 throw new NotImplementedException("Different Alphabets are not implemented");
         }
 
+        public static DFA GenerateRandom() {
+            const byte MAX_STATES = 20;
+            const byte MAX_CHAR = 7;
+
+            var rnd = Utils.RND;
+
+            var t = new FATransform();
+
+            int stateCount = rnd.Next(1, MAX_STATES);
+
+            //generate Random Alphabet
+            char[] alphabet = new char[rnd.Next(1, MAX_CHAR)];
+            for (int i=0; i < alphabet.Length; i++)
+                alphabet[i] = (char)rnd.Next('a', 'z');
+            alphabet = alphabet.Distinct().ToArray();
+
+            for (uint i = 0; i < stateCount; i++) {
+                char[] rndAlph = Utils.RandomizeArray(alphabet);
+                for (int j = 0; j < rndAlph.Length; j++) {
+                    t.AddM(i, alphabet[j], (uint)rnd.Next(0, stateCount));
+                }
+            }
+
+            uint[] accState = new uint[rnd.Next(1, System.Math.Max(1,stateCount/3))];
+            for (int i=0; i < accState.Length; i++)
+                accState[i] = (uint)rnd.Next(0, stateCount);
+
+            accState = accState.Distinct().ToArray();
+
+            var ret = new DFA("DFA_Random", (uint)stateCount, alphabet, t, (uint)rnd.Next(0,stateCount), accState);
+            ret.Name = $"DFA_Random_{ret.GetHashCode()}";
+            return ret;
+
+        }
+
+        public override IAutomat RemoveUnreachable() {
+            var newT = new FATransform();
+
+            bool[] fromStartReachable = new bool[StatesCount];
+            fromStartReachable[StartState] = true;
+            bool foundnew = true;
+            while (foundnew) {
+                foundnew = false;
+                foreach (var t in (from tr in Transform where fromStartReachable[tr.Key.q] select tr)) {
+                    foreach (var v in (from vr in t.Value where !fromStartReachable[vr] select vr)) {
+                        fromStartReachable[v] = true;
+                        foundnew = true;
+                    }
+                }
+            }
+
+            uint[] translate = new uint[(from fsr in fromStartReachable where fsr select fsr).Count()];
+            for (uint i=0; i < translate.Length; i++) {
+                uint j=i;
+                if (i>0)
+                    j = System.Math.Max(i, translate[i-1]+1);
+                while (!fromStartReachable[j])
+                    j++;
+                translate[i] = j;
+            }
+
+            string[] names = new string[translate.Length];
+            for (int i = 0; i < translate.Length; i++)
+                names[i] = translate[i].ToString();
+
+            if (Utils.ArrayIndex(translate,StartState) > 100) {
+                Utils.DebugMessage("removed with high start state", this);
+            }
+                
+            foreach (var t2 in Transform)
+                if (translate.Contains(t2.Key.q))
+                    foreach (var v in t2.Value)
+                        if (translate.Contains(v))
+                            newT.AddM(Utils.ArrayIndex(translate,t2.Key.q), t2.Key.c.Value, Utils.ArrayIndex(translate,v));
+            
+            var astates = new System.Collections.Generic.List<uint>();
+            foreach (var accept in AcceptedStates)
+                if (translate.Contains(accept))
+                    astates.Add(Utils.ArrayIndex(translate,accept));
+
+            return new DFA($"{Name}_minmized", names, Alphabet, newT, Utils.ArrayIndex(translate,StartState), astates.ToArray());
+        
+        }
+
+
         public static readonly DFA Empty = new DFA("DFA_Empty", new String[] { }, new char[] { }, new FATransform(), 0, new uint[] { });
 
         public override bool Equals(object obj1) {
@@ -291,7 +376,7 @@ namespace Serpen.Uni.Automat.Finite {
         public override int GetHashCode() => ToString().GetHashCode();
 
         public override string ToString()
-            => $"{Name} DEA(|{StatesCount}|={string.Join(";", States)}), {{{String.Join(',', Alphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {{{string.Join(',', AcceptedStates)}}})".Trim();
+            => $"{Name} DEA(|{StatesCount}|={string.Join(";", States)}, {{{String.Join(',', Alphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {{{string.Join(',', AcceptedStates)}}})".Trim();
 
         /// <summary>
         /// Table Filling Algorithm for minimize a DEA

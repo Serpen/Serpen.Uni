@@ -2,14 +2,16 @@ using System.Linq;
 
 namespace Serpen.Uni.Automat.Turing {
 public class TuringTransformMultiTrack : TransformBase<TuringTransformMultiTrack.TuringKey, TuringTransformMultiTrack.TuringVal> {
-        string[] States { get; }
-        public TuringTransformMultiTrack(string[] states) {
-            States = states;
+        internal string[] StateTracks { get; }
+        public TuringTransformMultiTrack(string[] stateTracks) {
+            StateTracks = stateTracks;
         }
         
         public void AddByStateStoreAndTracks(string q, string c1, string qNext, string c2, TMDirection dir) {
-            Add(new TuringTransformMultiTrack.TuringKey(Utils.ArrayIndex(States, q), c1.Replace(",", "").ToCharArray().Reverse().ToArray()),
-                new TuringTransformMultiTrack.TuringVal(Utils.ArrayIndex(States, qNext), c2.Replace(",", "").ToCharArray().Reverse().ToArray(), dir));
+            Add(new TuringTransformMultiTrack.TuringKey(Utils.ArrayIndex(StateTracks, q), 
+                    c1.Replace(",", "").ToCharArray().Reverse().ToArray()),
+                new TuringTransformMultiTrack.TuringVal(Utils.ArrayIndex(StateTracks, qNext), 
+                    c2.Replace(",", "").ToCharArray().Reverse().ToArray(), dir));
 
         }
         

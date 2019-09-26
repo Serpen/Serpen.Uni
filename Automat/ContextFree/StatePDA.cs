@@ -7,6 +7,10 @@ namespace Serpen.Uni.Automat.ContextFree {
          : base(name, StatesCount, InputAlphabet, Workalphabet, Transform, StartState, Startstacksymbol, AcceptedStates) {
         }
 
+        public StatePDA(string name, string[] names, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char Startstacksymbol, uint[] AcceptedStates)
+         : base(name, names, InputAlphabet, Workalphabet, Transform, StartState, Startstacksymbol, AcceptedStates) {
+        }
+
         
         [System.ComponentModel.Description("EAFK_A64")]
         public static explicit operator StatePDA(StackPDA pda) {
@@ -135,6 +139,94 @@ namespace Serpen.Uni.Automat.ContextFree {
             }
 
             return false;
+        }
+
+        public static StatePDA GenerateRandom() {
+            const byte MAX_STATES = 20;
+            const byte MAX_CHAR = 7;
+
+            var rnd = Utils.RND;
+
+            var t = new PDATransform();
+            int stateCount = rnd.Next(1, MAX_STATES);
+
+            char[] inputAlphabet = new char[rnd.Next(1, MAX_CHAR)];
+            for (int i=0; i < inputAlphabet.Length; i++)
+                inputAlphabet[i] = (char)rnd.Next('a', 'z');
+            inputAlphabet = inputAlphabet.Distinct().ToArray();
+
+            char[] workAlphabet = new char[rnd.Next(1, MAX_CHAR)];
+            for (int i=1; i < workAlphabet.Length; i++)
+                workAlphabet[i] = (char)rnd.Next('a', 'z');
+            workAlphabet[0] = START;
+            workAlphabet = workAlphabet.Distinct().ToArray();
+
+            for (uint i = 0; i < stateCount; i++) {
+                int transformsRnd = rnd.Next(0, inputAlphabet.Length);
+                for (int j = 0; j < transformsRnd; j++) {
+                    t.AddM(i, Utils.GrAE(inputAlphabet), Utils.GrAE(workAlphabet), Utils.GrAE(workAlphabet).ToString(), (uint)rnd.Next(0, stateCount));
+                }
+            }
+
+            uint[] accState = new uint[rnd.Next(1, System.Math.Max(1,stateCount/3))];
+            for (int i=0; i < accState.Length; i++)
+                accState[i] = (uint)rnd.Next(0, stateCount);
+
+            accState = accState.Distinct().ToArray();
+
+            var ret = new StatePDA("QPDA_Random", (uint)stateCount, inputAlphabet, workAlphabet , t, (uint)rnd.Next(0,stateCount), START , accState);
+            ret.Name = $"QPDA_Random_{ret.GetHashCode()}";
+            return ret;
+        }
+
+        
+        public override IAutomat RemoveUnreachable() {
+            var newT = new PDATransform();
+
+            bool[] fromStartReachable = new bool[StatesCount];
+            fromStartReachable[StartState] = true;
+            bool foundnew = true;
+            while (foundnew) {
+                foundnew = false;
+                foreach (var t in (from tr in Transform where fromStartReachable[tr.Key.q] select tr)) {
+                    foreach (var v in (from vr in t.Value where !fromStartReachable[vr.qNext] select vr)) {
+                        fromStartReachable[v.qNext] = true;
+                        foundnew = true;
+                    }
+                }
+            }
+
+            uint[] translate = new uint[(from fsr in fromStartReachable where fsr select fsr).Count()];
+            for (uint i=0; i < translate.Length; i++) {
+                uint j=i;
+                if (i>0)
+                    j = System.Math.Max(i, translate[i-1]+1);
+                while (!fromStartReachable[j])
+                    j++;
+                translate[i] = j;
+            }
+
+            string[] names = new string[translate.Length];
+            for (int i = 0; i < translate.Length; i++)
+                names[i] = translate[i].ToString();
+
+            if (Utils.ArrayIndex(translate,StartState) > 100) {
+                Utils.DebugMessage("removed with high start state", this);
+            }
+                
+            foreach (var t2 in Transform)
+                if (translate.Contains(t2.Key.q))
+                    foreach (var v in t2.Value)
+                        if (translate.Contains(v.qNext))
+                            newT.AddM(Utils.ArrayIndex(translate,t2.Key.q), t2.Key.ci, t2.Key.cw, v.cw2, Utils.ArrayIndex(translate,v));
+            
+            var astates = new System.Collections.Generic.List<uint>();
+            foreach (var accept in AcceptedStates)
+                if (translate.Contains(accept))
+                    astates.Add(Utils.ArrayIndex(translate,accept));
+
+            return new StatePDA($"{Name}_minmized", names, Alphabet, WorkAlphabet, newT, Utils.ArrayIndex(translate,StartState), StartStackSymbol, astates.ToArray());
+        
         }
     }
 }

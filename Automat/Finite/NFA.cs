@@ -63,8 +63,7 @@ namespace Serpen.Uni.Automat.Finite {
 
         public override int GetHashCode() => ToString().GetHashCode();
 
-        [System.Obsolete("buggy")]
-        public NFA RemoveUnreachable() {
+        public override IAutomat RemoveUnreachable() {
             var newT = new NFAeTransform();
 
             bool[] fromStartReachable = new bool[StatesCount];
@@ -76,17 +75,26 @@ namespace Serpen.Uni.Automat.Finite {
                     foreach (var v in (from vr in t.Value where !fromStartReachable[vr] select vr)) {
                         fromStartReachable[v] = true;
                         foundnew = true;
-                        
                     }
                 }
             }
 
-            var translate = new uint[(from fsr in fromStartReachable where fsr select fsr).Count()];
-            for (uint i=0,j=0; i < translate.Length; i++) {
-                translate[i] = j;
-                do
+            uint[] translate = new uint[(from fsr in fromStartReachable where fsr select fsr).Count()];
+            for (uint i=0; i < translate.Length; i++) {
+                uint j=i;
+                if (i>0)
+                    j = System.Math.Max(i, translate[i-1]+1);
+                while (!fromStartReachable[j])
                     j++;
-                while (j < translate.Length && !fromStartReachable[j]);
+                translate[i] = j;
+            }
+
+            string[] names = new string[translate.Length];
+            for (int i = 0; i < translate.Length; i++)
+                names[i] = translate[i].ToString();
+
+            if (Utils.ArrayIndex(translate,StartState) > 100) {
+                Utils.DebugMessage("removed with high start state", this);
             }
                 
             foreach (var t2 in Transform)
@@ -100,9 +108,10 @@ namespace Serpen.Uni.Automat.Finite {
                 if (translate.Contains(accept))
                     astates.Add(Utils.ArrayIndex(translate,accept));
 
-            return new NFA($"MinimizeUnreachable({Name})", (uint)translate.Length, Alphabet, newT, Utils.ArrayIndex(translate,StartState), astates.ToArray());
+            return new NFA($"{Name}_minmized", names, Alphabet, newT, Utils.ArrayIndex(translate,StartState), astates.ToArray());
         
         }
+        
         public static NFA GenerateRandom() {
             const byte MAX_STATES = 20;
             const byte MAX_CHAR = 7;
@@ -120,8 +129,7 @@ namespace Serpen.Uni.Automat.Finite {
             for (uint i = 0; i < stateCount; i++) {
                 int transformsRnd = rnd.Next(0,alphabet.Length);
                 for (int j = 0; j < transformsRnd; j++) {
-                    var k = new EATuple(i, alphabet[rnd.Next(0,alphabet.Length)]);
-                    t.AddM(i, alphabet[j], (uint)rnd.Next(0, stateCount));
+                    t.AddM(i, Utils.GrAE(alphabet), (uint)rnd.Next(0, stateCount));
                 }
             }
 
@@ -201,7 +209,7 @@ namespace Serpen.Uni.Automat.Finite {
             return new NFA($"NFA_({D.Name})", D.StatesCount, D.Alphabet, t, D.StartState, D.AcceptedStates);
         }
 
-        public override string ToString() => $"{Name} NEA(|{States.Length}|={string.Join(";", States)}), {{{string.Join(',', Alphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {{{string.Join(',', AcceptedStates)}}})".Trim();
+        public override string ToString() => $"{Name} NEA(|{States.Length}|={string.Join(";", States)}, {{{string.Join(',', Alphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {{{string.Join(',', AcceptedStates)}}})".Trim();
     
         public FABase Union(FABase A) => throw new System.NotImplementedException();
         public FABase Intersect(FABase A) => throw new System.NotImplementedException();

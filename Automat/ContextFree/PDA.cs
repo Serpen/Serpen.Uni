@@ -18,21 +18,33 @@ namespace Serpen.Uni.Automat.ContextFree {
         /// <summary>
         /// Create a PDA which accepts when ending in Accepted States
         /// </summary>
-        /// <param name="StatesCount"></param>
-        /// <param name="InputAlphabet"></param>
-        /// <param name="Workalphabet"></param>
-        /// <param name="Transform"></param>
-        /// <param name="StartState"></param>
-        /// <param name="Startstacksymbol"></param>
-        /// <param name="AcceptedStates">Accepted Endstates</param>
-        public PDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char Startstacksymbol, uint[] AcceptedStates)
-        : base(StatesCount, InputAlphabet, StartState, name) {
-            this.WorkAlphabet = Workalphabet;
-            if (!Workalphabet.Contains(Startstacksymbol))
-                this.WorkAlphabet = this.WorkAlphabet.Append(Startstacksymbol).ToArray();
-            this.Transform = Transform;
-            this.StartStackSymbol = Startstacksymbol;
-            this.AcceptedStates = AcceptedStates;
+        /// <param name="statesCount"></param>
+        /// <param name="inputAlphabet"></param>
+        /// <param name="workalphabet"></param>
+        /// <param name="transform"></param>
+        /// <param name="startState"></param>
+        /// <param name="startstacksymbol"></param>
+        /// <param name="acceptedStates">Accepted Endstates</param>
+        public PDA(string name, uint statesCount, char[] inputAlphabet, char[] workalphabet, PDATransform transform, uint startState, char startstacksymbol, uint[] acceptedStates)
+        : base(statesCount, inputAlphabet, startState, name) {
+            this.WorkAlphabet = workalphabet;
+            if (!workalphabet.Contains(startstacksymbol))
+                this.WorkAlphabet = this.WorkAlphabet.Append(startstacksymbol).ToArray();
+            this.Transform = transform;
+            this.StartStackSymbol = startstacksymbol;
+            this.AcceptedStates = acceptedStates;
+
+            CheckConstraints();
+        }
+
+        public PDA(string name, string[] states, char[] inputAlphabet, char[] workalphabet, PDATransform transform, uint startState, char startStacksymbol, uint[] acceptedStates)
+        : base(states, inputAlphabet, startState, name) {
+            this.WorkAlphabet = workalphabet;
+            if (!workalphabet.Contains(startStacksymbol))
+                this.WorkAlphabet = this.WorkAlphabet.Append(startStacksymbol).ToArray();
+            this.Transform = transform;
+            this.StartStackSymbol = startStacksymbol;
+            this.AcceptedStates = acceptedStates;
 
             CheckConstraints();
         }
@@ -149,7 +161,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         public abstract override bool AcceptWord(string w);
 
-        public override System.Tuple<int, int, string>[] VisualizationLines() {
+                public override System.Tuple<int, int, string>[] VisualizationLines() {
             var tcol = new System.Collections.Generic.List<System.Tuple<int, int, string>>();
             foreach (var t in Transform) {
                 foreach (var v in t.Value) {

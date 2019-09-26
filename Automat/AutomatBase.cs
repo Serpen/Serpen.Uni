@@ -15,6 +15,8 @@ namespace Serpen.Uni.Automat {
         string GetRandomWord();
         string[] GetRandomWords(int count);
         bool AcceptWord(string w);
+        IAutomat RemoveUnreachable();
+
         System.Tuple<int, int, string>[] VisualizationLines();
     }
 
@@ -64,6 +66,8 @@ namespace Serpen.Uni.Automat {
         public bool IsAcceptedState(uint q) {
             return AcceptedStates.Contains(q);
         }
+
+        public abstract IAutomat RemoveUnreachable();
 
         public abstract System.Tuple<int, int, string>[] VisualizationLines();
 

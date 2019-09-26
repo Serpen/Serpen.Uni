@@ -149,6 +149,40 @@ namespace Serpen.Uni.Automat {
             return true;
         }
 
+        public static IAutomat[] GenerateRandomAutomats(int count) {
+            var retAut = new System.Collections.Generic.List<IAutomat>();
+            for (int i = 0; i < count; i++)
+            {
+                retAut.Add(DFA.GenerateRandom());
+                retAut.Add(NFA.GenerateRandom());
+                retAut.Add(NFAe.GenerateRandom());
+                retAut.Add(StatePDA.GenerateRandom());
+                retAut.Add(StackPDA.GenerateRandom());
+                retAut.Add(DPDA.GenerateRandom());
+                retAut.Add(TuringMachineSingleBand.GenerateRandom());
+                retAut.Add(TuringMachineSingleBand1659.GenerateRandom());
+                // retAut.Add(TuringMachineMultiTrack.GenerateRandom());
+            }
+            return retAut.ToArray();
+        }
+
+        public static void RemoveUnusedEquality(IAutomat[] automats) {
+            foreach (IAutomat a in automats) {
+                if (a is NFA nfa) {
+                    var nfa_removed = nfa.RemoveUnreachable();
+                    string[] rwords = nfa.GetRandomWords(100); 
+                    for (int i = 0; i < rwords.Length; i++)
+                    {
+                        if (!nfa.AcceptWord(rwords[i]) == nfa_removed.AcceptWord(rwords[i]))
+                            throw new Uni.Exception($"Automats {nfa} not equal {nfa_removed} by word");
+                    }
+                    if (!nfa.Equals(nfa_removed)) {
+                        throw new Uni.Exception($"Automats {nfa} not equal {nfa_removed}");
+                    }
+                }
+            }
+        }
+
         public static void ExportAllAutomatBitmaps() => ExportAllAutomatBitmaps(KnownAutomat.GetAllAutomats());
         public static void ExportAllAutomatBitmaps(IAutomat[] As) {
             {

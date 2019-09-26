@@ -141,13 +141,7 @@ namespace Serpen.Uni.Automat.Finite {
             for (uint i = 0; i < stateCount; i++) {
                 int transformsRnd = rnd.Next(0, alphabet.Length);
                 for (int j = 0; j < transformsRnd; j++) {
-                    var rndInt = rnd.Next(0, (int)System.Math.Max(alphabet.Length + 2, (int)alphabet.Length * 1.2));
-                    EATuple k;
-                    if (rndInt <= alphabet.Length)
-                        k = new EATuple(i, alphabet[rndInt]);
-                    else
-                        k = new EATuple(i, null);
-                    t.AddM(i, alphabet[j], (uint)rnd.Next(0, stateCount));
+                    t.AddM(i, Utils.GrAE(alphabet), (uint)rnd.Next(0, stateCount));
                 }
             }
 
@@ -161,6 +155,55 @@ namespace Serpen.Uni.Automat.Finite {
             ret.Name = $"NFAe_Random_{ret.GetHashCode()}";
             return ret;
 
+        }
+
+        public override IAutomat RemoveUnreachable() {
+            var newT = new NFAeTransform();
+
+            bool[] fromStartReachable = new bool[StatesCount];
+            fromStartReachable[StartState] = true;
+            bool foundnew = true;
+            while (foundnew) {
+                foundnew = false;
+                foreach (var t in (from tr in Transform where fromStartReachable[tr.Key.q] select tr)) {
+                    foreach (var v in (from vr in t.Value where !fromStartReachable[vr] select vr)) {
+                        fromStartReachable[v] = true;
+                        foundnew = true;
+                    }
+                }
+            }
+
+            uint[] translate = new uint[(from fsr in fromStartReachable where fsr select fsr).Count()];
+            for (uint i=0; i < translate.Length; i++) {
+                uint j=i;
+                if (i>0)
+                    j = System.Math.Max(i, translate[i-1]+1);
+                while (!fromStartReachable[j])
+                    j++;
+                translate[i] = j;
+            }
+
+            string[] names = new string[translate.Length];
+            for (int i = 0; i < translate.Length; i++)
+                names[i] = translate[i].ToString();
+
+            if (Utils.ArrayIndex(translate,StartState) > 100) {
+                Utils.DebugMessage("removed with high start state", this);
+            }
+                
+            foreach (var t2 in Transform)
+                if (translate.Contains(t2.Key.q))
+                    foreach (var v in t2.Value)
+                        if (translate.Contains(v))
+                            newT.AddM(Utils.ArrayIndex(translate,t2.Key.q), t2.Key.c.Value, Utils.ArrayIndex(translate,v));
+            
+            var astates = new System.Collections.Generic.List<uint>();
+            foreach (var accept in AcceptedStates)
+                if (translate.Contains(accept))
+                    astates.Add(Utils.ArrayIndex(translate,accept));
+
+            return new NFAe($"{Name}_minmized", names, Alphabet, newT, Utils.ArrayIndex(translate,StartState), astates.ToArray());
+        
         }
 
 
@@ -263,7 +306,7 @@ namespace Serpen.Uni.Automat.Finite {
         }
 
         public override string ToString() {
-            return $"{Name} NEAe(|{StatesCount}|={string.Join(";", States)}), {{{String.Join(',', Alphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {{{string.Join(',', AcceptedStates)}}})".Trim();
+            return $"{Name} NEAe(|{StatesCount}|={string.Join(";", States)}, {{{String.Join(',', Alphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {{{string.Join(',', AcceptedStates)}}})".Trim();
         }
 
         public FABase Union(FABase A) => throw new System.NotImplementedException();

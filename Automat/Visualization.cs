@@ -1,6 +1,5 @@
 using System.Drawing;
 using Math = System.Math;
-using System.Linq;
 
 namespace Serpen.Uni.Automat {
     public static class Visualization {
@@ -40,7 +39,7 @@ namespace Serpen.Uni.Automat {
                 return tmpen;
             }
         }
-        static readonly Font FONT = new Font(SystemFonts.DefaultFont.FontFamily, 14);
+        static readonly Font FONT = new Font("Courier New", 14);
 
         static readonly Pen PEN = Pens.Black;
 
@@ -88,19 +87,20 @@ namespace Serpen.Uni.Automat {
             g.DrawString(A.Name, headFont, Brushes.Black, 20, 20);
 
             //Draw full declaration to bottom
-            var toString = A.ToString();
+            var FullDesc = A.ToString();
             try {
-                toString = toString.Replace(A.Name, "").Trim();
+                FullDesc = FullDesc.Replace(A.Name, "").Trim();
             } catch { }
-            var toStringSize = g.MeasureString(toString, FONT);
-            if (toStringSize.Width < bmpwidth)
-                g.DrawString(toString, FONT, Brushes.Black, 20, bmp.Height - toStringSize.Height * 2);
+
+            var FullDescSize = g.MeasureString(new string(' ', 10) + FullDesc + new string(' ', 10), FONT);
+            if (FullDescSize.Width < bmpwidth-30)
+                g.DrawString(FullDesc, FONT, Brushes.Black, 15, bmp.Height - FullDescSize.Height * 2);
             else {
-                int toStringSplits = (int)Math.Ceiling(bmpwidth-30 / toStringSize.Width) + 1;
-                int toStringSplitFactor = toString.Length / toStringSplits;
-                for (int i = 0; i < toStringSplits; i++) {
-                    g.DrawString(toString.Substring(i * toStringSplitFactor, toStringSplitFactor),
-                        FONT, Brushes.Black, 15, bmp.Height - toStringSplits * toStringSize.Height + i * toStringSize.Height);
+                int DescPartCount = (int)Math.Ceiling((bmpwidth-15*3) / (FullDescSize.Width+10)) + 2;
+                int toStringSplitFactor = FullDesc.Length / DescPartCount;
+                for (int i = 0; i < DescPartCount; i++) {
+                    g.DrawString(FullDesc.Substring(i * toStringSplitFactor, toStringSplitFactor),
+                        FONT, Brushes.Black, 15, bmp.Height - (DescPartCount-i+1) * (FullDescSize.Height+2));
                 }
             }
 
