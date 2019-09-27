@@ -7,13 +7,11 @@ namespace Serpen.Uni.Automat.Turing {
 
         public TuringMachineMultiTrack(string name, uint tracks, string[] states, char[] inputAlphabet, char[] bandAlphabet, TuringTransformMultiTrack transform, uint startState, char blankSymbol, uint[] acceptedStates)
             : base(name, states, inputAlphabet, bandAlphabet, startState, blankSymbol, acceptedStates) {
-            // Transform = transform;
             Tracks = tracks;
         }
 
         public TuringMachineMultiTrack(string name, uint tracks, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, TuringTransformMultiTrack transform, uint startState, char blankSymbol, uint[] acceptedStates)
             : base(name, stateCount, inputAlphabet, bandAlphabet, startState, blankSymbol, acceptedStates) {
-            // Transform = transform;
             Tracks = tracks;
         }
 
@@ -29,18 +27,18 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         public override bool AcceptWord(string w) {
-            string[] newW = new string[Tracks];
-            newW[0] = w;
+            string[] wordTracks = new string[Tracks];
+            wordTracks[0] = w;
             for (int i = 1; i < Tracks; i++)
-                newW[i] = new string(BlankSymbol, w.Length);
-            string way = "";
-            Utils.DebugMessage($"w: {w}=>{string.Join(',', newW)}", this);
-            var tcfg = new TuringConfigMultiTrack(BlankSymbol, newW, 0) { q = StartState };
+                wordTracks[i] = new string(BlankSymbol, w.Length);
+            Utils.DebugMessage($"w: {w}=>{string.Join(',', wordTracks)}", this);
+            
+            var tcfg = new TuringConfigMultiTrack(BlankSymbol, wordTracks, 0) { q = StartState };
+            
             int runs = 0;
             uint lastQ = tcfg.q;
             while (tcfg != null && !IsAcceptedState(tcfg.q)) {
                 Utils.DebugMessage(tcfg.ToString(), this);
-                way += $"({lastQ.ToString()}/{States[lastQ]}/{tcfg.Band[0]}|{tcfg.Band[1]}/{tcfg.Position}),";
                 tcfg = GoChar(tcfg);
                 if (tcfg != null)
                     lastQ = tcfg.q;
@@ -54,20 +52,27 @@ namespace Serpen.Uni.Automat.Turing {
                 return false;
         }
 
-        // public string GetBandOutput(string w) {
-        //     var tcfg = new TuringConfigRealMultiTrack(BlankSymbol, w, 0);
-        //     int runs = 0;
-        //     string lastBand = tcfg.Band;
-        //     while (tcfg != null && !IsAcceptedState(tcfg.q)) {
-        //         tcfg = GoChar(tcfg);
-        //         if (tcfg != null)
-        //             lastBand = tcfg.Band;
-        //         if (runs > MAX_TURING_RUNS)
-        //             throw new TuringCycleException($"possible Turing cycle at {runs} with {w} now is: {tcfg.Band.Trim(BlankSymbol)}");
-        //         runs++;
-        //     }
-        //     return lastBand.Trim(BlankSymbol);
-        // }
+        public override string GetBandOutput(string w) {
+            string[] wordTracks = new string[Tracks];
+            wordTracks[0] = w;
+            for (int i = 1; i < Tracks; i++)
+                wordTracks[i] = new string(BlankSymbol, w.Length);
+            Utils.DebugMessage($"w: {w}=>{string.Join(',', wordTracks)}", this);
+            
+            var tcfg = new TuringConfigMultiTrack(BlankSymbol, wordTracks, 0) { q = StartState };
+            
+            int runs = 0;
+            string lastBand = tcfg.Band[0];
+            while (tcfg != null && !IsAcceptedState(tcfg.q)) {
+                tcfg = GoChar(tcfg);
+                if (tcfg != null)
+                    lastBand = tcfg.Band[0];
+                if (runs > MAX_TURING_RUNS)
+                    throw new TuringCycleException($"possible Turing cycle at {runs} with {w} now is: {lastBand.Trim(BlankSymbol)}");
+                runs++;
+            }
+            return lastBand.Trim(BlankSymbol);
+        }
 
         public override IAutomat PurgeStates() {
             (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
@@ -85,7 +90,33 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         public static TuringMachineMultiTrack GenerateRandom() {
-            throw new System.NotImplementedException();
+            int stateCount = Utils.RND.Next(1, 20);
+            char[] inputAlphabet = RandomGenerator.RandomAlphabet(1,20);
+            char[] bandAlphabet = RandomGenerator.RandomAlphabet(1,20, inputAlphabet.Append(BLANK), 0);
+            uint trackCount = (uint)Utils.RND.Next(1,5);
+            string[] TrackTranslate = new string[Utils.RND.Next(1,10)];
+            for (int i = 0; i < TrackTranslate.Length; i++)
+            {
+                var curChars = new string[trackCount];
+                for (int j = 0; j < trackCount; j++)
+                    curChars[j] = ((char)(Utils.GrAE(bandAlphabet))).ToString();
+                TrackTranslate[i] = string.Join(",", curChars);
+            }
+            uint[] accState = RandomGenerator.RandomAcceptedStates(1, stateCount/3, stateCount); 
+
+            var t = new TuringTransformMultiTrack(TrackTranslate);
+            for (uint i = 0; i < stateCount; i++) {
+                int transformsRnd = Utils.RND.Next(0, inputAlphabet.Length);
+                for (uint j = 0; j < transformsRnd; j++) {
+                    var tk = new TuringTransformMultiTrack.TuringKey(i, Utils.GrAE(TrackTranslate).ToCharArray());
+                    var tv = new TuringTransformMultiTrack.TuringVal(j, Utils.GrAE(TrackTranslate).ToCharArray(), TMDirection.Right);
+                    t.TryAdd(tk,tv);
+                }
+            }
+
+            var ret = new TuringMachineMultiTrack($"TM{trackCount}_Random", trackCount, (uint)stateCount, inputAlphabet, bandAlphabet , t, (uint)Utils.RND.Next(0,stateCount), BLANK , accState);
+            ret.Name = $"TM{trackCount}_Random_{ret.GetHashCode()}";
+            return ret;
         }
 
         public override System.Tuple<int, int, string>[] VisualizationLines() {
