@@ -8,7 +8,6 @@ namespace Serpen.Uni.Automat.ContextFree {
         public CFGrammer(string name, char[] variables, char[] terminals, RuleSet rules, char startSymbol)
             : base(name, variables, terminals, rules, startSymbol) {
             
-
             CheckConstraints();
         }
 

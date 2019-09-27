@@ -31,7 +31,7 @@ namespace Serpen.Uni.Automat.Turing {
 
         protected const int MAX_TURING_RUNS = 10000;
         
-        // public abstract string GetBandOutput(string w);
+        public abstract string GetBandOutput(string w);
 
 
     }

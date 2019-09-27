@@ -74,7 +74,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             var retCfgs = new List<PDAConfig>();
 
             if (pcfgs.Length > MAX_RUNS_OR_STACK) {
-                Utils.DebugMessage($"Stack >= {pcfgs.Length}, abort", this);
+                Utils.DebugMessage($"Stack >= {pcfgs.Length}, abort", this, Utils.eDebugLogLevel.Low);
                 return new PDAConfig[0];
             }
 
@@ -173,6 +173,92 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
         public override string ToString() => $"{Name} PDA(|{States.Length}|={string.Join(";", States)}), {{{string.Join(',', Alphabet)}}},{{{string.Join(',', WorkAlphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {StartStackSymbol}, {{{string.Join(',', AcceptedStates)}}})".Trim();
+    
+        #region "Operations"
+
+        public PDA Union(PDA pda) {
+            uint offsetD2 = this.StatesCount+1; //first state of D2
+            uint[] accStates = new uint[this.AcceptedStates.Length + pda.AcceptedStates.Length];
+            char[] inputAlphabet = this.Alphabet.Union(pda.Alphabet).ToArray();
+            char[] workAlphabet = this.WorkAlphabet.Union(pda.WorkAlphabet).ToArray();
+
+            var pdat = new PDATransform();
+            //add new start state, with e to both starts
+            pdat.Add(0, null, null, this.StartStackSymbol.ToString(), 1);
+            pdat.AddM(0, null, null, pda.StartStackSymbol.ToString(), offsetD2);
+
+            //add each D1 transform, +1
+            foreach (var item in this.Transform)
+                foreach (var val in item.Value)
+                    pdat.AddM(item.Key.q+1, item.Key.ci, item.Key.cw, val.cw2, val.qNext+1);
+
+            //add each D1 transform, +offset
+            foreach (var item in pda.Transform)
+                foreach (var val in item.Value)
+                    pdat.AddM(item.Key.q+offsetD2, item.Key.ci, item.Key.cw, val.cw2, val.qNext+offsetD2);
+
+
+            int i; //store where D1 acc ends
+            //iterate D1 acc and +1
+            for (i = 0; i < this.AcceptedStates.Length; i++)
+                accStates[i] = this.AcceptedStates[i]+1;
+
+            //iterate D2 acc and add offset
+            for (int j = 0; j < pda.AcceptedStates.Length; j++)
+                accStates[i+j] = (pda.AcceptedStates[j]+offsetD2);
+
+            if (this is StatePDA)
+                return new StatePDA($"Union({Name}+{pda.Name})",this.StatesCount+pda.StatesCount+1, inputAlphabet, workAlphabet, pdat, 0, (char)0, accStates);
+            else if (this is StackPDA)
+                return new StackPDA($"Union({Name}+{pda.Name})",this.StatesCount+pda.StatesCount+1, inputAlphabet, workAlphabet, pdat, 0, (char)0);
+            else
+                throw new System.NotImplementedException();
+        }
+
+        public PDA Concat(PDA pda) {
+            var pdat = new PDATransform();
+
+            char[] inputAlphabet = this.Alphabet.Union(pda.Alphabet).ToArray();
+            char[] workAlphabet = this.WorkAlphabet.Union(pda.WorkAlphabet).ToArray();
+
+            // if (!Utils.SameAlphabet(this, A))
+            //     throw new System.NotImplementedException("Different Alphabets are not implemented");
+            
+            var accStates = new List<uint>(pda.AcceptedStates.Length);
+            uint offset = this.StatesCount;
+
+            foreach (var t in this.Transform)
+                foreach (var val in t.Value)
+                    pdat.AddM(t.Key.q, t.Key.ci, t.Key.cw, val.cw2, val.qNext);
+            
+            foreach (var t in pda.Transform) {
+                uint[] qnexts = new uint[t.Value.Length];
+                for (int i = 0; i < t.Value.Length; i++) {
+                    qnexts[i] = t.Value[i].qNext+offset;
+                    pdat.AddM(t.Key.q+offset, t.Key.ci, t.Key.cw, t.Value[i].cw2, qnexts[i]);
+                }
+            }
+                
+
+            for (int i = 0; i < this.AcceptedStates.Length; i++)
+                pdat.AddM(this.AcceptedStates[i], null, null, null, offset);
+            
+            for (int i = 0; i < pda.AcceptedStates.Length; i++)
+                accStates.Add((pda.AcceptedStates[i]+offset));
+
+            accStates.Sort();
+
+            if (this is StatePDA)
+                return new StatePDA($"Union({Name}+{pda.Name})",this.StatesCount+pda.StatesCount, inputAlphabet, workAlphabet, pdat, 0, (char)0, accStates.ToArray());
+            else if (this is StackPDA)
+                return new StackPDA($"Union({Name}+{pda.Name})",this.StatesCount+pda.StatesCount, inputAlphabet, workAlphabet, pdat, 0, (char)0);
+            else
+                throw new System.NotImplementedException();
+
+        }
+
+        #endregion
+    
     } //end class
 
 } //end ns

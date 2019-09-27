@@ -28,7 +28,7 @@ namespace Serpen.Uni.Automat.Turing {
             int runs = 0;
             uint lastQ = tcfg.State;
             while (tcfg != null && (!IsAcceptedState(tcfg.State) || wordConsumed) && (!wordConsumed || tcfg.Band.Replace(BlankSymbol.ToString(), "") != "")) {
-                Utils.DebugMessage(tcfg.ToString(), this);
+                Utils.DebugMessage(tcfg.ToString(), this, Utils.eDebugLogLevel.Verbose);
                 tcfg = GoChar(tcfg);
                 if (tcfg != null)
                     lastQ = tcfg.State;
@@ -42,7 +42,7 @@ namespace Serpen.Uni.Automat.Turing {
                 return false;
         }
 
-        public string GetBandOutput(string w) {
+        public override string GetBandOutput(string w) {
             var tcfg = new TuringConfigSingleBand(BlankSymbol, w, 0);
             int runs = 0;
             string lastBand = tcfg.Band;
@@ -89,13 +89,13 @@ namespace Serpen.Uni.Automat.Turing {
 
             var rnd = Utils.RND;
 
-            var t = new TuringTransformSingleBand();
             int stateCount = rnd.Next(1, MAX_STATES);
 
             char[] inputAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR);
             char[] bandAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR, inputAlphabet.Append(BLANK), 0);
             uint[] accState = RandomGenerator.RandomAcceptedStates(1, stateCount/3, stateCount); 
             
+            var t = new TuringTransformSingleBand();
             for (uint i = 0; i < stateCount; i++) {
                 int transformsRnd = rnd.Next(0, inputAlphabet.Length);
                 for (uint j = 0; j < transformsRnd; j++) {

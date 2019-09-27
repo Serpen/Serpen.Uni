@@ -130,9 +130,8 @@ namespace Serpen.Uni.Automat.Finite {
             else {
                 var neat = new NFAeTransform();
 
-                if (!Utils.SameAlphabet(this, A)) {
+                if (!Utils.SameAlphabet(this, A))
                     throw new Uni.Exception("Different Alphabets are not implemented");
-                }
                 
                 var accStates = new List<uint>(this.AcceptedStates.Length+N2.AcceptedStates.Length);
                 uint sc = this.StatesCount;

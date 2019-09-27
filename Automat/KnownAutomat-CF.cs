@@ -2,7 +2,7 @@ using Serpen.Uni.Automat.ContextFree;
 
 namespace Serpen.Uni.Automat {
     public static partial class KnownAutomat {
-        public static PDA PDA_1659_A33_K1 {
+        public static PDA QPDA_1659_A33_K1 {
             get {
                 var pdaT = new PDATransform();
                 pdaT.Add(0, null, PDA.START, PDA.START.ToString(), 1);
@@ -10,11 +10,11 @@ namespace Serpen.Uni.Automat {
                 pdaT.Add(1, null, null, null, 2);
                 pdaT.Add(2, 'b', 'a', null, 2);
                 pdaT.Add(2, null, PDA.START, null, 3);
-                return new StatePDA(nameof(PDA_1659_A33_K1), 4, new char[] { 'a', 'b' }, new char[] { 'a', PDA.START }, pdaT, 0, PDA.START, new uint[] { 3 });
+                return new StatePDA(nameof(QPDA_1659_A33_K1), 4, new char[] { 'a', 'b' }, new char[] { 'a', PDA.START }, pdaT, 0, PDA.START, new uint[] { 3 });
             }
         }
 
-        public static PDA PDA_EAFK_A62_wwr_Palindrom {
+        public static PDA QPDA_EAFK_A62_wwr_Palindrom {
             get {
                 var pdaT = new PDATransform();
                 pdaT.Add(0, '0', null, "0", 0);
@@ -23,7 +23,7 @@ namespace Serpen.Uni.Automat {
                 pdaT.Add(1, '0', '0', null, 1);
                 pdaT.Add(1, '1', '1', null, 1);
                 pdaT.Add(1, null, PDA.START, null, 2);
-                return new StatePDA(nameof(PDA_EAFK_A62_wwr_Palindrom), 3, binAlp, new char[] { '0', '1', DPDA.START }, pdaT, 0, PDA.START, new uint[] { 2 });
+                return new StatePDA(nameof(QPDA_EAFK_A62_wwr_Palindrom), 3, binAlp, new char[] { '0', '1', DPDA.START }, pdaT, 0, PDA.START, new uint[] { 2 });
             }
         }
 

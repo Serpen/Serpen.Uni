@@ -213,9 +213,8 @@ namespace Serpen.Uni.Automat.Finite {
             if (!(N2 is null)) {
                 var neat = new NFAeTransform();
 
-                if (!Utils.SameAlphabet(this, A)) {
+                if (!Utils.SameAlphabet(this, A))
                     throw new NotImplementedException("Different Alphabets are not implemented");
-                }
 
                 var accStates = new List<uint>(this.AcceptedStates.Length + N2.AcceptedStates.Length);
                 uint sc = this.StatesCount;
@@ -260,14 +259,11 @@ namespace Serpen.Uni.Automat.Finite {
             return thisobj.Equals(dobj);
         }
 
-        public override int GetHashCode() {
-            return ToString().GetHashCode();
-        }
-
-        public override string ToString() {
-            return $"{Name} NEAe(|{StatesCount}|={string.Join(";", States)}, {{{String.Join(',', Alphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {{{string.Join(',', AcceptedStates)}}})".Trim();
-        }
+        public override int GetHashCode() => ToString().GetHashCode();
 
 
+        public override string ToString() 
+            => $"{Name} NEAe(|{StatesCount}|={string.Join(";", States)}, {{{String.Join(',', Alphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {{{string.Join(',', AcceptedStates)}}})".Trim();
+        
     } //end class
 } //end ns

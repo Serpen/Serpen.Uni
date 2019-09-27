@@ -35,7 +35,6 @@ namespace Serpen.Uni.Automat {
         public uint[] AcceptedStates { get; protected set; }
 
         public AutomatBase(uint stateCount, char[] alphabet, uint startState, string name, uint[] acceptedStates) {
-            this.States = new string[stateCount];
 
             var sortAlp = alphabet.ToList();
             sortAlp.Sort();
@@ -46,6 +45,7 @@ namespace Serpen.Uni.Automat {
             
             AcceptedStates = acceptedStates;
             
+            this.States = new string[stateCount];
             for (int i = 0; i < stateCount; i++)
                 States[i] = i.ToString();
 
@@ -60,7 +60,7 @@ namespace Serpen.Uni.Automat {
                 throw new Automat.StateException(StartState);
         }
 
-        private bool[] reachableStates() {
+        public bool[] ReachableStates() {
             bool[] fromStartReachable = new bool[StatesCount];
             fromStartReachable[StartState] = true;
             bool foundnew = true;
@@ -85,7 +85,7 @@ namespace Serpen.Uni.Automat {
         }
 
         protected (uint[], string[], uint[]) removedStateTranslateTables() {
-            bool[] fromStartReachable = reachableStates();
+            bool[] fromStartReachable = ReachableStates();
 
             uint[] translate = new uint[fromStartReachable.Count((b) => b)];
             for (uint i = 0; i < translate.Length; i++) {

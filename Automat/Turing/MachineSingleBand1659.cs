@@ -51,7 +51,7 @@ namespace Serpen.Uni.Automat.Turing {
             return false;
         }
 
-        public string GetBandOutput(string w) {
+        public override string GetBandOutput(string w) {
             var tcfg = new TuringConfigSingleBand(BlankSymbol, w, 0);
             int runs = 0;
             string lastBand = tcfg.Band;

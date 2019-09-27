@@ -47,9 +47,8 @@ namespace Serpen.Uni.Automat.Finite {
         public NFAe Concat(FABase A) {
             var neaET = new NFAeTransform();
 
-            if (!Utils.SameAlphabet(this, A)) {
+            if (!Utils.SameAlphabet(this, A))
                 throw new System.NotImplementedException("Different Alphabets are not implemented");
-            }
             
             var accStates = new List<uint>(A.AcceptedStates.Length);
             uint offset = this.StatesCount;
@@ -61,7 +60,7 @@ namespace Serpen.Uni.Automat.Finite {
                 uint[] qnexts = new uint[t.Value.Length];
                 for (int i = 0; i < t.Value.Length; i++) 
                     qnexts[i] = t.Value[i]+offset;
-                neaET.Add((t.Key.q+offset), t.Key.c, qnexts);
+                neaET.Add(t.Key.q+offset, t.Key.c, qnexts);
             }
                 
 
@@ -96,7 +95,7 @@ namespace Serpen.Uni.Automat.Finite {
 
             //add each D1 transform, +offset
             foreach (var item in fa.Transform)
-                neat.Add((item.Key.q+offsetD2), item.Key.c, (item.Value[0]+offsetD2));
+                neat.Add(item.Key.q+offsetD2, item.Key.c, item.Value[0]+offsetD2);
 
 
             int i; //store where D1 acc ends
@@ -112,7 +111,6 @@ namespace Serpen.Uni.Automat.Finite {
         }
 
         public FABase ProductEA(FABase A, DFA.eProductDeaMode mode) {
-            
             uint len = (this.StatesCount*A.StatesCount);
 
             if (!Utils.SameAlphabet(this, A)) {
@@ -140,8 +138,6 @@ namespace Serpen.Uni.Automat.Finite {
                             //Transform exists, out qNext
                             var exist1 = ((Finite.FATransform)this.Transform).TryGetValue(i,c, out qNext1);
                             var exist2 = ((Finite.FATransform)A.Transform).TryGetValue(j,c, out qNext2);
-                            // var exist1 = this.Transform.TryGetValue(i,c, out qNext1);
-                            // var exist2 = A.Transform.TryGetValue(j,c, out qNext2);
 
                             //same calc logic for dstIndex
                             uint dstIndex;
@@ -187,7 +183,6 @@ namespace Serpen.Uni.Automat.Finite {
         /// Reverse all transforms, add an qε which goes to all former q ϵ F,
         /// former q0 becomes the only ϵ F
         /// </summary>
-        /// <returns></returns>  
         public NFAe Reverse() {
             var neaET = new NFAeTransform();
 
@@ -201,11 +196,9 @@ namespace Serpen.Uni.Automat.Finite {
 
                 //new tuple with opposite direction
                 var newVals = new uint[dt.Value.Length];
+                // foreach (var dtv in dt.Value)
                 for (int i = 0; i < dt.Value.Length; i++) {
-
-
                     var tuple = new EATuple(newstate[dt.Value[i]], dt.Key.c);
-                    
 
                     if (!neaET.ContainsKey(tuple.q, tuple.c.Value))
                         //add turned tuple
@@ -213,7 +206,6 @@ namespace Serpen.Uni.Automat.Finite {
                     else //could exists multiple possibilites, so append tranform
                         neaET[tuple.q, tuple.c.Value] = neaET[tuple.q, tuple.c.Value].Append(newstate[dt.Key.q]).ToArray();
                 }
-                
             }
 
             //start state is qe, which leads to every old accepted state

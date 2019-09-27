@@ -15,6 +15,8 @@ namespace Serpen.Uni.Automat {
         public static int Log2(int z) => (int)System.Math.Log2(z);
         public static bool HasBitSet(byte i, int b) => (b & (1 << i)) > 0;
 
+        private static eDebugLogLevel DebugLogLevel = eDebugLogLevel.Normal; 
+
         /// <summary>
         /// Get Random Array Elemet
         /// </summary>
@@ -45,21 +47,18 @@ namespace Serpen.Uni.Automat {
             return true;
         }
 
+        public enum eDebugLogLevel {Low, Normal, Verbose}
 
-#if VERBOSE
-        internal static void DebugMessage(string message) => DebugMessage(message, null);
-        internal static void DebugMessage(string message, IAcceptWord a) {
+        internal static void DebugMessage(string message, IAcceptWord a, eDebugLogLevel level) {
             var stack = new System.Diagnostics.StackTrace();
-            System.Diagnostics.Debug.WriteLine("DBG: " +
-                stack.GetFrame(1).GetMethod().DeclaringType.Name + "." +
-                stack.GetFrame(1).GetMethod().Name +
-                ":" + stack.GetFrame(1).GetILOffset() + " " +
-                (a != null ? "[" + a.Name + "] " : " ") +
-                message);
+            if (DebugLogLevel >= level)
+                System.Diagnostics.Debug.WriteLine("DBG: " +
+                    stack.GetFrame(1).GetMethod().DeclaringType.Name + "." +
+                    stack.GetFrame(1).GetMethod().Name +
+                    ":" + stack.GetFrame(1).GetILOffset() + " " +
+                    (a != null ? "[" + a.Name + "] " : " ") +
+                    message);
         }
-#else
-        internal static void DebugMessage(string message, IAcceptWord) {}
-#endif
         internal static void AcceptWordConsoleLine(IAcceptWord A, string w) {
             try {
                 System.Console.WriteLine($"{A.Name} accepts '{w}': {A.AcceptWord(w)}");
@@ -142,6 +141,10 @@ namespace Serpen.Uni.Automat {
 
         public static uint ArrayIndex(System.Array array, object value)
             => (uint)System.Array.IndexOf(array, value);
+
+        public static void DrawAutomatToTemp(IAutomat automat)
+            => Visualization.DrawAutomat(automat).Save(System.Environment.ExpandEnvironmentVariables($@"%temp%\automat\{automat.Name}.png"));
+        
 
     } //end class Utils 
 

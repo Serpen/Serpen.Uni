@@ -293,24 +293,35 @@ namespace Serpen.Uni.Automat {
 #endregion
         
 
-        public static bool TestEqualWithWords(IAutomat A1, IAutomat A2, int count, int maxlen) {
-            var rnd = Utils.RND;
+        public static bool TestEqualWithWords(IAutomat A1, IAutomat A2, int initialCount) {
+            int onceTrue = 0, onceFalse = 0;
+            int passLevel = initialCount/10;
 
-            string[] words = A1.GetRandomWords(count);
-            foreach (string w in words)
-            {
-                var erg1 = A1.AcceptWord(w);
-                var erg2 = A2.AcceptWord(w);
+            int count = 0;
+            while ((onceTrue < passLevel | onceFalse < passLevel) && count < initialCount*2) {
+                string[] words = A1.GetRandomWords(initialCount/2);
+                foreach (string w in words)
+                {
+                    var erg1 = A1.AcceptWord(w);
+                    var erg2 = A2.AcceptWord(w);
 
-                if (erg1 != erg2) {
-                    Utils.DebugMessage($"word '{w}' divides Automates", A1);
-                    return false;
-                } else
-                    Utils.DebugMessage($"word '{w}' passes", A1);
+                    if (erg1) onceTrue++;
+                    if (!erg1) onceFalse++;
+                    if (erg1 != erg2) {
+                        Utils.DebugMessage($"{count}. word '{w}' divides Automates", A1, Utils.eDebugLogLevel.Low);
+                        return false;
+                    }
+                        Utils.DebugMessage($"{count}. word '{w}' passes", A1, Utils.eDebugLogLevel.Verbose);
 
+                    count++;
+                }
             }
-            Utils.DebugMessage($"{count} words passed", A1);
-            return true;
+            if (onceTrue>passLevel && onceFalse>passLevel) {
+                Utils.DebugMessage($"{count} words passed", A1, Utils.eDebugLogLevel.Normal);
+                return true;
+            } else
+                Utils.DebugMessage($"{count} words passed, but not both tested", A1, Utils.eDebugLogLevel.Low);
+                return true;
         }
         
     } //end class

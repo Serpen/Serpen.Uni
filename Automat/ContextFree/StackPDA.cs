@@ -20,6 +20,8 @@ namespace Serpen.Uni.Automat.ContextFree {
         : base(name, states, InputAlphabet, Workalphabet, Transform, StartState, Startsymbol, new uint[] { }) {
         }
 
+        public static readonly StackPDA Empty = new StackPDA("SPDA_Empty", 1, new char[] {}, new char[] {}, new PDATransform(), 0, START); 
+
         [AlgorithmSource("1659_L33")]
         public static explicit operator StackPDA(StatePDA pda) {
             var newt = new PDATransform();
@@ -77,7 +79,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                 runCount++;
 
                 if (pcfgs.Length > MAX_RUNS_OR_STACK || runCount > MAX_RUNS_OR_STACK) {
-                    Utils.DebugMessage($"{runCount}: Stack >= {pcfgs.Length}, abort", this);
+                    Utils.DebugMessage($"{runCount}: Stack >= {pcfgs.Length}, abort", this, Utils.eDebugLogLevel.Low);
                     return false;
                 }
             }

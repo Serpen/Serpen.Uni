@@ -4,9 +4,7 @@ namespace Serpen.Uni.Automat.Finite
     public class NFAeTransform : TransformBase<EATuple, uint[]>
     {
         internal void Add(uint q1, char? w, params uint[] q2)
-        {
-            dic.Add(new EATuple(q1, w), q2);
-        }
+            => dic.Add(new EATuple(q1, w), q2);
 
         internal void AddM(uint q1, char c, uint qNext) {
             uint[] qBefore;
@@ -19,18 +17,11 @@ namespace Serpen.Uni.Automat.Finite
 
         public uint[] this[uint q, char c]
         {
-            get
-            {
-                return dic[new EATuple(q, c)];
-            }
-            set
-            {
-                dic[new EATuple(q, c)] = value;
-            }
+            get => dic[new EATuple(q, c)];
+            set => dic[new EATuple(q, c)] = value;
         }
 
-        internal bool ContainsKey(uint q, char c)
-            => dic.ContainsKey(new EATuple(q, c));
+        internal bool ContainsKey(uint q, char c) => dic.ContainsKey(new EATuple(q, c));
 
         public override string ToString()
         {

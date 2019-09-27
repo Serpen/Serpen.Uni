@@ -11,6 +11,9 @@ namespace Serpen.Uni.Automat.ContextFree {
          : base(name, names, InputAlphabet, Workalphabet, Transform, StartState, Startstacksymbol, AcceptedStates) {
         }
 
+        public static readonly StatePDA Empty = new StatePDA("QPDA_Empty", 1, new char[] {}, new char[] {}, new PDATransform(), 0, START, new uint[] {}); 
+
+
         
         [AlgorithmSource("EAFK_A64")]
         public static explicit operator StatePDA(StackPDA pda) {
@@ -118,7 +121,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             //while any pcfg exists
             while (pcfgs.Length > 0) { //&& (pcfg.Where((a) => a.Stack.Length>0).Any())
-                Utils.DebugMessage(string.Join(',', (from a in pcfgs select a.ToString())), this);
+                Utils.DebugMessage(string.Join(',', (from a in pcfgs select a.ToString())), this, Utils.eDebugLogLevel.Verbose);
                 foreach (var p in pcfgs) {
                     if (p.word.Length == 0)
                         if (IsAcceptedState(p.q))
@@ -129,7 +132,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
                 runCount++;
                 if (pcfgs.Length > MAX_RUNS_OR_STACK || runCount > MAX_RUNS_OR_STACK) {
-                    Utils.DebugMessage($"{runCount}: Stack >= {pcfgs.Length}, abort", this);
+                    Utils.DebugMessage($"{runCount}: Stack >= {pcfgs.Length}, abort", this, Utils.eDebugLogLevel.Low);
                     return false;
                 }
 
