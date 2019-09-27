@@ -32,6 +32,8 @@ namespace Serpen.Uni.Automat.Finite {
 
         public override bool AcceptWord(string w) {
             uint[] q = new uint[] {StartState};
+
+            CheckWordInAlphabet(w);
             
             for (int i = 0; i < w.Length; i++)
             {
@@ -102,7 +104,7 @@ namespace Serpen.Uni.Automat.Finite {
 
         }
 
-        #region Ops
+        #region Operations
 
         public override FABase HomomorphismChar(Dictionary<char,char> translate) {
             var neat = new NFAeTransform();
@@ -123,13 +125,14 @@ namespace Serpen.Uni.Automat.Finite {
         public override FABase Join(FABase A) {
             var N2 = A as NFA;
 
-            if (!(N2 is null)) {
+            if (!(N2 is null))
+                throw new System.NotSupportedException();
+            else {
                 var neat = new NFAeTransform();
 
                 if (!Utils.SameAlphabet(this, A)) {
                     throw new Uni.Exception("Different Alphabets are not implemented");
                 }
-
                 
                 var accStates = new List<uint>(this.AcceptedStates.Length+N2.AcceptedStates.Length);
                 uint sc = this.StatesCount;
@@ -149,10 +152,12 @@ namespace Serpen.Uni.Automat.Finite {
 
                 accStates.Sort();
 
-                return new NFA($"NFA_Join({Name}+{N2.Name})", (N2.StatesCount+sc), this.Alphabet, neat, this.StartState, accStates.ToArray());
-            } else
-                throw new System.NotSupportedException();
+                return new NFA($"Join({Name}+{N2.Name})", (N2.StatesCount+sc), this.Alphabet, neat, this.StartState, accStates.ToArray());
+            }
         }
+        public FABase Union(FABase A) => throw new System.NotImplementedException();
+        public FABase Intersect(FABase A) => throw new System.NotImplementedException();
+        public FABase Diff(FABase A) => throw new System.NotImplementedException();
 
         #endregion
 
@@ -168,9 +173,6 @@ namespace Serpen.Uni.Automat.Finite {
 
         public override string ToString() => $"{Name} NEA(|{States.Length}|={string.Join(";", States)}, {{{string.Join(',', Alphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {{{string.Join(',', AcceptedStates)}}})".Trim();
     
-        public FABase Union(FABase A) => throw new System.NotImplementedException();
-        public FABase Intersect(FABase A) => throw new System.NotImplementedException();
-        public FABase Diff(FABase A) => throw new System.NotImplementedException();
         
     }
 }

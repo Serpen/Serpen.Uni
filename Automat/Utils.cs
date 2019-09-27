@@ -6,7 +6,6 @@ using System.Linq;
 
 namespace Serpen.Uni.Automat {
 
-
     public static class Utils {
 
         public const char EPSILON = 'ε';
@@ -14,9 +13,7 @@ namespace Serpen.Uni.Automat {
         public static int Pow(int bas, int exp) => (int)System.Math.Pow(bas, exp);
         public static int Pow2(int exp) => (int)System.Math.Pow(2, exp);
         public static int Log2(int z) => (int)System.Math.Log2(z);
-        public static bool HasBitSet(byte i, int b) {
-            return (b & (1 << i)) > 0;
-        }
+        public static bool HasBitSet(byte i, int b) => (b & (1 << i)) > 0;
 
         /// <summary>
         /// Get Random Array Elemet
@@ -24,9 +21,7 @@ namespace Serpen.Uni.Automat {
         /// <param name="array"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T GrAE<T>(T[] array) {
-            return array[RND.Next(0, array.Length)];
-        }
+        public static T GrAE<T>(T[] array) => array[RND.Next(0, array.Length)];
 
         public static bool[,] GetPowerSet(int bitscount) {
             var ret = new bool[Pow2(bitscount), bitscount];
@@ -53,19 +48,19 @@ namespace Serpen.Uni.Automat {
 
 #if VERBOSE
         internal static void DebugMessage(string message) => DebugMessage(message, null);
-        internal static void DebugMessage(string message, IAutomat a) {
+        internal static void DebugMessage(string message, IAcceptWord a) {
             var stack = new System.Diagnostics.StackTrace();
-            System.Diagnostics.Debug.WriteLine("DBG: " + 
+            System.Diagnostics.Debug.WriteLine("DBG: " +
                 stack.GetFrame(1).GetMethod().DeclaringType.Name + "." +
-                stack.GetFrame(1).GetMethod().Name + 
+                stack.GetFrame(1).GetMethod().Name +
                 ":" + stack.GetFrame(1).GetILOffset() + " " +
                 (a != null ? "[" + a.Name + "] " : " ") +
                 message);
         }
 #else
-        internal static void DebugMessage(string message, IAutomat) {}
+        internal static void DebugMessage(string message, IAcceptWord) {}
 #endif
-        internal static void AcceptWordConsoleLine(IAutomat A, string w) {
+        internal static void AcceptWordConsoleLine(IAcceptWord A, string w) {
             try {
                 System.Console.WriteLine($"{A.Name} accepts '{w}': {A.AcceptWord(w)}");
             } catch (Serpen.Uni.Automat.TuringCycleException e) {
@@ -145,7 +140,7 @@ namespace Serpen.Uni.Automat {
 
         } //end function
 
-        public static uint ArrayIndex(System.Array array, object value) 
+        public static uint ArrayIndex(System.Array array, object value)
             => (uint)System.Array.IndexOf(array, value);
 
     } //end class Utils 

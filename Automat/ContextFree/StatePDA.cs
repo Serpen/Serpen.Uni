@@ -12,7 +12,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
         
-        [System.ComponentModel.Description("EAFK_A64")]
+        [AlgorithmSource("EAFK_A64")]
         public static explicit operator StatePDA(StackPDA pda) {
             var newt = new PDATransform();
 
@@ -45,7 +45,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             return new StatePDA($"QPDA_({N.Name})", N.StatesCount, N.Alphabet, new char[] {}, newTrans, N.StartState, (char)0, N.AcceptedStates);
         }
 
-        [System.ComponentModel.Description("1659_L3.1_P76")]
+        [AlgorithmSource("1659_L3.1_P76")]
         public static explicit operator StatePDA(ContextFree.CFGrammer cfg) {
             var t = new ContextFree.PDATransform();
             var sn = new System.Collections.Generic.Dictionary<uint,string>();
@@ -128,14 +128,11 @@ namespace Serpen.Uni.Automat.ContextFree {
                 pcfgs = GoChar(pcfgs);
 
                 runCount++;
-                if (pcfgs.Length > 100000 || runCount > 1000) {
+                if (pcfgs.Length > MAX_RUNS_OR_STACK || runCount > MAX_RUNS_OR_STACK) {
                     Utils.DebugMessage($"{runCount}: Stack >= {pcfgs.Length}, abort", this);
                     return false;
                 }
 
-                //check if a cfg has word and stack cleared and ends in accepted states
-                        
-                
             }
 
             return false;

@@ -15,6 +15,12 @@ namespace Serpen.Uni.Automat {
 
     public enum RuleConstaint {None, Left, Right}
     public interface IConfig {}
-    
 
+}
+
+namespace Serpen.Uni.Automat.ExtensionMethods
+{
+    public static class ExtensionMethods {
+        
+    }
 }

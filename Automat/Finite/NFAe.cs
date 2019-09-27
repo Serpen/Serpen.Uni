@@ -15,7 +15,7 @@ namespace Serpen.Uni.Automat.Finite {
             : base(states, alphabet, transform, startState, acceptedStates, name) {
         }
 
-        #region "Operators"
+        #region "Conversions"
 
         public static explicit operator NFAe(NFA A) {
             var t = new NFAeTransform();
@@ -77,7 +77,7 @@ namespace Serpen.Uni.Automat.Finite {
         /// </summary>
         /// <param name="q">States</param>
         /// <returns></returns>
-        [System.ComponentModel.Description("EAFK-2.5.3")]
+        [AlgorithmSource("EAFK-2.5.3")]
         public uint[] EpsilonHuelle(uint[] q) {
             var toProcess = new Stack<uint>(); //States that should be processed
             var Processed = new List<uint>(); //States that have beend processed
@@ -164,7 +164,7 @@ namespace Serpen.Uni.Automat.Finite {
         
         }
 
-
+#region "Operations"
         public override FABase HomomorphismChar(Dictionary<char, char> Translate) {
             var neat = new NFAeTransform();
             var Alp = (char[])this.Alphabet.Clone();
@@ -207,8 +207,6 @@ namespace Serpen.Uni.Automat.Finite {
             return new NFAe($"NFAe_KleeneStern({D.Name})", D.StatesCount, D.Alphabet, neaET, 0, 0);
         }
 
-        #region Ops
-
         public override FABase Join(FABase A) {
             var N2 = A as NFAe;
 
@@ -241,6 +239,9 @@ namespace Serpen.Uni.Automat.Finite {
             } else
                 throw new NotSupportedException();
         }
+        public FABase Union(FABase A) => throw new System.NotImplementedException();
+        public FABase Intersect(FABase A) => throw new System.NotImplementedException();
+        public FABase Diff(FABase A) => throw new System.NotImplementedException();
 
         #endregion
 
@@ -267,9 +268,6 @@ namespace Serpen.Uni.Automat.Finite {
             return $"{Name} NEAe(|{StatesCount}|={string.Join(";", States)}, {{{String.Join(',', Alphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {{{string.Join(',', AcceptedStates)}}})".Trim();
         }
 
-        public FABase Union(FABase A) => throw new System.NotImplementedException();
-        public FABase Intersect(FABase A) => throw new System.NotImplementedException();
-        public FABase Diff(FABase A) => throw new System.NotImplementedException();
 
     } //end class
 } //end ns

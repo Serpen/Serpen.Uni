@@ -47,12 +47,6 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         public override void ReplaceChar(char[] newChar, TMDirection dir) {
-#if DEBUG
-            char[] prevChar = new char[Band.GetLength(0)];
-            for (int i = 0; i < Band.Length; i++)
-                prevChar[i] = Band[i][Position];
-            Utils.DebugMessage($"replace {new string(prevChar)} with {new string(newChar)}");
-#endif
             string[] s = new string[Band.GetLength(0)];
             for (int i = 0; i < Band.GetLength(0); i++) {
                 s[i] = Band[i].Remove(Position, 1);
@@ -81,7 +75,6 @@ namespace Serpen.Uni.Automat.Turing {
             string str = string.Join('|', Band);
             str = str.Insert(Position, $"<{q}>");
             return str;
-            // return $"({q}, {string.Join('|',Band)}, {position})";
         }
     }
 }

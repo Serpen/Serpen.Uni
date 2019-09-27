@@ -8,7 +8,7 @@ namespace Serpen.Uni.Automat.ContextFree {
     /// </summary>
     public abstract class PDA : AutomatBase<PDATransformKey, PDATransformValue[]> {
 
-        protected int MAX_RUNS_OR_STACK = 10000;
+        protected const int MAX_RUNS_OR_STACK = 10000;
         protected static readonly char[] EXTRASYMBOLS = new char[] { '§', '$', '%', '&' };
         public const char START = '$';
         public readonly char[] WorkAlphabet;
@@ -26,31 +26,30 @@ namespace Serpen.Uni.Automat.ContextFree {
         /// <param name="startstacksymbol"></param>
         /// <param name="acceptedStates">Accepted Endstates</param>
         public PDA(string name, uint statesCount, char[] inputAlphabet, char[] workalphabet, PDATransform transform, uint startState, char startstacksymbol, uint[] acceptedStates)
-        : base(statesCount, inputAlphabet, startState, name) {
+        : base(statesCount, inputAlphabet, startState, name, acceptedStates) {
             this.WorkAlphabet = workalphabet;
             if (!workalphabet.Contains(startstacksymbol))
                 this.WorkAlphabet = this.WorkAlphabet.Append(startstacksymbol).ToArray();
             this.Transform = transform;
             this.StartStackSymbol = startstacksymbol;
-            this.AcceptedStates = acceptedStates;
 
             CheckConstraints();
         }
 
         public PDA(string name, string[] states, char[] inputAlphabet, char[] workalphabet, PDATransform transform, uint startState, char startStacksymbol, uint[] acceptedStates)
-        : base(states, inputAlphabet, startState, name) {
+        : base(states, inputAlphabet, startState, name, acceptedStates) {
             this.WorkAlphabet = workalphabet;
             if (!workalphabet.Contains(startStacksymbol))
                 this.WorkAlphabet = this.WorkAlphabet.Append(startStacksymbol).ToArray();
             this.Transform = transform;
             this.StartStackSymbol = startStacksymbol;
-            this.AcceptedStates = acceptedStates;
 
             CheckConstraints();
         }
 
 
         protected override void CheckConstraints() {
+            base.CheckConstraints();
             foreach (var t in Transform) {
                 for (int i = 0; i < t.Value.Length; i++) {
                     if (t.Key.q > StatesCount | t.Value[i].qNext > StatesCount)
@@ -161,7 +160,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         public abstract override bool AcceptWord(string w);
 
-                public override System.Tuple<int, int, string>[] VisualizationLines() {
+        public override System.Tuple<int, int, string>[] VisualizationLines() {
             var tcol = new System.Collections.Generic.List<System.Tuple<int, int, string>>();
             foreach (var t in Transform) {
                 foreach (var v in t.Value) {

@@ -12,7 +12,6 @@ namespace Serpen.Uni.Automat.Finite {
             CheckConstraints();
         }
 
-
         public DFA(string name, string[] states, char[] alphabet, FATransform transform, uint startState, params uint[] acceptedStates)
             : base(states, alphabet, transform, startState, acceptedStates, name) {
             CheckConstraints();
@@ -31,10 +30,7 @@ namespace Serpen.Uni.Automat.Finite {
         public override bool AcceptWord(string w) {
             uint q = StartState;
 
-            //check if word is valid
-            for (int i = 0; i < w.Length; i++)
-                if (!Alphabet.Contains(w[i]))
-                    throw new AlphabetException(w[i]);
+            CheckWordInAlphabet(w);
 
             var extTuple = new Tuple<uint, string>(StartState, w);
 
@@ -95,8 +91,6 @@ namespace Serpen.Uni.Automat.Finite {
 
             acc.Sort();
 
-            //return obj
-
             //give each onging state its eqClass states[] as name 
             string[] names = new string[tfEqClasses.Length];
             for (uint i = 0; i < tfEqClasses.Length; i++)
@@ -134,6 +128,8 @@ namespace Serpen.Uni.Automat.Finite {
             }
             return true;
         } //end StatesEqual
+
+        #region "Operations"
 
         /// <returns>
         /// D1 ∩ ⌐D2
@@ -203,9 +199,11 @@ namespace Serpen.Uni.Automat.Finite {
 
             uint len = (D1.StatesCount * D2.StatesCount);
 
-            if (Utils.SameAlphabet(D1, D2)) {
-                char[] Alphabet = D1.Alphabet;
+            if (!Utils.SameAlphabet(D1, D2))
+                throw new NotImplementedException("Different Alphabets are not implemented");
+            else {
                 var accStates = new List<uint>();
+
                 string[] stateNames = new string[len];
 
                 var deat = new FATransform();
@@ -217,7 +215,7 @@ namespace Serpen.Uni.Automat.Finite {
                         uint index = (i * D2.StatesCount + j);
                         stateNames[index] = $"{i},{j}";
 
-                        foreach (char c in Alphabet) {
+                        foreach (char c in D1.Alphabet) {
                             uint qNext1, qNext2; //next states for D1, D2
 
                             //tuple for D1,D2
@@ -260,10 +258,11 @@ namespace Serpen.Uni.Automat.Finite {
                     }
                 }
 
-                return new DFA($"DEA_Product_({mode},{D1.Name}+{D2.Name})", stateNames, Alphabet, deat, 0, accStates.Distinct().ToArray());
-            } else
-                throw new NotImplementedException("Different Alphabets are not implemented");
+                return new DFA($"DEA_Product_({mode},{D1.Name}+{D2.Name})", stateNames, D1.Alphabet, deat, 0, accStates.Distinct().ToArray());
+            }
         }
+
+        #endregion
 
         public static DFA GenerateRandom() {
             const byte MAX_STATES = 20;
@@ -274,7 +273,7 @@ namespace Serpen.Uni.Automat.Finite {
             int stateCount = rnd.Next(1, MAX_STATES);
 
             char[] alphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR);
-            uint[] accState = RandomGenerator.RandomAcceptedStates(1, stateCount/3, stateCount); 
+            uint[] accState = RandomGenerator.RandomAcceptedStates(1, stateCount / 3, stateCount);
 
 
             var t = new FATransform();
@@ -285,7 +284,7 @@ namespace Serpen.Uni.Automat.Finite {
                 }
             }
 
-            var ret = new DFA("DFA_Random", (uint)stateCount, alphabet, t, (uint)rnd.Next(0,stateCount), accState);
+            var ret = new DFA("DFA_Random", (uint)stateCount, alphabet, t, (uint)rnd.Next(0, stateCount), accState);
             ret.Name = $"DFA_Random_{ret.GetHashCode()}";
             return ret;
 
@@ -294,16 +293,16 @@ namespace Serpen.Uni.Automat.Finite {
         public override IAutomat PurgeStates() {
 
             (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
-                
+
             var newT = new FATransform();
             foreach (var t2 in Transform)
                 if (translate.Contains(t2.Key.q))
                     foreach (var v in t2.Value)
                         if (translate.Contains(v))
-                            newT.AddM(Utils.ArrayIndex(translate,t2.Key.q), t2.Key.c.Value, Utils.ArrayIndex(translate,v));
-            
-            return new DFA($"{Name}_purged", names, Alphabet, newT, Utils.ArrayIndex(translate,StartState), aStates);
-        
+                            newT.AddM(Utils.ArrayIndex(translate, t2.Key.q), t2.Key.c.Value, Utils.ArrayIndex(translate, v));
+
+            return new DFA($"{Name}_purged", names, Alphabet, newT, Utils.ArrayIndex(translate, StartState), aStates);
+
         }
 
 
@@ -325,11 +324,13 @@ namespace Serpen.Uni.Automat.Finite {
 
         }
 
+        #region "Conversion"
         
-
         public static explicit operator DFA(NFA N) => Converter.Nea2TeilmengenDea(N);
         public static explicit operator DFA(NFAe Ne) => Converter.Nea2TeilmengenDea(Ne);
-        
+
+        #endregion
+
         public override int GetHashCode() => ToString().GetHashCode();
 
         public override string ToString()

@@ -5,7 +5,7 @@ using RegExText = System.Text.RegularExpressions.Regex;
 namespace Serpen.Uni.Automat.Finite {
     public class Converter {
 
-        [System.ComponentModel.Description("EAFK-2.3.5, EAFK-2.5.5, 1659-D-2.8")]
+        [AlgorithmSource("EAFK-2.3.5, EAFK-2.5.5, 1659-D-2.8")]
         public static Finite.DFA Nea2TeilmengenDea(Finite.INFA N) {
             var States = new List<uint[]>();
             var DeaStatesNames2Index = new Dictionary<string, uint>();
@@ -75,7 +75,7 @@ namespace Serpen.Uni.Automat.Finite {
         /// </summary>
         /// <param name="D"></param>
         /// <returns></returns>
-        [System.ComponentModel.Description("1659-S-2.11")]
+        [AlgorithmSource("1659-S-2.11")]
         public static string DEA2RegExp(Finite.DFA D) {
             //represents R<sub>ij</sub><sup>(k)</sup> From i to j, without State higher than k
             string[,,] R = new string[D.States.Length, D.States.Length, D.States.Length+1];

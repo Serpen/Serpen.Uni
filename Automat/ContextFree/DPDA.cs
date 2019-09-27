@@ -7,12 +7,11 @@ namespace Serpen.Uni.Automat.ContextFree {
     /// deterministic PDA with Stack Symbol, which must end as empty stack and accepted state
     /// </summary>
     public class DPDA : AutomatBase<PDATransformKey, PDATransformValue> {
-        public DPDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, DPDATransform Transform, uint StartState, char Startsymbol, uint[] AcceptedStates)
-        : base(StatesCount, InputAlphabet, StartState, name) {
+        public DPDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, DPDATransform Transform, uint StartState, char Startsymbol, uint[] acceptedStates)
+        : base(StatesCount, InputAlphabet, StartState, name, acceptedStates) {
             this.WorkAlphabet = Workalphabet;
             this.Transform = Transform;
             this.StartSymbol = Startsymbol;
-            this.AcceptedStates = AcceptedStates;
 
             CheckConstraints();
         }

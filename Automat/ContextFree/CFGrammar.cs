@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Serpen.Uni.Automat.ContextFree {
-    public class CFGrammer : GrammerBase, IAbgeschlossenheitseigenschaften<CFGrammer, CFGrammer> {
+    public class CFGrammer : GrammerBase, IAbgeschlossenheitseigenschaften<CFGrammer, CFGrammer>, IAcceptWord {
 
         public CFGrammer(string name, char[] variables, char[] terminals, RuleSet rules, char startSymbol)
             : base(name, variables, terminals, rules, startSymbol) {

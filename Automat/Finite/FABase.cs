@@ -6,23 +6,19 @@ namespace Serpen.Uni.Automat.Finite {
     public abstract class FABase : AutomatBase<EATuple, uint[]> {
         
         public FABase(uint stateCount, char[] alphabet, TransformBase<EATuple,uint[]> eat, uint startState, uint[] acceptedStates, string name = "") 
-        : base(stateCount, alphabet, startState, name) {
+        : base(stateCount, alphabet, startState, name, acceptedStates) {
             this.Transform = eat;
-            this.AcceptedStates = acceptedStates;
         }
 
         public FABase(string[] names, char[] alphabet, TransformBase<EATuple,uint[]> eat, uint startState, uint[] acceptedStates, string name = "") 
-        : base((uint)names.Length, alphabet, startState, name) {
+        : base(names, alphabet, startState, name, acceptedStates) {
             this.Transform = eat;
-            this.AcceptedStates = acceptedStates;
-            for (int i = 0; i < States.Length; i++)
-                    States[i] = names[i];
         }
 
         protected abstract uint[] GoChar(uint q, char c); //maybe return only uint
 
         public override System.Tuple<int, int, string>[] VisualizationLines() {
-            var tcol = new System.Collections.Generic.List<System.Tuple<int, int, string>>();
+            var tcol = new List<System.Tuple<int, int, string>>();
             foreach (var t in Transform) {
                 string desc = t.Key.c.ToString();
                 if (desc == "")
@@ -77,7 +73,7 @@ namespace Serpen.Uni.Automat.Finite {
 
             accStates.Sort();
 
-            return new NFAe($"NFAe_Concat({Name}+{A.Name})", A.StatesCount+offset, this.Alphabet, neaET, this.StartState, accStates.ToArray());
+            return new NFAe($"Concat({Name}+{A.Name})", A.StatesCount+offset, this.Alphabet, neaET, this.StartState, accStates.ToArray());
         }
 
         

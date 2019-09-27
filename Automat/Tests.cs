@@ -1,6 +1,7 @@
 using Serpen.Uni.Automat.Finite;
 using Serpen.Uni.Automat.ContextFree;
 using Serpen.Uni.Automat.Turing;
+using System.Linq;
 
 namespace Serpen.Uni.Automat {
     public static class Tests {
@@ -65,7 +66,8 @@ namespace Serpen.Uni.Automat {
             return Automates.ToArray();
         }
 
-        public static bool CastingEquality() {
+        [System.Obsolete()]
+        public static bool CastingEquality() { //IAutomat[][] automats
             foreach (DFA D in KnownAutomat.GetDFAModels()) {
                 NFA NfromD = (NFA)D;
                 NFAe NEfromD = (NFAe)D;
@@ -197,51 +199,117 @@ namespace Serpen.Uni.Automat {
             return;
         }
 
-        public static bool Joins() {
-            
-            FABase[] As = KnownAutomat.GetAllFiniteAutomats();
+#region  "Operations"
+        public static FABase[] GenerateJoins() {
+            var finiteAutomats = KnownAutomat.GetAllFiniteAutomats();
+            var ret = new System.Collections.Generic.List<FABase>(finiteAutomats.Length*finiteAutomats.Length);
 
-            for (int i = 0; i < As.Length; i++)
+            foreach (var d1 in finiteAutomats)
             {
-                for (int j = 0; j < As.Length; j++)
+                foreach (var d2 in finiteAutomats)
                 {
-                    var d1 = As[i];
-                    var d2 = As[j];
-                    
                     if (d1.GetType()==d2.GetType())
                         if (Utils.SameAlphabet(d1,d2))
-                            d1.Join(d2);
+                            ret.Add(d1.Join(d2));
                 }
             }
-            
-            return true;
+            return ret.ToArray();
         }
 
-        public static bool TestEqualAutomatWords(IAutomat A1, IAutomat A2, int count, int maxlen) {
+        public static FABase[] GenerateDiffs() {
+            var finiteAutomats = (from fa in KnownAutomat.GetAllFiniteAutomats() where fa is DFA da select (DFA)fa);
+            var ret = new System.Collections.Generic.List<FABase>(finiteAutomats.Count()*finiteAutomats.Count());
+
+            foreach (var d1 in finiteAutomats)
+                foreach (var d2 in finiteAutomats)
+                    if (d1.GetType()==d2.GetType())
+                        if (Utils.SameAlphabet(d1,d2))
+                            ret.Add(DFA.Diff(d1,d2));
+            
+            return ret.ToArray();
+        }
+
+        public static FABase[] GenerateUnions() {
+            var finiteAutomats = (from fa in KnownAutomat.GetAllFiniteAutomats() where fa is DFA da select (DFA)fa);
+            var ret = new System.Collections.Generic.List<FABase>(finiteAutomats.Count()*finiteAutomats.Count());
+
+            foreach (var d1 in finiteAutomats)
+                foreach (var d2 in finiteAutomats)
+                    if (d1.GetType()==d2.GetType())
+                        if (Utils.SameAlphabet(d1,d2)) {
+                            ret.Add(d1.UnionNEA(d2));
+                            ret.Add(DFA.UnionProduct(d1,d2));
+                        }
+            
+            return ret.ToArray();
+        }
+
+        
+        public static IAutomat[] GenerateIntersects() {
+            var finiteAutomats = (from fa in KnownAutomat.GetAllFiniteAutomats() where fa is DFA da select (DFA)fa);
+            var ret = new System.Collections.Generic.List<IAutomat>(finiteAutomats.Count()*finiteAutomats.Count());
+
+            foreach (var d1 in finiteAutomats)
+                foreach (var d2 in finiteAutomats)
+                    if (d1.GetType()==d2.GetType())
+                        if (Utils.SameAlphabet(d1,d2)) {
+                            ret.Add(DFA.Intersect(d1,d2));
+                        }
+            
+            return ret.ToArray();
+        }
+        
+        public static IAutomat[] GenerateComplements() {
+            var finiteAutomats = KnownAutomat.GetAllFiniteAutomats();
+            var ret = new System.Collections.Generic.List<IAutomat>(finiteAutomats.Length);
+
+            foreach (var fa1 in finiteAutomats)
+                ret.Add(fa1.Complement());
+            
+            return ret.ToArray();
+        }
+
+        public static IAutomat[] GenerateReverses() {
+            var finiteAutomats = KnownAutomat.GetAllFiniteAutomats();
+            var ret = new System.Collections.Generic.List<IAutomat>(finiteAutomats.Length);
+
+            foreach (var fa1 in finiteAutomats)
+                ret.Add(fa1.Reverse());
+            
+            return ret.ToArray();
+        }
+        
+        public static IAutomat[] GenerateCconcats() {
+            var finiteAutomats = KnownAutomat.GetAllFiniteAutomats();
+            var ret = new System.Collections.Generic.List<IAutomat>(finiteAutomats.Length*finiteAutomats.Length);
+
+            foreach (var fa1 in finiteAutomats)
+            foreach (var fa2 in finiteAutomats)
+                ret.Add(fa1.Concat(fa2));
+            
+            return ret.ToArray();
+        }
+
+#endregion
+        
+
+        public static bool TestEqualWithWords(IAutomat A1, IAutomat A2, int count, int maxlen) {
             var rnd = Utils.RND;
 
-            var sw = new System.Text.StringBuilder(maxlen);
-            for (int c = 0; c < count; c++)
+            string[] words = A1.GetRandomWords(count);
+            foreach (string w in words)
             {
-                int l = rnd.Next(maxlen);
-                sw.Clear();
-
-                for (int i = 0; i < l; i++)
-                {
-                    sw.Append(A1.Alphabet[rnd.Next(A1.Alphabet.Length)]);
-                }
-
-                var erg1 = A1.AcceptWord(sw.ToString());
-                var erg2 = A2.AcceptWord(sw.ToString());
+                var erg1 = A1.AcceptWord(w);
+                var erg2 = A2.AcceptWord(w);
 
                 if (erg1 != erg2) {
-                    System.Console.WriteLine($"word {c} {sw.ToString()} divides Automates");
-                    //return false;
+                    Utils.DebugMessage($"word '{w}' divides Automates", A1);
+                    return false;
                 } else
-                    System.Console.WriteLine($"word {c} {sw.ToString()} passes");
+                    Utils.DebugMessage($"word '{w}' passes", A1);
 
             }
-            System.Console.WriteLine($"{count} words passed, last {sw.ToString()}");
+            Utils.DebugMessage($"{count} words passed", A1);
             return true;
         }
         

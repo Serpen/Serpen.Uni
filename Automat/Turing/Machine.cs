@@ -9,17 +9,15 @@ namespace Serpen.Uni.Automat.Turing {
         public char BlankSymbol;
 
         public TuringMachineBase(string name, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, uint startState, char blankSymbol, uint[] acceptedStates)
-            : base(stateCount, inputAlphabet, startState, name) {
+            : base(stateCount, inputAlphabet, startState, name, acceptedStates) {
             BandAlphabet = bandAlphabet;
             BlankSymbol = blankSymbol;
-            AcceptedStates = acceptedStates;
             CheckConstraints();
         }
         public TuringMachineBase(string name, string[] states, char[] inputAlphabet, char[] bandAlphabet, uint startState, char blankSymbol, uint[] acceptedStates)
-            : base(states, inputAlphabet, startState, name) {
+            : base(states, inputAlphabet, startState, name, acceptedStates) {
             BandAlphabet = bandAlphabet;
             BlankSymbol = blankSymbol;
-            AcceptedStates = acceptedStates;
             CheckConstraints();
         }
 

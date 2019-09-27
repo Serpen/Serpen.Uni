@@ -2,18 +2,24 @@ using System.Linq;
 
 namespace Serpen.Uni.Automat {
 
-    public interface IAutomat {
+    public interface IAcceptWord
+    {
+        string Name { get; }
+        bool AcceptWord(string w);
+
+        //protected void CheckConstraints();
+    }
+
+    public interface IAutomat : IAcceptWord {
         uint StartState { get; }
         string[] States { get; }
         uint StatesCount { get; }
         char[] Alphabet { get; }
-        string Name { get; }
         uint[] AcceptedStates { get; }
         bool IsAcceptedState(uint q);
 
         string GetRandomWord();
         string[] GetRandomWords(int count);
-        bool AcceptWord(string w);
         IAutomat PurgeStates();
 
         System.Tuple<int, int, string>[] VisualizationLines();
@@ -28,7 +34,7 @@ namespace Serpen.Uni.Automat {
         public string Name { get; protected set; }
         public uint[] AcceptedStates { get; protected set; }
 
-        public AutomatBase(uint stateCount, char[] alphabet, uint startState, string name) {
+        public AutomatBase(uint stateCount, char[] alphabet, uint startState, string name, uint[] acceptedStates) {
             this.States = new string[stateCount];
 
             var sortAlp = alphabet.ToList();
@@ -37,22 +43,17 @@ namespace Serpen.Uni.Automat {
 
             this.StartState = startState;
             this.Name = name;
-
+            
+            AcceptedStates = acceptedStates;
+            
             for (int i = 0; i < stateCount; i++)
                 States[i] = i.ToString();
 
         }
 
-        public AutomatBase(string[] states, char[] alphabet, uint startState, string name) {
-            this.States = states;
-
-            var sortAlp = alphabet.ToList();
-            sortAlp.Sort();
-            this.Alphabet = sortAlp.ToArray();
-
-            this.StartState = startState;
-            this.Name = name;
-
+        public AutomatBase(string[] states, char[] alphabet, uint startState, string name, uint[] acceptedStates)
+            : this ((uint)states.Length, alphabet, startState, name, acceptedStates) {
+            States = states;
         }
         protected virtual void CheckConstraints() {
             if (StartState > StatesCount)
@@ -114,6 +115,12 @@ namespace Serpen.Uni.Automat {
 
 
         public abstract bool AcceptWord(string w);
+
+        protected void CheckWordInAlphabet(string w) {
+            for (int i = 0; i < w.Length; i++)
+                if (!Alphabet.Contains(w[i]))
+                    throw new AlphabetException(w[i]);
+        }
 
         public bool IsAcceptedState(uint q) {
             return AcceptedStates.Contains(q);
