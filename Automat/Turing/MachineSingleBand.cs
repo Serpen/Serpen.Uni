@@ -92,15 +92,9 @@ namespace Serpen.Uni.Automat.Turing {
             var t = new TuringTransformSingleBand();
             int stateCount = rnd.Next(1, MAX_STATES);
 
-
-            char[] bandAlphabet = new char[rnd.Next(1, MAX_CHAR)+1];
-            for (int i=0; i < bandAlphabet.Length-1; i++)
-                bandAlphabet[i] = (char)rnd.Next('a', 'z');
-            bandAlphabet[^1] = BLANK;
-            bandAlphabet = bandAlphabet.Distinct().ToArray();
-
-            char[] inputAlphabet = new char[rnd.Next(1, bandAlphabet.Length)];
-            System.Array.Copy(bandAlphabet, inputAlphabet, inputAlphabet.Length);
+            char[] inputAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR);
+            char[] bandAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR, inputAlphabet.Append(BLANK), 0);
+            uint[] accState = RandomGenerator.RandomAcceptedStates(1, stateCount/3, stateCount); 
             
             for (uint i = 0; i < stateCount; i++) {
                 int transformsRnd = rnd.Next(0, inputAlphabet.Length);
@@ -111,12 +105,6 @@ namespace Serpen.Uni.Automat.Turing {
                 }
             }
 
-            uint[] accState = new uint[rnd.Next(1, System.Math.Max(1,stateCount/3))];
-            for (int i=0; i < accState.Length; i++)
-                accState[i] = (uint)rnd.Next(0, stateCount);
-
-            accState = accState.Distinct().ToArray();
-
             var ret = new TuringMachineSingleBand("TM1_Random", (uint)stateCount, inputAlphabet, bandAlphabet , t, (uint)rnd.Next(0,stateCount), BLANK , accState);
             ret.Name = $"TM1_Random_{ret.GetHashCode()}";
             return ret;
@@ -125,16 +113,7 @@ namespace Serpen.Uni.Automat.Turing {
         public override IAutomat RemoveUnreachable() {
             var newT = new TuringTransformSingleBand();
 
-            bool[] fromStartReachable = new bool[StatesCount];
-            fromStartReachable[StartState] = true;
-            bool foundnew = true;
-            while (foundnew) {
-                foundnew = false;
-                foreach (var t in (from tr in Transform where fromStartReachable[tr.Key.q] select tr)) {
-                    fromStartReachable[t.Value.qNext] = true;
-                    foundnew = true;
-                }
-            }
+            bool[] fromStartReachable = base.reachableStates();
 
             uint[] translate = new uint[(from fsr in fromStartReachable where fsr select fsr).Count()];
             for (uint i=0; i < translate.Length; i++) {

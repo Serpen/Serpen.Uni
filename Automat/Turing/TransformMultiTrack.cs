@@ -15,13 +15,13 @@ public class TuringTransformMultiTrack : TransformBase<TuringTransformMultiTrack
 
         }
         
-        public struct TuringKey {
+        public struct TuringKey : ITransformKey {
             public TuringKey(uint q, char[] c) {
                 this.q = q;
                 this.c = c;
             }
-            public uint q;
-            public char[] c;
+            public uint q {get;}
+            public char[] c {get;}
 
             public override bool Equals(object obj) {
                 if (obj is TuringKey tk) {
@@ -35,7 +35,7 @@ public class TuringTransformMultiTrack : TransformBase<TuringTransformMultiTrack
             public override string ToString() => $"({q}, {string.Join("", c)})";
         }
 
-        public struct TuringVal {
+        public struct TuringVal : ITransformValue {
             public TuringVal(uint qNext, char[] c, TMDirection dir) {
                 this.qNext = qNext;
                 this.c2 = c;

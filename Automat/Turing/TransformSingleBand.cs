@@ -22,13 +22,15 @@ namespace Serpen.Uni.Automat.Turing {
             );
         }
 
-        public struct TuringKey {
+        public struct TuringKey : ITransformKey {
             public TuringKey(uint q, char c) {
                 this.q = q;
                 this.c = c;
             }
-            public uint q;
-            public char c;
+            public uint q {get;}
+            public char c {get;}
+
+            char[] ITransformKey.c => new char[] {c};
 
             public override bool Equals(object obj) {
                 if (obj is TuringKey tk) {
@@ -42,7 +44,7 @@ namespace Serpen.Uni.Automat.Turing {
             public override string ToString() => $"({q}, {c})";
         }
         
-        public struct TuringVal {
+        public struct TuringVal : ITransformValue {
             public TuringVal(uint qNext, char c, TMDirection dir) {
                 this.qNext = qNext;
                 this.c2 = c;

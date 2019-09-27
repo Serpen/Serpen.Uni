@@ -130,14 +130,12 @@ namespace Serpen.Uni.Automat.Finite {
 
             var rnd = Utils.RND;
 
-            var t = new NFAeTransform();
             int stateCount = rnd.Next(1, MAX_STATES);
-            char[] alphabet = new char[rnd.Next(1, MAX_CHAR)];
-            for (int i = 0; i < alphabet.Length; i++)
-                alphabet[i] = (char)rnd.Next('a', 'z');
 
-            alphabet = alphabet.Distinct().ToArray();
+            char[] alphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR);
+            uint[] accState = RandomGenerator.RandomAcceptedStates(1, stateCount/3, stateCount); 
 
+            var t = new NFAeTransform();
             for (uint i = 0; i < stateCount; i++) {
                 int transformsRnd = rnd.Next(0, alphabet.Length);
                 for (int j = 0; j < transformsRnd; j++) {
@@ -145,11 +143,6 @@ namespace Serpen.Uni.Automat.Finite {
                 }
             }
 
-            uint[] accState = new uint[rnd.Next(1, System.Math.Max(1, stateCount / 3))];
-            for (int i = 0; i < accState.Length; i++)
-                accState[i] = (uint)rnd.Next(0, stateCount);
-
-            accState = accState.Distinct().ToArray();
 
             var ret = new NFAe("NFAe_Random", (uint)stateCount, alphabet, t, (uint)rnd.Next(0, stateCount), accState);
             ret.Name = $"NFAe_Random_{ret.GetHashCode()}";
@@ -160,18 +153,7 @@ namespace Serpen.Uni.Automat.Finite {
         public override IAutomat RemoveUnreachable() {
             var newT = new NFAeTransform();
 
-            bool[] fromStartReachable = new bool[StatesCount];
-            fromStartReachable[StartState] = true;
-            bool foundnew = true;
-            while (foundnew) {
-                foundnew = false;
-                foreach (var t in (from tr in Transform where fromStartReachable[tr.Key.q] select tr)) {
-                    foreach (var v in (from vr in t.Value where !fromStartReachable[vr] select vr)) {
-                        fromStartReachable[v] = true;
-                        foundnew = true;
-                    }
-                }
-            }
+            bool[] fromStartReachable = base.reachableStates();
 
             uint[] translate = new uint[(from fsr in fromStartReachable where fsr select fsr).Count()];
             for (uint i=0; i < translate.Length; i++) {
@@ -202,7 +184,7 @@ namespace Serpen.Uni.Automat.Finite {
                 if (translate.Contains(accept))
                     astates.Add(Utils.ArrayIndex(translate,accept));
 
-            return new NFAe($"{Name}_minmized", names, Alphabet, newT, Utils.ArrayIndex(translate,StartState), astates.ToArray());
+            return new NFAe($"{Name}", names, Alphabet, newT, Utils.ArrayIndex(translate,StartState), astates.ToArray());
         
         }
 

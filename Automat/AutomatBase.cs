@@ -2,13 +2,12 @@ using System.Linq;
 
 namespace Serpen.Uni.Automat {
 
-    public interface IAutomat
-    {
-        uint StartState {get;}
-        string[] States {get;}
-        uint StatesCount {get;}
+    public interface IAutomat {
+        uint StartState { get; }
+        string[] States { get; }
+        uint StatesCount { get; }
         char[] Alphabet { get; }
-        string Name { get;}
+        string Name { get; }
         uint[] AcceptedStates { get; }
         bool IsAcceptedState(uint q);
 
@@ -20,13 +19,13 @@ namespace Serpen.Uni.Automat {
         System.Tuple<int, int, string>[] VisualizationLines();
     }
 
-    public abstract class AutomatBase<TKey, TVal> : IAutomat where TKey : struct {
-        public TransformBase<TKey, TVal> Transform { get; protected set;}
-        public string[] States {get;}
+    public abstract class AutomatBase<TKey, TVal> : IAutomat where TKey : struct, ITransformKey {
+        public TransformBase<TKey, TVal> Transform { get; protected set; }
+        public string[] States { get; }
         public uint StatesCount => (uint)States.Length;
-        public uint StartState {get;} = 0;
+        public uint StartState { get; } = 0;
         public char[] Alphabet { get; }
-        public string Name { get; protected set;}
+        public string Name { get; protected set; }
         public uint[] AcceptedStates { get; protected set; }
 
         public AutomatBase(uint stateCount, char[] alphabet, uint startState, string name) {
@@ -38,10 +37,10 @@ namespace Serpen.Uni.Automat {
 
             this.StartState = startState;
             this.Name = name;
-            
+
             for (int i = 0; i < stateCount; i++)
-                States[i] = i.ToString(); 
-            
+                States[i] = i.ToString();
+
         }
 
         public AutomatBase(string[] states, char[] alphabet, uint startState, string name) {
@@ -53,11 +52,35 @@ namespace Serpen.Uni.Automat {
 
             this.StartState = startState;
             this.Name = name;
-            
+
         }
         protected virtual void CheckConstraints() {
             if (StartState > StatesCount)
                 throw new Automat.StateException(StartState);
+        }
+
+        protected bool[] reachableStates() {
+            bool[] fromStartReachable = new bool[StatesCount];
+            fromStartReachable[StartState] = true;
+            bool foundnew = true;
+            while (foundnew) {
+                foundnew = false;
+                foreach (var t in (from tr in Transform where fromStartReachable[tr.Key.q] select tr)) {
+                    if (t.Value is uint qnext) {
+                        if (!fromStartReachable[qnext])
+                            fromStartReachable[qnext] = foundnew = true;
+                    } else if (t.Value is uint[] qnexts) {
+                        foreach (var qn in qnexts)
+                            if (!fromStartReachable[qn])
+                                fromStartReachable[qn] = foundnew = true;
+                    } else if (t.Value is ITransformValue tt) {
+                        if (!fromStartReachable[tt.qNext])
+                            fromStartReachable[tt.qNext] = foundnew = true;
+                    } else
+                        throw new System.NotImplementedException();
+                }
+            }
+            return fromStartReachable;
         }
 
 
@@ -89,8 +112,7 @@ namespace Serpen.Uni.Automat {
 
             var rnd = Utils.RND;
 
-            while (words.Count < count)
-            {
+            while (words.Count < count) {
                 string w = "";
                 var wLen = rnd.Next(0, System.Math.Max(10, count));
                 for (int k = 0; k < wLen; k++)
@@ -101,7 +123,7 @@ namespace Serpen.Uni.Automat {
             }
             words.CopyTo(wordArray, 0);
             return wordArray;
-            
+
         }
     }
 }

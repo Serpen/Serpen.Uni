@@ -2,7 +2,7 @@ using System.Linq;
 
 namespace Serpen.Uni.Automat.Turing {
 
-    public abstract class TuringMachineBase<TKey, TVal> : AutomatBase<TKey, TVal> where TKey : struct { //where TConfig : ITuringConfig {
+    public abstract class TuringMachineBase<TKey, TVal> : AutomatBase<TKey, TVal> where TKey : struct, ITransformKey where TVal : ITransformValue { //where TConfig : ITuringConfig {
 
         public const char BLANK = '_';
         public char[] BandAlphabet;

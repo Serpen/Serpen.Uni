@@ -150,16 +150,9 @@ namespace Serpen.Uni.Automat.ContextFree {
             var t = new PDATransform();
             int stateCount = rnd.Next(1, MAX_STATES);
 
-            char[] inputAlphabet = new char[rnd.Next(1, MAX_CHAR)];
-            for (int i=0; i < inputAlphabet.Length; i++)
-                inputAlphabet[i] = (char)rnd.Next('a', 'z');
-            inputAlphabet = inputAlphabet.Distinct().ToArray();
-
-            char[] workAlphabet = new char[rnd.Next(1, MAX_CHAR)];
-            for (int i=1; i < workAlphabet.Length; i++)
-                workAlphabet[i] = (char)rnd.Next('a', 'z');
-            workAlphabet[0] = START;
-            workAlphabet = workAlphabet.Distinct().ToArray();
+            char[] inputAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR);
+            char[] workAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR, new char[] {START}, 0);
+            uint[] accState = RandomGenerator.RandomAcceptedStates(1, stateCount/3, stateCount); 
 
             for (uint i = 0; i < stateCount; i++) {
                 int transformsRnd = rnd.Next(0, inputAlphabet.Length);
@@ -167,12 +160,6 @@ namespace Serpen.Uni.Automat.ContextFree {
                     t.AddM(i, Utils.GrAE(inputAlphabet), Utils.GrAE(workAlphabet), Utils.GrAE(workAlphabet).ToString(), (uint)rnd.Next(0, stateCount));
                 }
             }
-
-            uint[] accState = new uint[rnd.Next(1, System.Math.Max(1,stateCount/3))];
-            for (int i=0; i < accState.Length; i++)
-                accState[i] = (uint)rnd.Next(0, stateCount);
-
-            accState = accState.Distinct().ToArray();
 
             var ret = new StatePDA("QPDA_Random", (uint)stateCount, inputAlphabet, workAlphabet , t, (uint)rnd.Next(0,stateCount), START , accState);
             ret.Name = $"QPDA_Random_{ret.GetHashCode()}";
@@ -183,18 +170,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         public override IAutomat RemoveUnreachable() {
             var newT = new PDATransform();
 
-            bool[] fromStartReachable = new bool[StatesCount];
-            fromStartReachable[StartState] = true;
-            bool foundnew = true;
-            while (foundnew) {
-                foundnew = false;
-                foreach (var t in (from tr in Transform where fromStartReachable[tr.Key.q] select tr)) {
-                    foreach (var v in (from vr in t.Value where !fromStartReachable[vr.qNext] select vr)) {
-                        fromStartReachable[v.qNext] = true;
-                        foundnew = true;
-                    }
-                }
-            }
+            bool[] fromStartReachable = base.reachableStates();
 
             uint[] translate = new uint[(from fsr in fromStartReachable where fsr select fsr).Count()];
             for (uint i=0; i < translate.Length; i++) {
@@ -225,7 +201,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                 if (translate.Contains(accept))
                     astates.Add(Utils.ArrayIndex(translate,accept));
 
-            return new StatePDA($"{Name}_minmized", names, Alphabet, WorkAlphabet, newT, Utils.ArrayIndex(translate,StartState), StartStackSymbol, astates.ToArray());
+            return new StatePDA($"{Name}", names, Alphabet, WorkAlphabet, newT, Utils.ArrayIndex(translate,StartState), StartStackSymbol, astates.ToArray());
         
         }
     }

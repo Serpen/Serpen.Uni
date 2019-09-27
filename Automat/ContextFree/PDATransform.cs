@@ -2,9 +2,18 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Serpen.Uni.Automat.ContextFree {
-    public struct PDATransformKey {
+    public struct PDATransformKey : ITransformKey {
         public uint q {get;}
         public char? ci {get;}
+
+        char[] ITransformKey.c {
+            get {
+                if (ci.HasValue)
+                    return new char[] {ci.Value};
+                else
+                    return new char[] {};
+            }
+        }
         public char? cw {get;}
         
         public PDATransformKey(uint q, char? ci, char? cw) {
@@ -26,7 +35,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             => $"({q}, {(ci.HasValue ? ci.Value : Utils.EPSILON)}, {(cw.HasValue ? cw.Value : Utils.EPSILON)})";
     }
 
-    public struct PDATransformValue {
+    public struct PDATransformValue : ITransformValue {
         public PDATransformValue(string cw2, uint qnext) {
             this.cw2 = cw2;
             this.qNext = qnext;

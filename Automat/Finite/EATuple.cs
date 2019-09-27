@@ -1,7 +1,15 @@
 namespace Serpen.Uni.Automat.Finite {
-    public struct EATuple {
+    public struct EATuple : ITransformKey {
         public uint q {get;}
         public char? c {get;}
+        char[] ITransformKey.c {
+            get {
+                if (c.HasValue)
+                    return new char[] {c.Value};
+                else
+                    return new char[] {};
+            }
+        }
 
         public EATuple(uint i, char? c) {
             this.q = i;
