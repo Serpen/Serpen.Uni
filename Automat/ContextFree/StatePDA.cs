@@ -167,41 +167,17 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
         
-        public override IAutomat RemoveUnreachable() {
+        public override IAutomat PurgeStates() {
+            (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
+
             var newT = new PDATransform();
-
-            bool[] fromStartReachable = base.reachableStates();
-
-            uint[] translate = new uint[(from fsr in fromStartReachable where fsr select fsr).Count()];
-            for (uint i=0; i < translate.Length; i++) {
-                uint j=i;
-                if (i>0)
-                    j = System.Math.Max(i, translate[i-1]+1);
-                while (!fromStartReachable[j])
-                    j++;
-                translate[i] = j;
-            }
-
-            string[] names = new string[translate.Length];
-            for (int i = 0; i < translate.Length; i++)
-                names[i] = translate[i].ToString();
-
-            if (Utils.ArrayIndex(translate,StartState) > 100) {
-                Utils.DebugMessage("removed with high start state", this);
-            }
-                
             foreach (var t2 in Transform)
                 if (translate.Contains(t2.Key.q))
                     foreach (var v in t2.Value)
                         if (translate.Contains(v.qNext))
                             newT.AddM(Utils.ArrayIndex(translate,t2.Key.q), t2.Key.ci, t2.Key.cw, v.cw2, Utils.ArrayIndex(translate,v));
             
-            var astates = new System.Collections.Generic.List<uint>();
-            foreach (var accept in AcceptedStates)
-                if (translate.Contains(accept))
-                    astates.Add(Utils.ArrayIndex(translate,accept));
-
-            return new StatePDA($"{Name}", names, Alphabet, WorkAlphabet, newT, Utils.ArrayIndex(translate,StartState), StartStackSymbol, astates.ToArray());
+            return new StatePDA($"{Name}_purged", names, Alphabet, WorkAlphabet, newT, Utils.ArrayIndex(translate,StartState), StartStackSymbol, aStates);
         
         }
     }

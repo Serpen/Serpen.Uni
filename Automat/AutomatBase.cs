@@ -14,7 +14,7 @@ namespace Serpen.Uni.Automat {
         string GetRandomWord();
         string[] GetRandomWords(int count);
         bool AcceptWord(string w);
-        IAutomat RemoveUnreachable();
+        IAutomat PurgeStates();
 
         System.Tuple<int, int, string>[] VisualizationLines();
     }
@@ -59,7 +59,7 @@ namespace Serpen.Uni.Automat {
                 throw new Automat.StateException(StartState);
         }
 
-        protected bool[] reachableStates() {
+        private bool[] reachableStates() {
             bool[] fromStartReachable = new bool[StatesCount];
             fromStartReachable[StartState] = true;
             bool foundnew = true;
@@ -83,6 +83,35 @@ namespace Serpen.Uni.Automat {
             return fromStartReachable;
         }
 
+        protected (uint[], string[], uint[]) removedStateTranslateTables() {
+            bool[] fromStartReachable = reachableStates();
+
+            uint[] translate = new uint[fromStartReachable.Count((b) => b)];
+            for (uint i = 0; i < translate.Length; i++) {
+                uint j = i;
+                if (i > 0)
+                    j = System.Math.Max(i, translate[i - 1] + 1);
+                while (!fromStartReachable[j])
+                    j++;
+                translate[i] = j;
+            }
+
+            if (Utils.ArrayIndex(translate, StartState) > this.StatesCount)
+                throw new Uni.Automat.StateException(StartState, "removed with too high start state");
+
+            string[] names = new string[translate.Length];
+            for (int i = 0; i < translate.Length; i++)
+                names[i] = translate[i].ToString();
+
+            var astates = new System.Collections.Generic.List<uint>();
+            foreach (var accept in AcceptedStates)
+                if (translate.Contains(accept))
+                    astates.Add(Utils.ArrayIndex(translate, accept));
+
+
+            return (translate, names, astates.ToArray());
+        }
+
 
         public abstract bool AcceptWord(string w);
 
@@ -90,7 +119,7 @@ namespace Serpen.Uni.Automat {
             return AcceptedStates.Contains(q);
         }
 
-        public abstract IAutomat RemoveUnreachable();
+        public abstract IAutomat PurgeStates();
 
         public abstract System.Tuple<int, int, string>[] VisualizationLines();
 

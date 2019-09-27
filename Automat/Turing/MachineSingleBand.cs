@@ -110,29 +110,10 @@ namespace Serpen.Uni.Automat.Turing {
             return ret;
         }
 
-        public override IAutomat RemoveUnreachable() {
+        public override IAutomat PurgeStates() {
+            (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
+
             var newT = new TuringTransformSingleBand();
-
-            bool[] fromStartReachable = base.reachableStates();
-
-            uint[] translate = new uint[(from fsr in fromStartReachable where fsr select fsr).Count()];
-            for (uint i=0; i < translate.Length; i++) {
-                uint j=i;
-                if (i>0)
-                    j = System.Math.Max(i, translate[i-1]+1);
-                while (!fromStartReachable[j])
-                    j++;
-                translate[i] = j;
-            }
-
-            string[] names = new string[translate.Length];
-            for (int i = 0; i < translate.Length; i++)
-                names[i] = translate[i].ToString();
-
-            if (Utils.ArrayIndex(translate,StartState) > 100) {
-                Utils.DebugMessage("removed with high start state", this);
-            }
-                
             foreach (var t2 in Transform)
                 if (translate.Contains(t2.Key.q))
                     if (translate.Contains(t2.Value.qNext)) {
@@ -140,12 +121,8 @@ namespace Serpen.Uni.Automat.Turing {
                         var tv = new TuringTransformSingleBand.TuringVal(Utils.ArrayIndex(translate,t2.Value.qNext), t2.Value.c2, t2.Value.Direction);
                         newT.Add(tk,tv);
                     }
-            var astates = new System.Collections.Generic.List<uint>();
-            foreach (var accept in AcceptedStates)
-                if (translate.Contains(accept))
-                    astates.Add(Utils.ArrayIndex(translate,accept));
 
-            return new TuringMachineSingleBand($"{Name}_removed", (uint)names.Length, Alphabet, BandAlphabet, newT, Utils.ArrayIndex(translate,StartState), BlankSymbol , astates.ToArray());
+            return new TuringMachineSingleBand($"{Name}_purged", (uint)names.Length, Alphabet, BandAlphabet, newT, Utils.ArrayIndex(translate,StartState), BlankSymbol , aStates);
         }
     }
 }

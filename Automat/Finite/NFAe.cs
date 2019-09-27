@@ -150,41 +150,17 @@ namespace Serpen.Uni.Automat.Finite {
 
         }
 
-        public override IAutomat RemoveUnreachable() {
-            var newT = new NFAeTransform();
-
-            bool[] fromStartReachable = base.reachableStates();
-
-            uint[] translate = new uint[(from fsr in fromStartReachable where fsr select fsr).Count()];
-            for (uint i=0; i < translate.Length; i++) {
-                uint j=i;
-                if (i>0)
-                    j = System.Math.Max(i, translate[i-1]+1);
-                while (!fromStartReachable[j])
-                    j++;
-                translate[i] = j;
-            }
-
-            string[] names = new string[translate.Length];
-            for (int i = 0; i < translate.Length; i++)
-                names[i] = translate[i].ToString();
-
-            if (Utils.ArrayIndex(translate,StartState) > 100) {
-                Utils.DebugMessage("removed with high start state", this);
-            }
+        public override IAutomat PurgeStates() {
+            (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
                 
+            var newT = new NFAeTransform();
             foreach (var t2 in Transform)
                 if (translate.Contains(t2.Key.q))
                     foreach (var v in t2.Value)
                         if (translate.Contains(v))
                             newT.AddM(Utils.ArrayIndex(translate,t2.Key.q), t2.Key.c.Value, Utils.ArrayIndex(translate,v));
             
-            var astates = new System.Collections.Generic.List<uint>();
-            foreach (var accept in AcceptedStates)
-                if (translate.Contains(accept))
-                    astates.Add(Utils.ArrayIndex(translate,accept));
-
-            return new NFAe($"{Name}", names, Alphabet, newT, Utils.ArrayIndex(translate,StartState), astates.ToArray());
+            return new NFAe($"{Name}_purged", names, Alphabet, newT, Utils.ArrayIndex(translate,StartState), aStates);
         
         }
 

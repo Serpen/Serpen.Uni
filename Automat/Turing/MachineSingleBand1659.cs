@@ -92,28 +92,9 @@ namespace Serpen.Uni.Automat.Turing {
             return ret;
         }
 
-        public override IAutomat RemoveUnreachable() {
+        public override IAutomat PurgeStates() {
+            (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
 
-            bool[] fromStartReachable = base.reachableStates();
-
-            uint[] translate = new uint[(from fsr in fromStartReachable where fsr select fsr).Count()];
-            for (uint i=0; i < translate.Length; i++) {
-                uint j=i;
-                if (i>0)
-                    j = System.Math.Max(i, translate[i-1]+1);
-                while (!fromStartReachable[j])
-                    j++;
-                translate[i] = j;
-            }
-
-            string[] names = new string[translate.Length];
-            for (int i = 0; i < translate.Length; i++)
-                names[i] = translate[i].ToString();
-
-            if (Utils.ArrayIndex(translate,StartState) > 100) {
-                Utils.DebugMessage("removed with high start state", this);
-            }
-                
             var newT = new TuringTransformSingleBand();
             foreach (var t2 in Transform)
                 if (translate.Contains(t2.Key.q))
@@ -123,7 +104,7 @@ namespace Serpen.Uni.Automat.Turing {
                         newT.Add(tk,tv);
                     }
 
-            return new TuringMachineSingleBand1659($"{Name}_removed", (uint)names.Length, Alphabet, BandAlphabet, newT, Utils.ArrayIndex(translate,StartState), BlankSymbol , Utils.ArrayIndex(translate,AcceptedState), Utils.ArrayIndex(translate,DiscardState));
+            return new TuringMachineSingleBand1659($"{Name}_purged", (uint)names.Length, Alphabet, BandAlphabet, newT, Utils.ArrayIndex(translate,StartState), BlankSymbol , Utils.ArrayIndex(translate,AcceptedState), Utils.ArrayIndex(translate,DiscardState));
         }
 
         public override System.Tuple<int, int, string>[] VisualizationLines() {

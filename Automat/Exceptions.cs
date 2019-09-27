@@ -17,6 +17,7 @@ namespace Serpen.Uni.Automat {
     [System.Serializable]
     public class StateException : Serpen.Uni.Exception {
         public StateException(uint q) : base($"{q} not in States") => State = q;
+        public StateException(uint q, string message) : base($"{q} {message}") => State = q;
         public uint State { get; }
     }
 

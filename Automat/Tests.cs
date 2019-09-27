@@ -166,11 +166,11 @@ namespace Serpen.Uni.Automat {
             return retAut.ToArray();
         }
 
-        public static void RemoveUnusedEquality(IAutomat[] automats) {
+        public static void PurgeEquality(IAutomat[] automats, int words = 100) {
             foreach (IAutomat a in automats) {
                 if (a is NFA nfa) {
-                    var nfa_removed = nfa.RemoveUnreachable();
-                    string[] rwords = nfa.GetRandomWords(100); 
+                    var nfa_removed = nfa.PurgeStates();
+                    string[] rwords = nfa.GetRandomWords(words); 
                     for (int i = 0; i < rwords.Length; i++)
                     {
                         if (!nfa.AcceptWord(rwords[i]) == nfa_removed.AcceptWord(rwords[i]))

@@ -159,40 +159,16 @@ namespace Serpen.Uni.Automat.ContextFree {
             return ret;
         }
 
-        public override IAutomat RemoveUnreachable() {
+        public override IAutomat PurgeStates() {
+            (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
+
             var newT = new DPDATransform();
-
-            bool[] fromStartReachable = base.reachableStates();
-
-            uint[] translate = new uint[(from fsr in fromStartReachable where fsr select fsr).Count()];
-            for (uint i=0; i < translate.Length; i++) {
-                uint j=i;
-                if (i>0)
-                    j = System.Math.Max(i, translate[i-1]+1);
-                while (!fromStartReachable[j])
-                    j++;
-                translate[i] = j;
-            }
-
-            string[] names = new string[translate.Length];
-            for (int i = 0; i < translate.Length; i++)
-                names[i] = translate[i].ToString();
-
-            if (Utils.ArrayIndex(translate,StartState) > 100) {
-                Utils.DebugMessage("removed with high start state", this);
-            }
-                
             foreach (var t2 in Transform)
                 if (translate.Contains(t2.Key.q))
                     if (translate.Contains(t2.Value.qNext))
                         newT.Add(Utils.ArrayIndex(translate,t2.Key.q), t2.Key.ci, t2.Key.cw, t2.Value.cw2, Utils.ArrayIndex(translate,t2.Value));
-            
-            var astates = new System.Collections.Generic.List<uint>();
-            foreach (var accept in AcceptedStates)
-                if (translate.Contains(accept))
-                    astates.Add(Utils.ArrayIndex(translate,accept));
 
-            return new DPDA($"{Name}_removed", (uint)names.Length, Alphabet, WorkAlphabet, newT, Utils.ArrayIndex(translate,StartState), StartSymbol, astates.ToArray());
+            return new DPDA($"{Name}_purged", (uint)names.Length, Alphabet, WorkAlphabet, newT, Utils.ArrayIndex(translate,StartState), StartSymbol, aStates);
         }
 
         public override string ToString() => $"{Name} DPDA(|{States.Length}|={string.Join(";", States)}), {{{string.Join(',', Alphabet)}}},{{{string.Join(',', WorkAlphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {StartSymbol} {{{string.Join(',', AcceptedStates)}}})".Trim();
