@@ -14,25 +14,13 @@ namespace Serpen.Uni.Automat.ContextFree {
         /// <param name="Startsymbol">Inital Stack Population</param>
         public StackPDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char Startsymbol)
         : base(name, StatesCount, InputAlphabet, Workalphabet, Transform, StartState, Startsymbol, new uint[] { }) {
-
-            //Make all States acceptable for 
-            base.AcceptedStates = new uint[StatesCount];
-            for (uint i = 0; i < StatesCount; i++)
-                base.AcceptedStates[i] = i;
-
         }
 
         public StackPDA(string name, string[] states, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char Startsymbol)
         : base(name, states, InputAlphabet, Workalphabet, Transform, StartState, Startsymbol, new uint[] { }) {
-
-            //Make all States acceptable for 
-            base.AcceptedStates = new uint[StatesCount];
-            for (uint i = 0; i < StatesCount; i++)
-                base.AcceptedStates[i] = i;
-
         }
 
-        [System.ComponentModel.Description("1659_L33")]
+        [AlgorithmSource("1659_L33")]
         public static explicit operator StackPDA(StatePDA pda) {
             var newt = new PDATransform();
 
@@ -92,8 +80,6 @@ namespace Serpen.Uni.Automat.ContextFree {
                     Utils.DebugMessage($"{runCount}: Stack >= {pcfgs.Length}, abort", this);
                     return false;
                 }
-                //check if a cfg has word and stack cleared and ends in accepted states
-
             }
 
             return false;
@@ -144,7 +130,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             return new StackPDA($"{Name}_purged", names, Alphabet, WorkAlphabet, newT, Utils.ArrayIndex(translate,StartState), StartStackSymbol);
         }
 
-        [System.ComponentModel.Description("1659_L3.1_P76")]
+        [AlgorithmSource("1659_L3.1_P76")]
         public static explicit operator StackPDA(ContextFree.CFGrammer cfg) {
             var t = new ContextFree.PDATransform();
             var sn = new System.Collections.Generic.Dictionary<uint, string>();
