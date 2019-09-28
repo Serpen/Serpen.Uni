@@ -257,6 +257,36 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         }
 
+        public virtual PDA Reverse() {
+            var pdat = new PDATransform();
+
+            string[] names = new string[this.StatesCount+1];
+
+            //array pointer old to new state            
+            uint[] newstate = new uint[this.StatesCount];
+            for (uint i = 0; i < newstate.Length; i++) {
+                newstate[i] = this.StatesCount - i;
+                names[i+1] = (newstate[i]-1).ToString();
+            }
+            names[0] = "new";
+
+            //turn and add each transform
+            foreach (var dt in this.Transform.Reverse())
+                foreach (var dtv in dt.Value)
+                    pdat.AddM(newstate[dtv.qNext], dt.Key.ci, dt.Key.cw, dtv.cw2, newstate[dt.Key.q]);
+                
+            //start state is qe, which leads to every old accepted state
+            for (int i = 0; i < this.AcceptedStates.Length; i++)
+                pdat.AddM(0, null, null, null, newstate[this.AcceptedStates[i]]);
+            
+            if (this is StatePDA)
+                return new StatePDA($"Reverse({Name})", names, this.Alphabet, this.WorkAlphabet, pdat, 0, START, new uint[] {this.StatesCount});
+            else if (this is StackPDA)
+                return new StackPDA($"Reverse({Name})", names, this.Alphabet, this.WorkAlphabet, pdat, 0, START);
+            else
+                throw new System.NotImplementedException();
+        }
+
         #endregion
     
     } //end class

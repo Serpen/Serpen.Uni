@@ -1,16 +1,17 @@
 using Serpen.Uni.Automat.Finite;
 using Serpen.Uni.Automat.ContextFree;
 using Serpen.Uni.Automat.Turing;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Serpen.Uni.Automat {
     public static class Tests {
 
         public static IAutomat[][] CastToEveryPossibility(IAutomat[] As) {
-            var Automates = new System.Collections.Generic.List<IAutomat[]>(); 
+            var Automates = new List<IAutomat[]>(); 
 
             foreach (IAutomat A in As) {
-                var list = new System.Collections.Generic.List<IAutomat>();
+                var list = new List<IAutomat>();
                 if (A is DFA D) {
                     NFA NfromD = (NFA)D;
                     NFAe NEfromD = (NFAe)D;
@@ -152,7 +153,7 @@ namespace Serpen.Uni.Automat {
         }
 
         public static IAutomat[] GenerateRandomAutomats(int count) {
-            var retAut = new System.Collections.Generic.List<IAutomat>();
+            var retAut = new List<IAutomat>();
             for (int i = 0; i < count; i++)
             {
                 retAut.Add(DFA.GenerateRandom());
@@ -202,7 +203,7 @@ namespace Serpen.Uni.Automat {
 #region  "Operations"
         public static FABase[] GenerateJoins() {
             var finiteAutomats = KnownAutomat.GetAllFiniteAutomats();
-            var ret = new System.Collections.Generic.List<FABase>(finiteAutomats.Length*finiteAutomats.Length);
+            var ret = new List<FABase>(finiteAutomats.Length*finiteAutomats.Length);
 
             foreach (var d1 in finiteAutomats)
             {
@@ -218,7 +219,7 @@ namespace Serpen.Uni.Automat {
 
         public static FABase[] GenerateDiffs() {
             var finiteAutomats = (from fa in KnownAutomat.GetAllFiniteAutomats() where fa is DFA da select (DFA)fa);
-            var ret = new System.Collections.Generic.List<FABase>(finiteAutomats.Count()*finiteAutomats.Count());
+            var ret = new List<FABase>(finiteAutomats.Count()*finiteAutomats.Count());
 
             foreach (var d1 in finiteAutomats)
                 foreach (var d2 in finiteAutomats)
@@ -231,7 +232,7 @@ namespace Serpen.Uni.Automat {
 
         public static FABase[] GenerateUnions() {
             var finiteAutomats = (from fa in KnownAutomat.GetAllFiniteAutomats() where fa is DFA da select (DFA)fa);
-            var ret = new System.Collections.Generic.List<FABase>(finiteAutomats.Count()*finiteAutomats.Count());
+            var ret = new List<FABase>(finiteAutomats.Count()*finiteAutomats.Count());
 
             foreach (var d1 in finiteAutomats)
                 foreach (var d2 in finiteAutomats)
@@ -247,7 +248,7 @@ namespace Serpen.Uni.Automat {
         
         public static IAutomat[] GenerateIntersects() {
             var finiteAutomats = (from fa in KnownAutomat.GetAllFiniteAutomats() where fa is DFA da select (DFA)fa);
-            var ret = new System.Collections.Generic.List<IAutomat>(finiteAutomats.Count()*finiteAutomats.Count());
+            var ret = new List<IAutomat>(finiteAutomats.Count()*finiteAutomats.Count());
 
             foreach (var d1 in finiteAutomats)
                 foreach (var d2 in finiteAutomats)
@@ -261,7 +262,7 @@ namespace Serpen.Uni.Automat {
         
         public static IAutomat[] GenerateComplements() {
             var finiteAutomats = KnownAutomat.GetAllFiniteAutomats();
-            var ret = new System.Collections.Generic.List<IAutomat>(finiteAutomats.Length);
+            var ret = new List<IAutomat>(finiteAutomats.Length);
 
             foreach (var fa1 in finiteAutomats)
                 ret.Add(fa1.Complement());
@@ -270,18 +271,41 @@ namespace Serpen.Uni.Automat {
         }
 
         public static IAutomat[] GenerateReverses() {
-            var finiteAutomats = KnownAutomat.GetAllFiniteAutomats();
-            var ret = new System.Collections.Generic.List<IAutomat>(finiteAutomats.Length);
+            var automats = new List<IAutomat>();
+            automats.AddRange(KnownAutomat.GetAllFiniteAutomats());
+            automats.Add(DFA.GenerateRandom());
+            automats.Add(NFA.GenerateRandom());
+            automats.Add(NFAe.GenerateRandom());
+            automats.AddRange(KnownAutomat.GetAllContextFreeAutomats());
+            automats.Add(StatePDA.GenerateRandom());
+            automats.Add(StackPDA.GenerateRandom());
+            var ret = new List<IAutomat>(automats.Count());
 
-            foreach (var fa1 in finiteAutomats)
-                ret.Add(fa1.Reverse());
+            foreach (var a in automats)
+                if (a is FABase fa1)
+                    ret.Add(fa1.Reverse());
+                else if (a is PDA pda)
+                    ret.Add(pda.Reverse());
             
             return ret.ToArray();
         }
+
+        public static void TestDoubleReversesByWord(IAutomat[] automats) {
+            foreach (var a in automats) {
+                if (a is FABase fa1) {
+                    var fa2 = fa1.Reverse().Reverse();
+                    TestEqualWithWords(fa1, fa2, 200);
+                }
+                else if (a is PDA pda) {
+                    var pdaR = pda.Reverse().Reverse();
+                    TestEqualWithWords(pda, pdaR, 200);
+                }
+            }
+        }
         
-        public static IAutomat[] GenerateCconcats() {
+        public static IAutomat[] GenerateConcats() {
             var finiteAutomats = KnownAutomat.GetAllFiniteAutomats();
-            var ret = new System.Collections.Generic.List<IAutomat>(finiteAutomats.Length*finiteAutomats.Length);
+            var ret = new List<IAutomat>(finiteAutomats.Length*finiteAutomats.Length);
 
             foreach (var fa1 in finiteAutomats)
             foreach (var fa2 in finiteAutomats)
@@ -295,7 +319,7 @@ namespace Serpen.Uni.Automat {
 
         public static bool TestEqualWithWords(IAutomat A1, IAutomat A2, int initialCount) {
             int onceTrue = 0, onceFalse = 0;
-            int passLevel = initialCount/10;
+            int passLevel = System.Math.Min(initialCount/10, 5);
 
             int count = 0;
             while ((onceTrue < passLevel | onceFalse < passLevel) && count < initialCount*2) {
@@ -316,12 +340,19 @@ namespace Serpen.Uni.Automat {
                     count++;
                 }
             }
-            if (onceTrue>passLevel && onceFalse>passLevel) {
+            if (onceTrue>=passLevel && onceFalse>=passLevel) {
                 Utils.DebugMessage($"{count} words passed", A1, Utils.eDebugLogLevel.Normal);
                 return true;
-            } else
-                Utils.DebugMessage($"{count} words passed, but not both tested", A1, Utils.eDebugLogLevel.Low);
-                return true;
+            } else {
+                if (A1.Equals(A2)) {
+                    Utils.DebugMessage($"{count} words passed, but not both tested, but Equals works", A1, Utils.eDebugLogLevel.Low);
+                    return true;
+                } else {
+                    Utils.DebugMessage($"{count} words passed, but not both tested, Equals not working", A1, Utils.eDebugLogLevel.Low);
+                    return true;
+                }
+                
+            }
         }
         
     } //end class

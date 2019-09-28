@@ -8,11 +8,17 @@ namespace Serpen.Uni.Automat.Finite {
         public FABase(uint stateCount, char[] alphabet, TransformBase<EATuple,uint[]> eat, uint startState, uint[] acceptedStates, string name = "") 
         : base(stateCount, alphabet, startState, name, acceptedStates) {
             this.Transform = eat;
+            CheckConstraints();
         }
 
         public FABase(string[] names, char[] alphabet, TransformBase<EATuple,uint[]> eat, uint startState, uint[] acceptedStates, string name = "") 
         : base(names, alphabet, startState, name, acceptedStates) {
             this.Transform = eat;
+            CheckConstraints();
+        }
+
+        protected override void CheckConstraints() {
+            base.CheckConstraints();
         }
 
         protected abstract uint[] GoChar(uint q, char c); //maybe return only uint
@@ -183,36 +189,30 @@ namespace Serpen.Uni.Automat.Finite {
         /// Reverse all transforms, add an qε which goes to all former q ϵ F,
         /// former q0 becomes the only ϵ F
         /// </summary>
+        [AlgorithmSource("EAFK_4.2.2")]
         public NFAe Reverse() {
             var neaET = new NFAeTransform();
 
+            string[] names = new string[this.StatesCount+1];
+
             //array pointer old to new state            
             uint[] newstate = new uint[this.StatesCount];
-            for (uint i = 0; i < newstate.Length; i++)
+            for (uint i = 0; i < newstate.Length; i++) {
                 newstate[i] = this.StatesCount - i;
+                names[i+1] = (newstate[i]-1).ToString();
+            }
+            names[0] = "new";
 
             //turn and add each transform
-            foreach (var dt in this.Transform.Reverse()) {
-
-                //new tuple with opposite direction
-                var newVals = new uint[dt.Value.Length];
-                // foreach (var dtv in dt.Value)
-                for (int i = 0; i < dt.Value.Length; i++) {
-                    var tuple = new EATuple(newstate[dt.Value[i]], dt.Key.c);
-
-                    if (!neaET.ContainsKey(tuple.q, tuple.c.Value))
-                        //add turned tuple
-                        neaET.Add(tuple.q, tuple.c, newstate[dt.Key.q]);
-                    else //could exists multiple possibilites, so append tranform
-                        neaET[tuple.q, tuple.c.Value] = neaET[tuple.q, tuple.c.Value].Append(newstate[dt.Key.q]).ToArray();
-                }
-            }
+            foreach (var dt in this.Transform.Reverse())
+                foreach (var dtv in dt.Value)
+                    neaET.AddM(newstate[dtv], dt.Key.c, newstate[dt.Key.q]);
 
             //start state is qe, which leads to every old accepted state
             for (int i = 0; i < this.AcceptedStates.Length; i++)
-                neaET.Add(0, null, newstate[this.AcceptedStates[i]]);
+                neaET.AddM(0, null, newstate[this.AcceptedStates[i]]);
             
-            return new NFAe($"NFAe_Reverse({Name})", this.StatesCount+1, this.Alphabet, neaET, 0, this.StatesCount);
+            return new NFAe($"NFAe_Reverse({Name})", names, this.Alphabet, neaET, 0, this.StatesCount);
         }
 
         public NFAe KleeneStern() {

@@ -37,6 +37,7 @@ namespace Serpen.Uni.Automat.Turing {
             int runs = 0;
             uint lastQ = tcfg.State;
             while (tcfg != null) {
+                Utils.DebugMessage(tcfg.ToString(), this, Utils.eDebugLogLevel.Verbose);
                 tcfg = GoChar(tcfg);
                 if (tcfg != null)
                     lastQ = tcfg.State;
