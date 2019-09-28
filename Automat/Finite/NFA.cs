@@ -31,9 +31,10 @@ namespace Serpen.Uni.Automat.Finite {
         protected override uint[] GoChar(uint q, char w) => GoChar(new uint[] { q }, w);
 
         public override bool AcceptWord(string w) {
+            CheckWordInAlphabet(w);
+            
             uint[] qs = new uint[] {StartState};
 
-            CheckWordInAlphabet(w);
             
             for (int i = 0; i < w.Length; i++)
             {

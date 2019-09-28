@@ -111,6 +111,8 @@ namespace Serpen.Uni.Automat.Finite {
         /// <param name="w">Word to Process</param>
         /// <returns></returns>
         public override bool AcceptWord(string w) {
+            CheckWordInAlphabet(w);
+            
             uint[] q = EpsilonHuelle(StartState); //Init Startstate
 
             //For every letter

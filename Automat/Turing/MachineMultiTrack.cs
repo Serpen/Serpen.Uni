@@ -3,16 +3,39 @@ using System.Linq;
 namespace Serpen.Uni.Automat.Turing {
     public class TuringMachineMultiTrack : TuringMachineBase<TuringTransformMultiTrack.TuringKey, TuringTransformMultiTrack.TuringVal> {
 
-        public uint Tracks { get; }
+        public readonly uint Tracks;
 
         public TuringMachineMultiTrack(string name, uint tracks, string[] states, char[] inputAlphabet, char[] bandAlphabet, TuringTransformMultiTrack transform, uint startState, char blankSymbol, uint[] acceptedStates)
             : base(name, states, inputAlphabet, bandAlphabet, startState, blankSymbol, acceptedStates) {
+            Transform = transform;
             Tracks = tracks;
         }
 
         public TuringMachineMultiTrack(string name, uint tracks, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, TuringTransformMultiTrack transform, uint startState, char blankSymbol, uint[] acceptedStates)
             : base(name, stateCount, inputAlphabet, bandAlphabet, startState, blankSymbol, acceptedStates) {
+            Transform = transform;
             Tracks = tracks;
+        }
+
+        protected override void CheckConstraints() {
+            base.CheckConstraints();
+            foreach (var ti in Transform) {
+                foreach (char c in ti.Key.c)
+                    if (!BandAlphabet.Contains(c))
+                        throw new Automat.AlphabetException(c);
+                 foreach (char c in ti.Value.c2)
+                    if (!BandAlphabet.Contains(c))
+                        throw new Automat.AlphabetException(c);
+                
+                if (Alphabet.Contains(BlankSymbol))
+                    throw new Automat.AlphabetException(BlankSymbol);
+               
+                if (ti.Key.q >= StatesCount)
+                    throw new Automat.StateException(ti.Key.q);
+                if (ti.Value.qNext >= StatesCount)
+                    throw new Automat.StateException(ti.Value.qNext);
+
+            }
         }
 
         TuringConfigMultiTrack GoChar(TuringConfigMultiTrack tcfg) {
@@ -27,6 +50,8 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         public override bool AcceptWord(string w) {
+            CheckWordInAlphabet(w);
+            
             string[] wordTracks = new string[Tracks];
             wordTracks[0] = w;
             for (int i = 1; i < Tracks; i++)

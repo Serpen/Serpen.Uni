@@ -5,8 +5,8 @@ namespace Serpen.Uni.Automat.Turing {
     public abstract class TuringMachineBase<TKey, TVal> : AutomatBase<TKey, TVal> where TKey : struct, ITransformKey { //where TConfig : ITuringConfig {
 
         public const char BLANK = '_';
-        public char[] BandAlphabet;
-        public char BlankSymbol;
+        public readonly char[] BandAlphabet;
+        public readonly char BlankSymbol;
 
         public TuringMachineBase(string name, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, uint startState, char blankSymbol, uint[] acceptedStates)
             : base(stateCount, inputAlphabet, startState, name, acceptedStates) {
@@ -28,12 +28,12 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         protected const int MAX_TURING_RUNS = 10000;
-        
+
         public abstract string GetBandOutput(string w);
 
 
     }
-    
+
     public enum TMDirection { Left, Right, Halt }
 
 }

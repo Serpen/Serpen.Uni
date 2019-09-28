@@ -26,9 +26,9 @@ namespace Serpen.Uni.Automat.Finite {
         }
 
         public override bool AcceptWord(string w) {
-            uint q = StartState;
-
             CheckWordInAlphabet(w);
+            
+            uint q = StartState;
 
             var extTuple = new Tuple<uint, string>(StartState, w);
 

@@ -58,6 +58,8 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
         public override bool AcceptWord(string w) {
+            CheckWordInAlphabet(w);
+            
             int runCount = 0;
             //construct start config
             PDAConfig[] pcfgs;

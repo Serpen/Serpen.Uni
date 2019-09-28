@@ -45,6 +45,8 @@ namespace Serpen.Uni.Automat.Turing {
 
         public override bool AcceptWord(string w) => AcceptWord(w, true);
         public bool AcceptWord(string w, bool wordConsumed) {
+            CheckWordInAlphabet(w);
+            
             var tcfg = new TuringConfigSingleBand(BlankSymbol, w, 0) {State=StartState};
             int runs = 0;
             uint lastQ = tcfg.State;
