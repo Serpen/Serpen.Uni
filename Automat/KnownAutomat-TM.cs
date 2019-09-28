@@ -50,6 +50,34 @@ namespace Serpen.Uni.Automat {
             }
         }
 
+        [AcceptedWordSamples("aaba")]
+        public static NTM1659 NTM_1659_A411_N1 {
+            get {
+                const char BLANK = TuringMachineSingleBand1659.BLANK;
+
+                const uint qA = 4;
+                const uint qD = 3;
+
+                var t = new NTM1659Transform();
+                t.Add(0,'a',0,'a',TMDirection.Right);
+                t.AddM(0,'a',1,'a',TMDirection.Right);
+                t.Add(0,'b',0,'b',TMDirection.Right);
+                t.Add(0,BLANK,qD,BLANK,TMDirection.Right);
+
+                t.Add(1,'a',2,'a',TMDirection.Right);
+                t.Add(1,'b',qD,'b',TMDirection.Right);
+                t.Add(1,BLANK,qD,BLANK,TMDirection.Right);
+
+                t.Add(2,'b',qA,'b',TMDirection.Right);
+                t.Add(2,'a',qD,'a',TMDirection.Right);
+                t.Add(2,BLANK,qD,BLANK,TMDirection.Right);
+
+                char[] alphabet = new char[] { 'a', 'b', BLANK };
+
+                return new NTM1659(nameof(NTM_1659_A411_N1), 5, new char[] {'a', 'b'}, alphabet, t, 0, BLANK, qA,  qD );
+            }
+        }
+
         public static TuringMachineSingleBand TM_EFAK_A89_B82_T81 {
             get {
                 var t = new TuringTransformSingleBand();
