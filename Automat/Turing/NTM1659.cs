@@ -59,20 +59,23 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         public override string GetBandOutput(string w) {
-            throw new System.NotImplementedException();
-            
-            // var tcfg = new TuringConfigSingleBand(BlankSymbol, w, 0);
-            // int runs = 0;
-            // string lastBand = tcfg.Band;
-            // while (tcfg != null && !IsAcceptedState(tcfg.State)) {
-            //     tcfg = GoChar(tcfg);
-            //     if (tcfg != null)
-            //         lastBand = tcfg.Band;
-            //     if (runs > MAX_TURING_RUNS)
-            //         throw new TuringCycleException($"possible Turing cycle at {runs} with {w} now is: {tcfg.Band.Trim(BlankSymbol)}");
-            //     runs++;
-            // }
-            // return lastBand.Trim(BlankSymbol);
+            var tcfgs = new TuringConfigSingleBand[] {new TuringConfigSingleBand(BlankSymbol, w, 0) { State = StartState }};
+            int runs = 0;
+            uint lastQ = tcfgs[0].State;
+            string lastBand = tcfgs[0].Band;
+
+            while (tcfgs.Length > 0 && !IsAcceptedState(lastQ)) {
+                foreach (var tcfg in tcfgs) {
+                    Utils.DebugMessage(tcfg.ToString(), this, Utils.eDebugLogLevel.Verbose);
+                    if (tcfg != null)
+                        lastBand = tcfg.Band;
+                    if (runs > MAX_TURING_RUNS)
+                        throw new TuringCycleException($"possible Turing cycle at {runs} with {w} now is: {tcfg.Band.Trim(BlankSymbol)}");
+                    runs++;
+                }
+                tcfgs = GoChar(tcfgs);
+            }
+            return lastBand.Trim(BlankSymbol);
         }
 
         public static NTM1659 GenerateRandom() {
@@ -87,13 +90,12 @@ namespace Serpen.Uni.Automat.Turing {
             char[] inputAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR);
             char[] bandAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR, inputAlphabet.Append(BLANK), 0);
 
-            for (uint i = 0; i < stateCount; i++) {
-                int transformsRnd = rnd.Next(0, inputAlphabet.Length);
-                for (uint j = 0; j < transformsRnd; j++) {
-                    var tk = new TuringTransformSingleBand.TuringKey(i, Utils.GrAE(bandAlphabet));
-                    var tv = new TuringTransformSingleBand.TuringVal(j, Utils.GrAE(bandAlphabet), TMDirection.Right);
+
+            int transformsRnd = rnd.Next(0, stateCount*inputAlphabet.Length);
+            for (uint k = 0; k < transformsRnd; k++) {
+                    var tk = new TuringTransformSingleBand.TuringKey((uint)rnd.Next(0, stateCount), Utils.GrAE(bandAlphabet));
+                    var tv = new TuringTransformSingleBand.TuringVal((uint)rnd.Next(0, stateCount), Utils.GrAE(bandAlphabet), TMDirection.Right);
                     t.TryAdd(tk, new TuringTransformSingleBand.TuringVal[] {tv});
-                }
             }
 
             var ret = new NTM1659("NTM1_Random", (uint)stateCount, inputAlphabet, bandAlphabet, t, (uint)rnd.Next(0, stateCount), BLANK, (uint)rnd.Next(0, stateCount), (uint)rnd.Next(0, stateCount));
@@ -102,23 +104,24 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         public override IAutomat PurgeStates() {
-            throw new System.NotImplementedException();
-            // (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
+            (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
 
-            // var newT = new TuringTransformSingleBand();
-            // foreach (var t2 in Transform)
-            //     if (translate.Contains(t2.Key.q))
-            //         if (translate.Contains(t2.Value.qNext)) {
-            //             var tk = new TuringTransformSingleBand.TuringKey(Utils.ArrayIndex(translate, t2.Key.q), t2.Key.c);
-            //             var tv = new TuringTransformSingleBand.TuringVal(Utils.ArrayIndex(translate, t2.Value.qNext), t2.Value.c2, t2.Value.Direction);
-            //             newT.Add(tk, tv);
-            //         }
+            var newT = new TuringTransformSingleBand();
+            foreach (var ti in Transform)
+                if (translate.Contains(ti.Key.q))
+                    foreach (var tv in ti.Value) {
+                        if (translate.Contains(tv.qNext)) {
+                            var ntk = new TuringTransformSingleBand.TuringKey(Utils.ArrayIndex(translate, ti.Key.q), ti.Key.c);
+                            var ntv = new TuringTransformSingleBand.TuringVal(Utils.ArrayIndex(translate, tv.qNext), tv.c2, tv.Direction);
+                            newT.Add(ntk, ntv);
 
-            // return new TuringMachineSingleBand1659($"{Name}_purged", (uint)names.Length, Alphabet, BandAlphabet, newT, Utils.ArrayIndex(translate, StartState), BlankSymbol, Utils.ArrayIndex(translate, AcceptedState), Utils.ArrayIndex(translate, DiscardState));
+                        }
+                    }
+
+            return new TuringMachineSingleBand1659($"{Name}_purged", (uint)names.Length, Alphabet, BandAlphabet, newT, Utils.ArrayIndex(translate, StartState), BlankSymbol, Utils.ArrayIndex(translate, AcceptedState), Utils.ArrayIndex(translate, DiscardState));
         }
 
         public override System.Tuple<int, int, string>[] VisualizationLines() {
-            // throw new System.NotImplementedException();
             var tcol = new System.Collections.Generic.List<System.Tuple<int, int, string>>();
             foreach (var t in Transform) {
                 foreach (var tv in t.Value) {

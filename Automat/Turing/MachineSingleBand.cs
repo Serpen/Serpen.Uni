@@ -35,7 +35,8 @@ namespace Serpen.Uni.Automat.Turing {
 
         TuringConfigSingleBand GoChar(TuringConfigSingleBand tcfg) {
             TuringTransformSingleBand.TuringVal tva;
-            if (Transform.TryGetValue(new TuringTransformSingleBand.TuringKey(tcfg.State, tcfg.CurSymbol), out tva)) {
+            var tkey = new TuringTransformSingleBand.TuringKey(tcfg.State, tcfg.CurSymbol);
+            if (Transform.TryGetValue(tkey, out tva)) {
                 tcfg.ReplaceChar(tva.c2, tva.Direction);
                 tcfg.State = tva.qNext;
                 return tcfg;
@@ -48,10 +49,12 @@ namespace Serpen.Uni.Automat.Turing {
             CheckWordInAlphabet(w);
             
             var tcfg = new TuringConfigSingleBand(BlankSymbol, w, 0) {State=StartState};
+
             int runs = 0;
             uint lastQ = tcfg.State;
+
             while (tcfg != null && (!IsAcceptedState(tcfg.State) || wordConsumed) && (!wordConsumed || tcfg.Band.Replace(BlankSymbol.ToString(), "") != "")) {
-                Utils.DebugMessage(tcfg.ToString(), this, Utils.eDebugLogLevel.Verbose);
+                Utils.DebugMessage(tcfg.ToString(), this, Utils.eDebugLogLevel.Normal);
                 tcfg = GoChar(tcfg);
                 if (tcfg != null)
                     lastQ = tcfg.State;
@@ -59,7 +62,9 @@ namespace Serpen.Uni.Automat.Turing {
                     throw new TuringCycleException($"possible Turing cycle at {runs} with {w} now is: {tcfg.Band.Trim(BlankSymbol)}");
                 runs++;
             }
-            if (tcfg != null && IsAcceptedState(lastQ) && (!wordConsumed || tcfg.Band.Replace(BlankSymbol.ToString(), "") == ""))
+            if (tcfg != null && (!wordConsumed || tcfg.Band.Replace(BlankSymbol.ToString(), "") == ""))
+                return true;
+            else if (IsAcceptedState(lastQ))
                 return true;
             else
                 return false;

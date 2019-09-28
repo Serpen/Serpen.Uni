@@ -14,13 +14,9 @@ namespace Serpen.Uni.Automat.Turing {
             DiscardState = discardState;
         }
 
-        public uint AcceptedState {
-            get {
-                return base.AcceptedStates[0];
-            }
-        }
+        public uint AcceptedState => base.AcceptedStates[0];
 
-        public uint DiscardState {get;}
+        public readonly uint DiscardState;
 
         TuringConfigSingleBand GoChar(TuringConfigSingleBand tcfg) {
             TuringTransformSingleBand.TuringVal tva;

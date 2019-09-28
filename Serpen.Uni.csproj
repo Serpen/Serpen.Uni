@@ -10,6 +10,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Program.cs" />
+    <Content Include="SortAlg.cs" />
+    <Content Include="AlgorithmAttributes.cs" />
     <Content Include="Automat\Converter.cs" />
     <Content Include="Automat\Utils.cs" />
     <Content Include="Automat\RuleSet.cs" />
@@ -18,6 +20,7 @@
     <Content Include="Automat\Exceptions.cs" />
     <Content Include="Automat\Various.cs" />
     <Content Include="Automat\Visualization.cs" />
+    <Content Include="Automat\RandomGenerator.cs" />
     <Content Include="Automat\KnownAutomat.cs" />
     <Content Include="Automat\KnownAutomat-CF.cs" />
     <Content Include="Automat\KnownAutomat-FA.cs" />
@@ -48,8 +51,7 @@
     <Content Include="Automat\Turing\ConfigSingleBand.cs" />
     <Content Include="Automat\Turing\TransformMultiTrack.cs" />
     <Content Include="Automat\Turing\ConfigMultiTrack.cs" />
-    <Content Include="SortAlg.cs" />
-    <Content Include="AlgorithmAttributes.cs" />
+    <Content Include="Automat\Turing\NTM1659.cs" />
     <Content Include="Graph\Tree.cs" />
     <Content Include="Graph\EdgeBase.cs" />
     <Content Include="Matrix\Matrix.cs" />

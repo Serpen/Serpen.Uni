@@ -40,7 +40,7 @@ namespace Serpen.Uni.Automat.Turing {
 
         TuringConfigMultiTrack GoChar(TuringConfigMultiTrack tcfg) {
             TuringTransformMultiTrack.TuringVal tva;
-            var tkey = new TuringTransformMultiTrack.TuringKey(tcfg.q, tcfg.CurSymbol);
+            var tkey = new TuringTransformMultiTrack.TuringKey(tcfg.q, tcfg.CurSymbol[0..2]);
             if (Transform.TryGetValue(tkey, out tva)) {
                 tcfg.ReplaceChar(tva.c2, tva.Direction);
                 tcfg.q = tva.qNext;
@@ -62,8 +62,9 @@ namespace Serpen.Uni.Automat.Turing {
             
             int runs = 0;
             uint lastQ = tcfg.q;
+
             while (tcfg != null && !IsAcceptedState(tcfg.q)) {
-                Utils.DebugMessage(tcfg.ToString(), this, Utils.eDebugLogLevel.Verbose);
+                Utils.DebugMessage(tcfg.ToString(), this, Utils.eDebugLogLevel.Normal);
                 tcfg = GoChar(tcfg);
                 if (tcfg != null)
                     lastQ = tcfg.q;

@@ -6,6 +6,16 @@ public class TuringTransformMultiTrack : TransformBase<TuringTransformMultiTrack
         public TuringTransformMultiTrack(string[] stateTracks) {
             StateTracks = stateTracks;
         }
+
+        public override string ToString() {
+            var sw = new System.Text.StringBuilder();
+            foreach (var item in this) {
+                sw.Append($"({item.Key.ToString()})=>");
+                sw.Append($"({item.Value.ToString()}); ");
+                // sw.Append("); ");
+            }
+            return sw.ToString();
+        }
         
         public void AddByStateStoreAndTracks(string q, string c1, string qNext, string c2, TMDirection dir) {
             Add(new TuringTransformMultiTrack.TuringKey(Utils.ArrayIndex(StateTracks, q), 
@@ -54,7 +64,7 @@ public class TuringTransformMultiTrack : TransformBase<TuringTransformMultiTrack
 
             public override int GetHashCode() => this.ToString().GetHashCode();
 
-            public override string ToString() => $"({qNext}, {c2}, {(Direction)})";
+            public override string ToString() => $"({qNext}, ({string.Join(',', c2)}), {(Direction)})";
         }
     }
 }
