@@ -78,6 +78,14 @@ namespace Serpen.Uni.Automat {
             return AList.ToArray();
         }
 
+        public static ContextFree.PDA[] GetAllContextFreeAutomats() {
+            var AList = new List<ContextFree.PDA>();
+            AList.AddRange(GetTypes<ContextFree.PDA>());
+            AList.AddRange(GetTypes<ContextFree.StackPDA>());
+            AList.AddRange(GetTypes<ContextFree.StatePDA>());
+            return AList.ToArray();
+        }
+
         static bool MemberTypeFilter(MemberInfo objMemberInfo, object objSearch) {
             if (objMemberInfo is PropertyInfo objPropertyInfo) 
                 if (objSearch is System.Type objSearchType)

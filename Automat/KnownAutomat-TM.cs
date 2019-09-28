@@ -3,6 +3,8 @@ using Serpen.Uni.Automat.Turing;
 
 namespace Serpen.Uni.Automat {
     public partial class KnownAutomat {
+
+        [AcceptedWordSamples("aba")]
         public static TuringMachineSingleBand TM_1659_A44_M1 {
             get {
                 var t = new TuringTransformSingleBand();
@@ -14,6 +16,37 @@ namespace Serpen.Uni.Automat {
                 t.Add(new TuringTransformSingleBand.TuringKey(2, 'b'), new TuringTransformSingleBand.TuringVal(0, 'b', TMDirection.Left));
                 t.Add(new TuringTransformSingleBand.TuringKey(2, 'a'), new TuringTransformSingleBand.TuringVal(4, 'a', TMDirection.Right));
                 return new TuringMachineSingleBand(nameof(TM_1659_A44_M1), 5, new char[] { 'a', 'b' }, new char[] { 'a', 'b', ' ' }, t, 0, ' ', new uint[] { 3 });
+            }
+        }
+
+        [AcceptedWordSamples("aa")]
+        public static TuringMachineSingleBand1659 TM_1659_A46_M2_a2n {
+            get {
+                const char BLANK = TuringMachineSingleBand1659.BLANK;
+
+                var t = new TuringTransformSingleBand();
+                t.Add(0,'a',1,'s',TMDirection.Right);
+                t.Add(0,BLANK, 5, BLANK, TMDirection.Right);
+
+                t.Add(1,'x',1,'x',TMDirection.Right);
+                t.Add(1,'a',2,'x',TMDirection.Right);
+                t.Add(1,BLANK,6,BLANK,TMDirection.Right);
+
+                t.Add(2,'x',2,'x',TMDirection.Right);
+                t.Add(2,'a',3,'a',TMDirection.Right);
+                t.Add(2,BLANK,4,BLANK,TMDirection.Left);
+
+                t.Add(3,'x',3,'x',TMDirection.Right);
+                t.Add(3,'a',2,'x',TMDirection.Right);
+                t.Add(3,BLANK,5,BLANK,TMDirection.Right);
+
+                t.Add(4,'a',4,'a',TMDirection.Left);
+                t.Add(4,'x',4,'x',TMDirection.Left);
+                t.Add(4,'s',1,'s',TMDirection.Right);
+
+                char[] alphabet = new char[] { 'a', 'x', 's', BLANK };
+
+                return new TuringMachineSingleBand1659(nameof(TM_1659_A46_M2_a2n), 7, new char[] {'a'}, alphabet, t, 0, BLANK, 6,  5 );
             }
         }
 

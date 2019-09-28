@@ -142,7 +142,7 @@ namespace Serpen.Uni.Automat {
         public static uint ArrayIndex(System.Array array, object value)
             => (uint)System.Array.IndexOf(array, value);
 
-        public static void DrawAutomatToTemp(IAutomat automat)
+        public static void SaveAutomatImageToTemp(IAutomat automat)
             => Visualization.DrawAutomat(automat).Save(System.Environment.ExpandEnvironmentVariables($@"%temp%\automat\{automat.Name}.png"));
         
 

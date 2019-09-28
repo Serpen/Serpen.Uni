@@ -16,6 +16,13 @@ namespace Serpen.Uni.Automat {
     public enum RuleConstaint {None, Left, Right}
     public interface IConfig {}
 
+    [System.AttributeUsage(System.AttributeTargets.Property, Inherited = false, AllowMultiple = true)]
+    sealed class AcceptedWordSamples : System.Attribute
+    {
+        public string[] Source {get;}
+        public AcceptedWordSamples(params string[] words) => this.Source = words;
+    }
+
 }
 
 namespace Serpen.Uni.Automat.ExtensionMethods
