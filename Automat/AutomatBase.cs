@@ -18,7 +18,7 @@ namespace Serpen.Uni.Automat {
         bool IsAcceptedState(uint q);
 
         string GetRandomWord();
-        string[] GetRandomWords(int count);
+        string[] GetRandomWords(int count, int maxLen);
         IAutomat PurgeStates();
 
         System.Tuple<int, int, string>[] VisualizationLines();
@@ -59,7 +59,7 @@ namespace Serpen.Uni.Automat {
                 throw new Automat.StateException(StartState);
             foreach (uint acc in AcceptedStates) {
                 if (acc >= StatesCount)
-                    throw new Automat.StateException(StartState);
+                    throw new Automat.StateException(acc);
             }
 
         }
@@ -146,7 +146,7 @@ namespace Serpen.Uni.Automat {
             return w;
         }
 
-        public string[] GetRandomWords(int count) {
+        public string[] GetRandomWords(int count, int maxLen) {
             var words = new System.Collections.Specialized.StringCollection();
             string[] wordArray = new string[count];
 
@@ -154,7 +154,7 @@ namespace Serpen.Uni.Automat {
 
             while (words.Count < count) {
                 string w = "";
-                var wLen = rnd.Next(0, System.Math.Max(10, count));
+                var wLen = rnd.Next(0, maxLen);
                 for (int k = 0; k < wLen; k++)
                     w = w.Insert(k, Alphabet[rnd.Next(0, Alphabet.Length)].ToString());
 

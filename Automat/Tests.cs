@@ -173,7 +173,7 @@ namespace Serpen.Uni.Automat {
             foreach (IAutomat a in automats) {
                 if (a is NFA nfa) {
                     var nfa_removed = nfa.PurgeStates();
-                    string[] rwords = nfa.GetRandomWords(words); 
+                    string[] rwords = nfa.GetRandomWords(words, words); 
                     for (int i = 0; i < rwords.Length; i++)
                     {
                         if (!nfa.AcceptWord(rwords[i]) == nfa_removed.AcceptWord(rwords[i]))
@@ -323,7 +323,7 @@ namespace Serpen.Uni.Automat {
 
             int count = 0;
             while ((onceTrue < passLevel | onceFalse < passLevel) && count < initialCount*2) {
-                string[] words = A1.GetRandomWords(initialCount/2);
+                string[] words = A1.GetRandomWords(initialCount/2, initialCount/2);
                 foreach (string w in words)
                 {
                     var erg1 = A1.AcceptWord(w);

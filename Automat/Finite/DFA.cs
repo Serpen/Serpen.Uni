@@ -9,12 +9,10 @@ namespace Serpen.Uni.Automat.Finite {
 
         public DFA(string name, uint stateCount, char[] alphabet, FATransform transform, uint startState, params uint[] acceptedStates)
             : base(stateCount, alphabet, transform, startState, acceptedStates, name) {
-            CheckConstraints();
         }
 
         public DFA(string name, string[] states, char[] alphabet, FATransform transform, uint startState, params uint[] acceptedStates)
             : base(states, alphabet, transform, startState, acceptedStates, name) {
-            CheckConstraints();
         }
 
         protected uint[] GoChar(EATuple eat) => GoChar(eat.q, eat.c.Value);

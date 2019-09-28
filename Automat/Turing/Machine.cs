@@ -12,13 +12,11 @@ namespace Serpen.Uni.Automat.Turing {
             : base(stateCount, inputAlphabet, startState, name, acceptedStates) {
             BandAlphabet = bandAlphabet;
             BlankSymbol = blankSymbol;
-            CheckConstraints();
         }
         public TuringMachineBase(string name, string[] states, char[] inputAlphabet, char[] bandAlphabet, uint startState, char blankSymbol, uint[] acceptedStates)
             : base(states, inputAlphabet, startState, name, acceptedStates) {
             BandAlphabet = bandAlphabet;
             BlankSymbol = blankSymbol;
-            CheckConstraints();
         }
 
         protected override void CheckConstraints() {

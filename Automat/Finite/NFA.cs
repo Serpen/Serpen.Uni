@@ -31,18 +31,18 @@ namespace Serpen.Uni.Automat.Finite {
         protected override uint[] GoChar(uint q, char w) => GoChar(new uint[] { q }, w);
 
         public override bool AcceptWord(string w) {
-            uint[] q = new uint[] {StartState};
+            uint[] qs = new uint[] {StartState};
 
             CheckWordInAlphabet(w);
             
             for (int i = 0; i < w.Length; i++)
             {
-                q = GoChar(q, w[i]);
-                if (q.Length == 0)
+                qs = GoChar(qs, w[i]);
+                if (qs.Length == 0)
                     return false;
             }
             
-            foreach (var q2 in q)
+            foreach (var q2 in qs)
                 if (IsAcceptedState(q2))
                     return true;
             return false;

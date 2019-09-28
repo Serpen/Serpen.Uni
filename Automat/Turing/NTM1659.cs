@@ -14,11 +14,7 @@ namespace Serpen.Uni.Automat.Turing {
             DiscardState = discardState;
         }
 
-        public uint AcceptedState {
-            get {
-                return base.AcceptedStates[0];
-            }
-        }
+        public uint AcceptedState => base.AcceptedStates[0];
 
         public uint DiscardState { get; }
 
@@ -45,7 +41,6 @@ namespace Serpen.Uni.Automat.Turing {
             int runs = 0;
             uint lastQ = tcfgs[0].State;
             while (tcfgs.Length > 0) {
-                bool? foundAccepted = default;
                 foreach (var tcfg in tcfgs) {
                     Utils.DebugMessage(tcfg.ToString(), this, Utils.eDebugLogLevel.Verbose);
                     if (tcfg != null)
@@ -54,17 +49,11 @@ namespace Serpen.Uni.Automat.Turing {
                         throw new TuringCycleException($"possible Turing cycle at {runs} with {w} now is: {tcfg.Band.Trim(BlankSymbol)}");
                     runs++;
                     if (IsAcceptedState(lastQ))
-                        foundAccepted = true;
-                    else if (DiscardState == lastQ)
-                        foundAccepted = false;
-                }
-                if (foundAccepted.HasValue)
-                    if (foundAccepted.Value)
                         return true;
-                    else
-                        return false;
+                    // else if (DiscardState == lastQ) // TM1659 should end when in discard state
+                    //     foundAccepted = false;
+                }
                 tcfgs = GoChar(tcfgs);
-
             }
             return false;
         }

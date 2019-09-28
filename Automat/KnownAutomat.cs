@@ -75,6 +75,10 @@ namespace Serpen.Uni.Automat {
             AList.AddRange(GetTypes<ContextFree.PDA>());
             AList.AddRange(GetTypes<ContextFree.StackPDA>());
             AList.AddRange(GetTypes<ContextFree.StatePDA>());
+            AList.AddRange(GetTypes<Turing.TuringMachineSingleBand>());
+            AList.AddRange(GetTypes<Turing.TuringMachineSingleBand1659>());
+            AList.AddRange(GetTypes<Turing.TuringMachineMultiTrack>());
+            AList.AddRange(GetTypes<Turing.NTM1659>());
             return AList.ToArray();
         }
 

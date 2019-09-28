@@ -6,10 +6,31 @@ namespace Serpen.Uni.Automat.Turing {
         public TuringMachineSingleBand(string name, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, TuringTransformSingleBand transform, uint startState, char blankSymbol, uint[] acceptedStates)
             : base(name, stateCount, inputAlphabet, bandAlphabet, startState, blankSymbol, acceptedStates) {
             Transform = transform;
+
+            CheckConstraints();
         }
         public TuringMachineSingleBand(string name, string[] states, char[] inputAlphabet, char[] bandAlphabet, TuringTransformSingleBand transform, uint startState, char blankSymbol, uint[] acceptedStates)
             : base(name, states, inputAlphabet, bandAlphabet, startState, blankSymbol, acceptedStates) {
             Transform = transform;
+
+            CheckConstraints();
+        }
+
+        protected override void CheckConstraints() {
+            base.CheckConstraints();
+            foreach (var ti in Transform) {
+                if (!BandAlphabet.Contains(ti.Key.c))
+                    throw new Automat.AlphabetException(ti.Key.c);
+                if (Alphabet.Contains(BlankSymbol))
+                    throw new Automat.AlphabetException(BlankSymbol);
+                if (!BandAlphabet.Contains(ti.Value.c2))
+                    throw new Automat.AlphabetException(ti.Value.c2);
+                if (ti.Key.q >= StatesCount)
+                    throw new Automat.StateException(ti.Key.q);
+                if (ti.Value.qNext >= StatesCount)
+                    throw new Automat.StateException(ti.Value.qNext);
+
+            }
         }
 
         TuringConfigSingleBand GoChar(TuringConfigSingleBand tcfg) {
