@@ -314,7 +314,7 @@ namespace Serpen.Uni.Automat {
                 neaET.Add(3, 'D', 3);
                 neaET.Add(3, null, 4); //->5?
                 neaET.Add(4, '.', 3);
-                return new NFAe(nameof(NEAe_EAFK_A213_Dec), 5, Decimals, neaET, 0, 5);
+                return new NFAe(nameof(NEAe_EAFK_A213_Dec), 5, Decimals, neaET, 0, 4);
             }
         }
         public static NFAe NEAe_1659_A27_N1 {

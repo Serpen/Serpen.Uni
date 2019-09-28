@@ -2,8 +2,7 @@ using System.Linq;
 
 namespace Serpen.Uni.Automat {
 
-    public interface IAcceptWord
-    {
+    public interface IAcceptWord {
         string Name { get; }
         bool AcceptWord(string w);
 
@@ -42,9 +41,9 @@ namespace Serpen.Uni.Automat {
 
             this.StartState = startState;
             this.Name = name;
-            
+
             AcceptedStates = acceptedStates;
-            
+
             this.States = new string[stateCount];
             for (int i = 0; i < stateCount; i++)
                 States[i] = i.ToString();
@@ -52,12 +51,17 @@ namespace Serpen.Uni.Automat {
         }
 
         public AutomatBase(string[] states, char[] alphabet, uint startState, string name, uint[] acceptedStates)
-            : this ((uint)states.Length, alphabet, startState, name, acceptedStates) {
+            : this((uint)states.Length, alphabet, startState, name, acceptedStates) {
             States = states;
         }
         protected virtual void CheckConstraints() {
-            if (StartState > StatesCount)
+            if (StartState >= StatesCount)
                 throw new Automat.StateException(StartState);
+            foreach (uint acc in AcceptedStates) {
+                if (acc >= StatesCount)
+                    throw new Automat.StateException(StartState);
+            }
+
         }
 
         public bool[] ReachableStates() {

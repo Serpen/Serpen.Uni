@@ -22,15 +22,6 @@ namespace Serpen.Uni.Automat.ContextFree {
             this.Origin = origin;
         }
 
-        public override bool Equals(object obj) {
-            if (obj is PDAConfig pobj) {
-                return pobj.GetHashCode() == this.GetHashCode();
-            }
-            return false;
-        }
-
-        public override int GetHashCode() => ToString().GetHashCode();
-
         public override string ToString() => $"({q},'{word}','{string.Join("", Stack)}')";
     }
 }
