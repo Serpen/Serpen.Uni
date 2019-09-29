@@ -2,7 +2,7 @@ using Serpen.Uni.Automat.ContextFree;
 
 namespace Serpen.Uni.Automat {
     public static partial class KnownAutomat {
-        public static PDA QPDA_1659_A33_K1 {
+        public static PDA QPDA_1659_A33_K1_anbn {
             get {
                 var pdaT = new PDATransform();
                 pdaT.Add(0, null, PDA.START, PDA.START.ToString(), 1);
@@ -10,7 +10,7 @@ namespace Serpen.Uni.Automat {
                 pdaT.Add(1, null, null, null, 2);
                 pdaT.Add(2, 'b', 'a', null, 2);
                 pdaT.Add(2, null, PDA.START, null, 3);
-                return new StatePDA(nameof(QPDA_1659_A33_K1), 4, new char[] { 'a', 'b' }, new char[] { 'a', PDA.START }, pdaT, 0, PDA.START, new uint[] { 3 });
+                return new StatePDA(nameof(QPDA_1659_A33_K1_anbn), 4, new char[] { 'a', 'b' }, new char[] { 'a', PDA.START }, pdaT, 0, PDA.START, new uint[] { 3 });
             }
         }
 

@@ -1,6 +1,3 @@
-#define VERBOSE
-// #undef VERBOSE
-
 using System.Collections.Generic;
 using System.Linq;
 

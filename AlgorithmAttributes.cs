@@ -1,14 +1,16 @@
+using System;
+
 namespace Serpen.Uni {
     
-    [System.AttributeUsage(System.AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-    sealed class AlgorithmComplexityAttribute : System.Attribute
+    [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
+    sealed class AlgorithmComplexityAttribute : Attribute
     {
         public string LandauComplexity {get;}
         public AlgorithmComplexityAttribute(string landauComplexity) => this.LandauComplexity = landauComplexity;
     }
 
-    [System.AttributeUsage(System.AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
-    sealed class AlgorithmSourceAttribute : System.Attribute
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
+    sealed class AlgorithmSourceAttribute : Attribute
     {
         public string Source {get;}
         public AlgorithmSourceAttribute(string landauComplexity) => this.Source = landauComplexity;
