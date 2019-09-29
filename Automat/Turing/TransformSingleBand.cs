@@ -26,6 +26,15 @@ namespace Serpen.Uni.Automat.Turing {
             );
         }
 
+        public void Insert(TuringTransformSingleBand transform, uint index) {
+            foreach (var ti in transform) {
+                var tk = new TuringKey(ti.Key.q+index, ti.Key.c);
+                var tv = new TuringVal(ti.Value.qNext+index, ti.Value.c2, ti.Value.Direction);
+                Add(tk, tv);
+
+            }
+        }
+
         public struct TuringKey : ITransformKey {
             public TuringKey(uint q, char c) {
                 this.q = q;
