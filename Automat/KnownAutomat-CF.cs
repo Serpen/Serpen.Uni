@@ -14,6 +14,19 @@ namespace Serpen.Uni.Automat {
             }
         }
 
+        
+        public static MultiPDA MPDA_1659_A33_K1_anbn {
+            get {
+                var pdaT = new MultiPDA.MPDATransform();
+                pdaT.Add(0, null, new char[] {PDA.START}, new string[] {PDA.START.ToString()}, 1);
+                pdaT.Add(1, 'a', new char[1], new string[] {"a"}, 1);
+                pdaT.Add(1, null, new char[1], new string[] {""}, 2);
+                pdaT.Add(2, 'b', new char[] {'a'}, new string[] {""}, 2);
+                pdaT.Add(2, null, new char[] {PDA.START}, new string[] {""}, 3);
+                return new MultiPDA(nameof(MPDA_1659_A33_K1_anbn), 1, 4, new char[] { 'a', 'b' }, new char[] { 'a', PDA.START }, pdaT, 0, PDA.START, new uint[] { 3 });
+            }
+        }
+
         public static PDA QPDA_EAFK_A62_wwr_Palindrom {
             get {
                 var pdaT = new PDATransform();
