@@ -5,7 +5,6 @@ using System.Linq;
 namespace Serpen.Uni.Automat.Finite {
 
     public class DFA : FABase, IAbgeschlossenheitseigenschaften<FABase, NFAe> {
-        public Dictionary<Tuple<uint, string>, uint> cachedExtendTransform = new Dictionary<Tuple<uint, string>, uint>();
 
         public DFA(string name, uint stateCount, char[] alphabet, FATransform transform, uint startState, params uint[] acceptedStates)
             : base(stateCount, alphabet, transform, startState, acceptedStates, name) {
@@ -30,15 +29,9 @@ namespace Serpen.Uni.Automat.Finite {
             
             uint q = StartState;
 
-            var extTuple = new Tuple<uint, string>(StartState, w);
-
-            if (!cachedExtendTransform.ContainsKey(extTuple)) {
-                //process word through GoChar
-                for (int i = 0; i < w.Length; i++)
-                    q = GoChar(q, w[i])[0];
-                cachedExtendTransform.Add(extTuple, q);
-            } else
-                q = cachedExtendTransform[extTuple];
+            //process word through GoChar
+            for (int i = 0; i < w.Length; i++)
+                q = GoChar(q, w[i])[0];
 
             return IsAcceptedState(q);
         } //end AcceptWord
