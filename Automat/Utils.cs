@@ -47,14 +47,15 @@ namespace Serpen.Uni.Automat {
         public enum eDebugLogLevel {Low, Normal, Verbose}
 
         internal static void DebugMessage(string message, IAcceptWord a, eDebugLogLevel level) {
-            var stack = new System.Diagnostics.StackTrace();
-            if (DebugLogLevel >= level)
+            if (DebugLogLevel >= level) {
+                var stack = new System.Diagnostics.StackTrace();
                 System.Diagnostics.Debug.WriteLine("DBG: " +
                     stack.GetFrame(1).GetMethod().DeclaringType.Name + "." +
                     stack.GetFrame(1).GetMethod().Name +
                     ":" + stack.GetFrame(1).GetILOffset() + " " +
                     (a != null ? "[" + a.Name + "] " : " ") +
                     message);
+            }
         }
         internal static void AcceptWordConsoleLine(IAcceptWord A, string w) {
             try {

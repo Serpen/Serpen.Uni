@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Serpen.Uni.Automat {
-    public abstract class GrammerBase {
+    public abstract class GrammerBase : IAcceptWord {
         protected GrammerBase(string name, char[] variables, char[] terminals, RuleSet rules, char startSymbol) {
             this.Variables = variables;
             this.Terminals = terminals;
@@ -25,6 +25,8 @@ namespace Serpen.Uni.Automat {
 
         public char StartSymbol { get; }
 
+        char[] IAcceptWord.Alphabet => Terminals;
+
         public string GetRandomWord() {
             var rnd = Utils.RND;
             var wLen = rnd.Next(0, 10);
@@ -33,6 +35,34 @@ namespace Serpen.Uni.Automat {
                 w = w.Insert(k, Terminals[rnd.Next(0, Terminals.Length)].ToString());
 
             return w;
+        }
+
+        public string[] GetRandomWords(int count, int maxLen) {
+            var words = new System.Collections.Specialized.StringCollection();
+            var rnd = Utils.RND;
+
+            int i = 0;
+
+            while (words.Count < count) {
+                string w = "";
+                var wLen = rnd.Next(0, maxLen);
+                for (int k = 0; k < wLen; k++)
+                    w = w.Insert(k, Terminals[rnd.Next(0, Terminals.Length)].ToString());
+
+                if (!words.Contains(w))
+                    words.Add(w);
+                
+                if (i > count*10) {
+                    Utils.DebugMessage($"Unable to get enough random words {i} tries>{words.Count}>{count}", null, Utils.eDebugLogLevel.Verbose);
+                    break;
+                }
+                i++;
+
+            }
+            var wordArray = new string[words.Count];
+            words.CopyTo(wordArray, 0);
+            return wordArray;
+
         }
 
         protected List<char> VarAndTerm;

@@ -6,6 +6,9 @@ namespace Serpen.Uni.Automat {
         string Name { get; }
         bool AcceptWord(string w);
 
+        string GetRandomWord();
+        string[] GetRandomWords(int count, int maxLen);
+        char[] Alphabet { get; }
         //protected void CheckConstraints();
     }
 
@@ -13,12 +16,9 @@ namespace Serpen.Uni.Automat {
         uint StartState { get; }
         string[] States { get; }
         uint StatesCount { get; }
-        char[] Alphabet { get; }
         uint[] AcceptedStates { get; }
         bool IsAcceptedState(uint q);
 
-        string GetRandomWord();
-        string[] GetRandomWords(int count, int maxLen);
         IAutomat PurgeStates();
 
         System.Tuple<int, int, string>[] VisualizationLines();
@@ -148,9 +148,9 @@ namespace Serpen.Uni.Automat {
 
         public string[] GetRandomWords(int count, int maxLen) {
             var words = new System.Collections.Specialized.StringCollection();
-            string[] wordArray = new string[count];
-
             var rnd = Utils.RND;
+
+            int i = 0;
 
             while (words.Count < count) {
                 string w = "";
@@ -160,7 +160,15 @@ namespace Serpen.Uni.Automat {
 
                 if (!words.Contains(w))
                     words.Add(w);
+                
+                if (i > count*10) {
+                    Utils.DebugMessage($"Unable to get enough random words {i} tries>{words.Count}>{count}", this, Utils.eDebugLogLevel.Verbose);
+                    break;
+                }
+                i++;
+
             }
+            var wordArray = new string[words.Count];
             words.CopyTo(wordArray, 0);
             return wordArray;
 
