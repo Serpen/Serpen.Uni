@@ -8,7 +8,7 @@ namespace Serpen.Uni.Automat {
     public static class Tests {
 
         public static IAutomat[][] CastToEveryPossibility(IAutomat[] As) {
-            var Automates = new List<IAutomat[]>(); 
+            var Automates = new List<IAutomat[]>();
 
             foreach (IAutomat A in As) {
                 var list = new List<IAutomat>();
@@ -26,7 +26,7 @@ namespace Serpen.Uni.Automat {
                     try {
                         DPDA DPDAFromD = (DPDA)D;
                         list.Add(DPDAFromD);
-                    } catch {}
+                    } catch { }
                     list.Add(QPDAfromNe);
                     list.Add(TMfromD);
                 } else if (A is NFA N) {
@@ -50,11 +50,11 @@ namespace Serpen.Uni.Automat {
                     list.Add(QPDAfromNe);
                 } else if (A is StatePDA QPDA) {
                     list.Add(QPDA);
-                    
+
                     try {
                         var SPDAfromQPDA = (StackPDA)QPDA;
                         list.Add(SPDAfromQPDA);
-                    } catch {}
+                    } catch { }
                 } else if (A is StackPDA SPDA) {
                     var QPDAfromSPDA = (StackPDA)SPDA;
 
@@ -154,8 +154,7 @@ namespace Serpen.Uni.Automat {
 
         public static IAutomat[] GenerateRandomAutomats(int count) {
             var retAut = new List<IAutomat>();
-            for (int i = 0; i < count; i++)
-            {
+            for (int i = 0; i < count; i++) {
                 retAut.Add(DFA.GenerateRandom());
                 retAut.Add(NFA.GenerateRandom());
                 retAut.Add(NFAe.GenerateRandom());
@@ -173,9 +172,8 @@ namespace Serpen.Uni.Automat {
             foreach (IAutomat a in automats) {
                 if (a is NFA nfa) {
                     var nfa_removed = nfa.PurgeStates();
-                    string[] rwords = nfa.GetRandomWords(words, 0, words); 
-                    for (int i = 0; i < rwords.Length; i++)
-                    {
+                    string[] rwords = nfa.GetRandomWords(words, 0, words);
+                    for (int i = 0; i < rwords.Length; i++) {
                         if (!nfa.AcceptWord(rwords[i]) == nfa_removed.AcceptWord(rwords[i]))
                             throw new Uni.Exception($"Automats {nfa} not equal {nfa_removed} by word");
                     }
@@ -191,8 +189,7 @@ namespace Serpen.Uni.Automat {
             {
                 var path = $@"{System.Environment.GetEnvironmentVariable("TEMP")}\automat";
                 System.IO.Directory.CreateDirectory(path);
-                foreach (var a in As)
-                {
+                foreach (var a in As) {
                     var bmp = Visualization.DrawAutomat(a);
                     bmp.Save($@"{path}\{a.Name}.png");
                 }
@@ -200,129 +197,130 @@ namespace Serpen.Uni.Automat {
             return;
         }
 
-#region  "Operations"
-        public static FABase[] GenerateJoins() {
-            var finiteAutomats = KnownAutomat.GetAllFiniteAutomats();
-            var ret = new List<FABase>(finiteAutomats.Length*finiteAutomats.Length);
+        #region  "Operations"
+        public static IAutomat[] GenerateJoins() {
+            var automats = KnownAutomat.GetTypes<IJoin>();
+            var ret = new List<IAutomat>(automats.Count * automats.Count);
 
-            foreach (var d1 in finiteAutomats)
-                foreach (var d2 in finiteAutomats)
-                    if (d1.GetType()==d2.GetType())
-                        if (Utils.SameAlphabet(d1,d2))
-                            ret.Add(d1.Join(d2));
-                            
+            foreach (var a1 in automats)
+                foreach (var a2 in automats)
+                    if (a1.GetType() == a2.GetType())
+                        if (!(a1 is DFA) || Utils.SameAlphabet(a1, a2))
+                            ret.Add(a1.Join(a2));
+
             return ret.ToArray();
         }
 
-        public static FABase[] GenerateDiffs() {
-            var finiteAutomats = (from fa in KnownAutomat.GetAllFiniteAutomats() where fa is DFA da select (DFA)fa);
-            var ret = new List<FABase>(finiteAutomats.Count()*finiteAutomats.Count());
+        public static IAutomat[] GenerateDiffs() {
+            var automats = KnownAutomat.GetTypes<IDiff>();
+            var ret = new List<IAutomat>(automats.Count() * automats.Count());
 
-            foreach (var d1 in finiteAutomats)
-                foreach (var d2 in finiteAutomats)
-                    if (d1.GetType()==d2.GetType())
-                        if (Utils.SameAlphabet(d1,d2))
-                            ret.Add(DFA.Diff(d1,d2));
-            
+            foreach (var a1 in automats)
+                foreach (var a2 in automats)
+                    if (a1.GetType() == a2.GetType())
+                        if (Utils.SameAlphabet(a1, a2))
+                            try {
+                                ret.Add(a1.Diff(a2));
+                            } catch (System.NotImplementedException niex) { }
+
             return ret.ToArray();
         }
 
-        public static FABase[] GenerateUnions() {
-            var finiteAutomats = (from fa in KnownAutomat.GetAllFiniteAutomats() where fa is DFA da select (DFA)fa);
-            var ret = new List<FABase>(finiteAutomats.Count()*finiteAutomats.Count());
+        public static IAutomat[] GenerateUnions() {
+            var automats = KnownAutomat.GetTypes<IUnion>();
+            var ret = new List<IAutomat>(automats.Count() * automats.Count());
 
-            foreach (var d1 in finiteAutomats)
-                foreach (var d2 in finiteAutomats)
-                    if (d1.GetType()==d2.GetType())
-                        if (Utils.SameAlphabet(d1,d2)) {
-                            ret.Add(d1.UnionNEA(d2));
-                            ret.Add(DFA.UnionProduct(d1,d2));
-                        }
-            
+            foreach (var a1 in automats)
+                foreach (var a2 in automats)
+                    if (a1.GetType() == a2.GetType())
+                        if (Utils.SameAlphabet(a1, a2))
+                            try {
+                                ret.Add(a1.Union(a2));
+                            } catch (System.NotImplementedException niex) { }
+
+
             return ret.ToArray();
         }
 
-        
+
         public static IAutomat[] GenerateIntersects() {
-            var finiteAutomats = (from fa in KnownAutomat.GetAllFiniteAutomats() where fa is DFA da select (DFA)fa);
-            var ret = new List<IAutomat>(finiteAutomats.Count()*finiteAutomats.Count());
+            var automats = KnownAutomat.GetTypes<IIntersect>();
+            var ret = new List<IAutomat>(automats.Count() * automats.Count());
 
-            foreach (var d1 in finiteAutomats)
-                foreach (var d2 in finiteAutomats)
-                    if (d1.GetType()==d2.GetType())
-                        if (Utils.SameAlphabet(d1,d2)) {
-                            ret.Add(DFA.Intersect(d1,d2));
-                        }
-            
+            foreach (var a1 in automats)
+                foreach (var a2 in automats)
+                    if (a1.GetType() == a2.GetType())
+                        if (Utils.SameAlphabet(a1, a2))
+                            try {
+                                ret.Add(a1.Intersect(a2));
+                            } catch (System.NotImplementedException niex) { }
+
             return ret.ToArray();
         }
-        
-        public static IAutomat[] GenerateComplements() {
-            var finiteAutomats = KnownAutomat.GetAllFiniteAutomats();
-            var ret = new List<IAutomat>(finiteAutomats.Length);
 
-            foreach (var fa1 in finiteAutomats)
-                ret.Add(fa1.Complement());
-            
+        public static IAutomat[] GenerateComplements() {
+            var automats = KnownAutomat.GetTypes<IComplement>();
+            var ret = new List<IAutomat>(automats.Count);
+
+            foreach (var a in automats)
+                ret.Add(a.Complement());
+
             return ret.ToArray();
         }
 
         public static IAutomat[] GenerateReverses() {
-            var automats = new List<IAutomat>();
-            automats.AddRange(KnownAutomat.GetAllFiniteAutomats());
-            automats.Add(DFA.GenerateRandom());
-            automats.Add(NFA.GenerateRandom());
-            automats.Add(NFAe.GenerateRandom());
-            automats.AddRange(KnownAutomat.GetAllContextFreeAutomats());
-            automats.Add(StatePDA.GenerateRandom());
-            automats.Add(StackPDA.GenerateRandom());
+            var automats = KnownAutomat.GetTypes<IReverse>();
             var ret = new List<IAutomat>(automats.Count());
 
             foreach (var a in automats)
-                if (a is FABase fa1)
-                    ret.Add(fa1.Reverse());
-                else if (a is PDA pda)
-                    ret.Add(pda.Reverse());
-            
+                ret.Add(a.Reverse());
+
+            return ret.ToArray();
+        }
+
+        public static IAutomat[] GenerateKleeneStern() {
+            var automats = KnownAutomat.GetTypes<IKleeneStern>();
+            var ret = new List<IAutomat>(automats.Count());
+
+            foreach (var a in automats)
+                ret.Add(a.KleeneStern());
+
             return ret.ToArray();
         }
 
         public static void TestDoubleReversesByWord(IAutomat[] automats) {
             foreach (var a in automats) {
                 if (a is FABase fa1) {
-                    var fa2 = fa1.Reverse().Reverse();
+                    var fa2 = ((FABase)fa1.Reverse()).Reverse();
                     TestEqualWithWords(fa1, fa2, 200);
-                }
-                else if (a is PDA pda) {
-                    var pdaR = pda.Reverse().Reverse();
+                } else if (a is PDA pda) {
+                    var pdaR = ((PDA)(pda.Reverse())).Reverse();
                     TestEqualWithWords(pda, pdaR, 200);
                 }
             }
         }
-        
-        public static IAutomat[] GenerateConcats() {
-            var finiteAutomats = KnownAutomat.GetAllFiniteAutomats();
-            var ret = new List<IAutomat>(finiteAutomats.Length*finiteAutomats.Length);
 
-            foreach (var fa1 in finiteAutomats)
-                foreach (var fa2 in finiteAutomats)
-                    if (Utils.SameAlphabet(fa1,fa2))
-                        ret.Add(fa1.Concat(fa2));
+        public static IAutomat[] GenerateConcats() {
+            var automats = KnownAutomat.GetTypes<IConcat>();
+            var ret = new List<IAutomat>(automats.Count * automats.Count);
+
+            foreach (var fa1 in automats)
+                foreach (var fa2 in automats)
+                    ret.Add(fa1.Concat((IAutomat)fa2));
             return ret.ToArray();
         }
 
-#endregion
-        
+        #endregion
+
 
         public static bool TestEqualWithWords(IAutomat A1, IAutomat A2, int initialCount) {
             int onceTrue = 0, onceFalse = 0;
-            int passLevel = System.Math.Min(initialCount/10, 5);
+            int passLevel = System.Math.Min(initialCount / 10, 5);
 
             int count = 0;
-            while ((onceTrue < passLevel | onceFalse < passLevel) && count < initialCount*2) {
-                string[] words = A1.GetRandomWords(initialCount/2, 0, initialCount/2);
-                foreach (string w in words)
-                {
+            while ((onceTrue < passLevel | onceFalse < passLevel) && count < initialCount * 2) {
+                string[] words = A1.GetRandomWords(initialCount / 2, 0, initialCount / 2);
+                foreach (string w in words) {
                     var erg1 = A1.AcceptWord(w);
                     var erg2 = A2.AcceptWord(w);
 
@@ -332,12 +330,12 @@ namespace Serpen.Uni.Automat {
                         Utils.DebugMessage($"{count}. word '{w}' divides Automates", A1, Utils.eDebugLogLevel.Always);
                         return false;
                     }
-                        Utils.DebugMessage($"{count}. word '{w}' passes", A1, Utils.eDebugLogLevel.Verbose);
+                    Utils.DebugMessage($"{count}. word '{w}' passes", A1, Utils.eDebugLogLevel.Verbose);
 
                     count++;
                 }
             }
-            if (onceTrue>=passLevel && onceFalse>=passLevel) {
+            if (onceTrue >= passLevel && onceFalse >= passLevel) {
                 Utils.DebugMessage($"{count} words passed", A1, Utils.eDebugLogLevel.Normal);
                 return true;
             } else {
@@ -348,9 +346,9 @@ namespace Serpen.Uni.Automat {
                     Utils.DebugMessage($"{count} words passed, but not both tested, Equals not working", A1, Utils.eDebugLogLevel.Always);
                     return true;
                 }
-                
+
             }
         }
-        
+
     } //end class
 } //end ns

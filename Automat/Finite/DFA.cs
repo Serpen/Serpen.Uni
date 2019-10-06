@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Serpen.Uni.Automat.Finite {
 
-    public class DFA : FABase, IAbgeschlossenheitseigenschaften<FABase, NFAe> {
+    public class DFA : FABase, IAlleAbgeschlossenheitseigenschaften { // IAbgeschlossenheitseigenschaften<FABase, NFAe> {
 
         public DFA(string name, uint stateCount, char[] alphabet, FATransform transform, uint startState, params uint[] acceptedStates)
             : base(stateCount, alphabet, transform, startState, acceptedStates, name) {
@@ -26,7 +26,7 @@ namespace Serpen.Uni.Automat.Finite {
 
         public override bool AcceptWord(string w) {
             CheckWordInAlphabet(w);
-            
+
             uint q = StartState;
 
             //process word through GoChar
@@ -129,7 +129,7 @@ namespace Serpen.Uni.Automat.Finite {
         public static DFA Diff(DFA D1, DFA D2) =>
             ProductDea(D1, D2, eProductDeaMode.Diff);
 
-        public override FABase HomomorphismChar(Dictionary<char, char> Translate) {
+        public override IAutomat HomomorphismChar(Dictionary<char, char> Translate) {
             var deat = new FATransform();
             var Alp = (char[])this.Alphabet.Clone();
 
@@ -146,7 +146,7 @@ namespace Serpen.Uni.Automat.Finite {
             return new DFA($"DFA_HomomorphismChar({Name})", this.StatesCount, Alp, deat, this.StartState, this.AcceptedStates);
         }
 
-        public override FABase Join(FABase A) {
+        public override IAutomat Join(IAutomat A) {
             var D2 = A as DFA;
 
             if (D2 != null) {
@@ -175,9 +175,9 @@ namespace Serpen.Uni.Automat.Finite {
                 throw new NotSupportedException();
         }
 
-        FABase IAbgeschlossenheitseigenschaften<FABase, NFAe>.Union(FABase A) => UnionProduct(this, (DFA)A);
-        FABase IAbgeschlossenheitseigenschaften<FABase, NFAe>.Intersect(FABase A) => Intersect(this, (DFA)A);
-        FABase IAbgeschlossenheitseigenschaften<FABase, NFAe>.Diff(FABase A) => Diff(this, (DFA)A);
+        public IAutomat Union(IAutomat A) => UnionProduct(this, (DFA)A);
+        public IAutomat Intersect(IAutomat A) => Intersect(this, (DFA)A);
+        public IAutomat Diff(IAutomat A) => Diff(this, (DFA)A);
 
         public static DFA UnionProduct(DFA D1, DFA D2)
             => ProductDea(D1, D2, eProductDeaMode.Union);
@@ -212,10 +212,10 @@ namespace Serpen.Uni.Automat.Finite {
                             //tuple for D1,D2
 
                             //Transform exists, out qNext
-                            var exist1 = ((FATransform)D1.Transform).TryGetValue(i, c, out qNext1);
-                            var exist2 = ((FATransform)D2.Transform).TryGetValue(j, c, out qNext2);
+                            bool exist1 = ((FATransform)D1.Transform).TryGetValue(i, c, out qNext1);
+                            bool exist2 = ((FATransform)D2.Transform).TryGetValue(j, c, out qNext2);
 
-                            //same calc logic for dstIndex
+                            //same calc logic for dstIndex in Matrix
                             uint dstIndex;
                             if (exist1 & exist2)
                                 dstIndex = (qNext1 * D2.StatesCount + qNext2);
@@ -316,7 +316,7 @@ namespace Serpen.Uni.Automat.Finite {
         }
 
         #region "Conversion"
-        
+
         public static explicit operator DFA(NFA N) => Converter.Nea2TeilmengenDea(N);
         public static explicit operator DFA(NFAe Ne) => Converter.Nea2TeilmengenDea(Ne);
 

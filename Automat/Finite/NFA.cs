@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Serpen.Uni.Automat.Finite {
 
-    public class NFA : FABase, INFA, IAbgeschlossenheitseigenschaften<FABase, NFAe> {
+    public class NFA : FABase, INFA, IAlleAbgeschlossenheitseigenschaften {
 
-        public static readonly NFA Empty = new NFA("Empty", 0, new char[] {}, new NFAeTransform(), 0, new uint[] {});
+        public static readonly NFA Empty = new NFA("Empty", 0, new char[] { }, new NFAeTransform(), 0, new uint[] { });
 
         public NFA(string name, uint StateCount, char[] Alphabet, NFAeTransform Transform, uint StartState, params uint[] acceptedStates)
             : base(StateCount, Alphabet, Transform, StartState, acceptedStates, name) {
@@ -18,11 +18,10 @@ namespace Serpen.Uni.Automat.Finite {
         internal uint[] GoChar(uint[] q, char w) {
             var retQ = new List<uint>();
 
-            for (int i = 0; i < q.Length; i++)
-            {
-                var t = new EATuple(q[i],w);
-                if (((NFAeTransform)Transform).ContainsKey(t.q,t.c.Value))
-                    retQ.AddRange((Transform as NFAeTransform)[t.q,t.c.Value]);
+            for (int i = 0; i < q.Length; i++) {
+                var t = new EATuple(q[i], w);
+                if (((NFAeTransform)Transform).ContainsKey(t.q, t.c.Value))
+                    retQ.AddRange((Transform as NFAeTransform)[t.q, t.c.Value]);
             }
             retQ.Sort();
             return retQ.Distinct().ToArray();
@@ -32,17 +31,16 @@ namespace Serpen.Uni.Automat.Finite {
 
         public override bool AcceptWord(string w) {
             CheckWordInAlphabet(w);
-            
-            uint[] qs = new uint[] {StartState};
 
-            
-            for (int i = 0; i < w.Length; i++)
-            {
+            uint[] qs = new uint[] { StartState };
+
+
+            for (int i = 0; i < w.Length; i++) {
                 qs = GoChar(qs, w[i]);
                 if (qs.Length == 0)
                     return false;
             }
-            
+
             foreach (var q2 in qs)
                 if (IsAcceptedState(q2))
                     return true;
@@ -52,7 +50,7 @@ namespace Serpen.Uni.Automat.Finite {
         public override bool Equals(object obj1) {
             DFA dobj;
             if (obj1 is DFA dobj1)
-                dobj=dobj1;
+                dobj = dobj1;
             else if (obj1 is NFA nobj)
                 dobj = Converter.Nea2TeilmengenDea(nobj);
             else if (obj1 is NFAe neobj)
@@ -68,16 +66,16 @@ namespace Serpen.Uni.Automat.Finite {
 
         public override IAutomat PurgeStates() {
             (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
-            
+
             var newT = new NFAeTransform();
             foreach (var t2 in Transform)
                 if (translate.Contains(t2.Key.q))
                     foreach (var v in t2.Value)
                         if (translate.Contains(v))
-                            newT.AddM(Utils.ArrayIndex(translate,t2.Key.q), t2.Key.c.Value, Utils.ArrayIndex(translate,v));
-            
-            return new NFA($"{Name}_purged", names, Alphabet, newT, Utils.ArrayIndex(translate,StartState), aStates);
-        
+                            newT.AddM(Utils.ArrayIndex(translate, t2.Key.q), t2.Key.c.Value, Utils.ArrayIndex(translate, v));
+
+            return new NFA($"{Name}_purged", names, Alphabet, newT, Utils.ArrayIndex(translate, StartState), aStates);
+
         }
 
         public static NFA GenerateRandom() {
@@ -88,18 +86,18 @@ namespace Serpen.Uni.Automat.Finite {
 
             var t = new NFAeTransform();
             int stateCount = rnd.Next(1, MAX_STATES);
-            
+
             char[] alphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR);
-            uint[] accState = RandomGenerator.RandomAcceptedStates(1, stateCount/3, stateCount); 
+            uint[] accState = RandomGenerator.RandomAcceptedStates(1, stateCount / 3, stateCount);
 
             for (uint i = 0; i < stateCount; i++) {
-                int transformsRnd = rnd.Next(0,alphabet.Length);
+                int transformsRnd = rnd.Next(0, alphabet.Length);
                 for (int j = 0; j < transformsRnd; j++) {
                     t.AddM(i, Utils.GrAE(alphabet), (uint)rnd.Next(0, stateCount));
                 }
             }
 
-            var ret = new NFA("NFA_Random", (uint)stateCount, alphabet, t, (uint)rnd.Next(0,stateCount), accState);
+            var ret = new NFA("NFA_Random", (uint)stateCount, alphabet, t, (uint)rnd.Next(0, stateCount), accState);
             ret.Name = $"NFA_Random_{ret.GetHashCode()}";
             return ret;
 
@@ -107,15 +105,15 @@ namespace Serpen.Uni.Automat.Finite {
 
         #region Operations
 
-        public override FABase HomomorphismChar(Dictionary<char,char> translate) {
+        public override IAutomat HomomorphismChar(Dictionary<char, char> translate) {
             var neat = new NFAeTransform();
             var Alp = (char[])this.Alphabet.Clone();
 
             foreach (var dt in this.Transform)
-                 if (translate.ContainsKey(dt.Key.c.Value))
-                        neat.Add(dt.Key.q, translate[dt.Key.c.Value], dt.Value);
-                    else
-                        neat.Add(dt.Key.q, dt.Key.c.Value, dt.Value);
+                if (translate.ContainsKey(dt.Key.c.Value))
+                    neat.Add(dt.Key.q, translate[dt.Key.c.Value], dt.Value);
+                else
+                    neat.Add(dt.Key.q, dt.Key.c.Value, dt.Value);
 
             for (int i = 0; i < this.Alphabet.Length; i++)
                 if (translate.ContainsKey(this.Alphabet[i]))
@@ -123,7 +121,7 @@ namespace Serpen.Uni.Automat.Finite {
 
             return new NFA($"NFA_HomomorphismChar({Name})", StatesCount, Alp, neat, StartState, AcceptedStates);
         }
-        public override FABase Join(FABase A) {
+        public override IAutomat Join(IAutomat A) {
             var N2 = A as NFA;
 
             if (N2 is null)
@@ -131,10 +129,7 @@ namespace Serpen.Uni.Automat.Finite {
             else {
                 var neat = new NFAeTransform();
 
-                if (!Utils.SameAlphabet(this, A))
-                    throw new Uni.Exception("Different Alphabets are not implemented");
-                
-                var accStates = new List<uint>(this.AcceptedStates.Length+N2.AcceptedStates.Length);
+                var accStates = new List<uint>(this.AcceptedStates.Length + N2.AcceptedStates.Length);
                 uint sc = this.StatesCount;
 
                 foreach (var t in this.Transform)
@@ -142,22 +137,22 @@ namespace Serpen.Uni.Automat.Finite {
                 foreach (var t in N2.Transform) {
                     uint[] qnexts = new uint[t.Value.Length];
                     for (int i = 0; i < t.Value.Length; i++)
-                        qnexts[i] = t.Value[i]+sc;
-                    neat.Add(t.Key.q+sc, t.Key.c.Value, qnexts);
+                        qnexts[i] = t.Value[i] + sc;
+                    neat.Add(t.Key.q + sc, t.Key.c.Value, qnexts);
                 }
 
                 accStates.AddRange(this.AcceptedStates);
                 for (int i = 0; i < N2.AcceptedStates.Length; i++)
-                    accStates.Add(N2.AcceptedStates[i]+sc);
+                    accStates.Add(N2.AcceptedStates[i] + sc);
 
                 accStates.Sort();
 
-                return new NFA($"Join({Name}+{N2.Name})", (N2.StatesCount+sc), this.Alphabet, neat, this.StartState, accStates.ToArray());
+                return new NFA($"Join({Name}+{N2.Name})", (N2.StatesCount + sc), this.Alphabet, neat, this.StartState, accStates.ToArray());
             }
         }
-        public FABase Union(FABase A) => throw new System.NotImplementedException();
-        public FABase Intersect(FABase A) => throw new System.NotImplementedException();
-        public FABase Diff(FABase A) => throw new System.NotImplementedException();
+        public IAutomat Union(IAutomat A) => throw new System.NotImplementedException();
+        public IAutomat Intersect(IAutomat A) => throw new System.NotImplementedException();
+        public IAutomat Diff(IAutomat A) => throw new System.NotImplementedException();
 
         #endregion
 
@@ -172,7 +167,7 @@ namespace Serpen.Uni.Automat.Finite {
         }
 
         public override string ToString() => $"{Name} NEA(|{States.Length}|={string.Join(";", States)}, {{{string.Join(',', Alphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {{{string.Join(',', AcceptedStates)}}})".Trim();
-    
-        
+
+
     }
 }

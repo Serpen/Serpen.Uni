@@ -6,7 +6,7 @@ namespace Serpen.Uni.Automat.ContextFree {
     /// <summary>
     /// nondeterministic PDA with Stack Symbol, which must end as empty stack and accepted state
     /// </summary>
-    public abstract class PDA : AutomatBase<PDATransformKey, PDATransformValue[]> {
+    public abstract class PDA : AutomatBase<PDATransformKey, PDATransformValue[]>, IReverse, IUnion, IConcat {
 
         protected const int MAX_RUNS_OR_STACK = 10000;
         protected static readonly char[] EXTRASYMBOLS = new char[] { '§', '$', '%', '&' };
@@ -175,11 +175,16 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
         public override string ToString() => $"{Name} PDA(|{States.Length}|={string.Join(";", States)}), {{{string.Join(',', Alphabet)}}},{{{string.Join(',', WorkAlphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {StartStackSymbol}, {{{string.Join(',', AcceptedStates)}}})".Trim();
-    
+
         #region "Operations"
 
-        public PDA Union(PDA pda) {
-            uint offsetD2 = this.StatesCount+1; //first state of D2
+        public IAutomat Union(IAutomat automat) {
+
+            var pda = automat as PDA;
+            if (pda == null)
+                throw new System.NotSupportedException();
+
+            uint offsetD2 = this.StatesCount + 1; //first state of D2
             uint[] accStates = new uint[this.AcceptedStates.Length + pda.AcceptedStates.Length];
             char[] inputAlphabet = this.Alphabet.Union(pda.Alphabet).ToArray();
             char[] workAlphabet = this.WorkAlphabet.Union(pda.WorkAlphabet).ToArray();
@@ -192,32 +197,37 @@ namespace Serpen.Uni.Automat.ContextFree {
             //add each D1 transform, +1
             foreach (var item in this.Transform)
                 foreach (var val in item.Value)
-                    pdat.AddM(item.Key.q+1, item.Key.ci, item.Key.cw, val.cw2, val.qNext+1);
+                    pdat.AddM(item.Key.q + 1, item.Key.ci, item.Key.cw, val.cw2, val.qNext + 1);
 
             //add each D1 transform, +offset
             foreach (var item in pda.Transform)
                 foreach (var val in item.Value)
-                    pdat.AddM(item.Key.q+offsetD2, item.Key.ci, item.Key.cw, val.cw2, val.qNext+offsetD2);
+                    pdat.AddM(item.Key.q + offsetD2, item.Key.ci, item.Key.cw, val.cw2, val.qNext + offsetD2);
 
 
             int i; //store where D1 acc ends
             //iterate D1 acc and +1
             for (i = 0; i < this.AcceptedStates.Length; i++)
-                accStates[i] = this.AcceptedStates[i]+1;
+                accStates[i] = this.AcceptedStates[i] + 1;
 
             //iterate D2 acc and add offset
             for (int j = 0; j < pda.AcceptedStates.Length; j++)
-                accStates[i+j] = (pda.AcceptedStates[j]+offsetD2);
+                accStates[i + j] = (pda.AcceptedStates[j] + offsetD2);
 
             if (this is StatePDA)
-                return new StatePDA($"Union({Name}+{pda.Name})",this.StatesCount+pda.StatesCount+1, inputAlphabet, workAlphabet, pdat, 0, (char)0, accStates);
+                return new StatePDA($"Union({Name}+{pda.Name})", this.StatesCount + pda.StatesCount + 1, inputAlphabet, workAlphabet, pdat, 0, (char)0, accStates);
             else if (this is StackPDA)
-                return new StackPDA($"Union({Name}+{pda.Name})",this.StatesCount+pda.StatesCount+1, inputAlphabet, workAlphabet, pdat, 0, (char)0);
+                return new StackPDA($"Union({Name}+{pda.Name})", this.StatesCount + pda.StatesCount + 1, inputAlphabet, workAlphabet, pdat, 0, (char)0);
             else
                 throw new System.NotImplementedException();
         }
 
-        public PDA Concat(PDA pda) {
+        public IAutomat Concat(IAutomat automat) {
+
+            var pda = automat as PDA;
+            if (pda == null)
+                throw new System.NotSupportedException();
+
             var pdat = new PDATransform();
 
             char[] inputAlphabet = this.Alphabet.Union(pda.Alphabet).ToArray();
@@ -225,50 +235,50 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             // if (!Utils.SameAlphabet(this, A))
             //     throw new System.NotImplementedException("Different Alphabets are not implemented");
-            
+
             var accStates = new List<uint>(pda.AcceptedStates.Length);
             uint offset = this.StatesCount;
 
             foreach (var t in this.Transform)
                 foreach (var val in t.Value)
                     pdat.AddM(t.Key.q, t.Key.ci, t.Key.cw, val.cw2, val.qNext);
-            
+
             foreach (var t in pda.Transform) {
                 uint[] qnexts = new uint[t.Value.Length];
                 for (int i = 0; i < t.Value.Length; i++) {
-                    qnexts[i] = t.Value[i].qNext+offset;
-                    pdat.AddM(t.Key.q+offset, t.Key.ci, t.Key.cw, t.Value[i].cw2, qnexts[i]);
+                    qnexts[i] = t.Value[i].qNext + offset;
+                    pdat.AddM(t.Key.q + offset, t.Key.ci, t.Key.cw, t.Value[i].cw2, qnexts[i]);
                 }
             }
-                
+
 
             for (int i = 0; i < this.AcceptedStates.Length; i++)
                 pdat.AddM(this.AcceptedStates[i], null, null, null, offset);
-            
+
             for (int i = 0; i < pda.AcceptedStates.Length; i++)
-                accStates.Add((pda.AcceptedStates[i]+offset));
+                accStates.Add((pda.AcceptedStates[i] + offset));
 
             accStates.Sort();
 
             if (this is StatePDA)
-                return new StatePDA($"Union({Name}+{pda.Name})",this.StatesCount+pda.StatesCount, inputAlphabet, workAlphabet, pdat, 0, (char)0, accStates.ToArray());
+                return new StatePDA($"Union({Name}+{pda.Name})", this.StatesCount + pda.StatesCount, inputAlphabet, workAlphabet, pdat, 0, (char)0, accStates.ToArray());
             else if (this is StackPDA)
-                return new StackPDA($"Union({Name}+{pda.Name})",this.StatesCount+pda.StatesCount, inputAlphabet, workAlphabet, pdat, 0, (char)0);
+                return new StackPDA($"Union({Name}+{pda.Name})", this.StatesCount + pda.StatesCount, inputAlphabet, workAlphabet, pdat, 0, (char)0);
             else
                 throw new System.NotImplementedException();
 
         }
 
-        public virtual PDA Reverse() {
+        public virtual IAutomat Reverse() {
             var pdat = new PDATransform();
 
-            string[] names = new string[this.StatesCount+1];
+            string[] names = new string[this.StatesCount + 1];
 
             //array pointer old to new state            
             uint[] newstate = new uint[this.StatesCount];
             for (uint i = 0; i < newstate.Length; i++) {
                 newstate[i] = this.StatesCount - i;
-                names[i+1] = (newstate[i]-1).ToString();
+                names[i + 1] = (newstate[i] - 1).ToString();
             }
             names[0] = "new";
 
@@ -276,13 +286,13 @@ namespace Serpen.Uni.Automat.ContextFree {
             foreach (var dt in this.Transform.Reverse())
                 foreach (var dtv in dt.Value)
                     pdat.AddM(newstate[dtv.qNext], dt.Key.ci, dt.Key.cw, dtv.cw2, newstate[dt.Key.q]);
-                
+
             //start state is qe, which leads to every old accepted state
             for (int i = 0; i < this.AcceptedStates.Length; i++)
                 pdat.AddM(0, null, null, null, newstate[this.AcceptedStates[i]]);
-            
+
             if (this is StatePDA)
-                return new StatePDA($"Reverse({Name})", names, this.Alphabet, this.WorkAlphabet, pdat, 0, START, new uint[] {this.StatesCount});
+                return new StatePDA($"Reverse({Name})", names, this.Alphabet, this.WorkAlphabet, pdat, 0, START, new uint[] { this.StatesCount });
             else if (this is StackPDA)
                 return new StackPDA($"Reverse({Name})", names, this.Alphabet, this.WorkAlphabet, pdat, 0, START);
             else
@@ -290,7 +300,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
         #endregion
-    
+
     } //end class
 
 } //end ns

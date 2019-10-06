@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Serpen.Uni.Automat.ContextFree {
-    public class CFGrammer : GrammerBase, IAbgeschlossenheitseigenschaften<CFGrammer, CFGrammer> {
+    public class CFGrammer : GrammerBase {
 
         public CFGrammer(string name, char[] variables, char[] terminals, RuleSet rules, char startSymbol)
             : base(name, variables, terminals, rules, startSymbol) {
-            
+
             CheckConstraints();
         }
 
         public bool isChomskey { get; internal set; }
-        
+
         public static CFGrammer GenerateRandom() {
             var rnd = Utils.RND;
             const byte MAX_CHAR = 10;
@@ -59,7 +59,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             return new CFGrammer("CFG_Random", Vars, Terms, rs, Utils.GrAE(HeadVars));
         }
 
-        
+
         public CFGrammer toChomskyNF(SourceMode mode = SourceMode.EAFK) {
             var newVars = new List<char>(Variables);
             var newRS = Rules;
@@ -387,33 +387,31 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         #region Abgeschlossenheitseigenschaften
 
-        
+
         CFGrammer Combine(CFGrammer cfg, string[] startBodysFormat, string nameExt) {
             var newRules = new RuleSet();
 
             List<char> bothVarAndTerm = this.VarAndTerm.Union(cfg.VarAndTerm).ToList();
             List<char> finalVars = this.Variables.ToList();
-            List<char> finalTerms= this.Terminals.ToList();
+            List<char> finalTerms = this.Terminals.ToList();
             char newStart = Utils.NextFreeCapitalLetter(bothVarAndTerm, this.StartSymbol);
-            
+
             bothVarAndTerm.Add(newStart);
             finalVars.Add(newStart);
 
             var translate = new Dictionary<char, char>();
-            foreach (char c in cfg.Variables)
-            {
+            foreach (char c in cfg.Variables) {
                 if (!finalVars.Contains(c)) {
-                    translate.Add(c,c);
+                    translate.Add(c, c);
                 } else {
                     char newChar = Utils.NextFreeCapitalLetter(finalVars, c);
                     translate.Add(c, newChar);
                     finalVars.Add(newChar);
                 }
             }
-            foreach (char c in cfg.Terminals)
-            {
+            foreach (char c in cfg.Terminals) {
                 if (!finalTerms.Contains(c)) {
-                    translate.Add(c,c);
+                    translate.Add(c, c);
                 } else {
                     char newChar = Utils.NextFreeCapitalLetter(finalTerms, c); //against convention!
                     translate.Add(c, newChar);
@@ -447,7 +445,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             }
 
             return new CFGrammer($"CFG_Combine({nameExt},{Name})", finalVars.ToArray(), finalTerms.ToArray(), newRules, newStart);
-        
+
         }
 
         public CFGrammer KleeneStern() {
@@ -463,7 +461,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             return new CFGrammer("$CFG_KleeneStern({Name})-", this.Variables.Append(newStart).ToArray(), this.Terminals, newRules, newStart);
         }
 
-        public CFGrammer Union(CFGrammer cfg) => Combine(cfg, new string[] {"{0}","{1}"}, "union");
+        public CFGrammer Union(CFGrammer cfg) => Combine(cfg, new string[] { "{0}", "{1}" }, "union");
 
         public CFGrammer Reverse() {
             var newRules = new RuleSet();
@@ -476,7 +474,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                 newRules.Add(r.Key, newVals.ToArray());
             }
             return new CFGrammer("CFG_Reverse({Name})", this.Variables, this.Terminals, newRules, this.StartSymbol);
-        
+
         }
 
         public CFGrammer Diff(CFGrammer cfg) => throw new NotSupportedException();
@@ -484,9 +482,9 @@ namespace Serpen.Uni.Automat.ContextFree {
         public CFGrammer Intersect(CFGrammer cfg) => throw new NotSupportedException();
         public CFGrammer Intersect(Finite.FABase A) => throw new NotImplementedException();
         public CFGrammer Complement() => throw new NotSupportedException();
-        public CFGrammer Concat(CFGrammer cfg) => Combine(cfg, new string[] {"{0}{1}"}, "concat");
-        public CFGrammer Join(CFGrammer cfg) => Combine(cfg, new string[] {"{0}"}, "join");
-        public CFGrammer HomomorphismChar(Dictionary<char,char> translate) => throw new NotImplementedException();
+        public CFGrammer Concat(CFGrammer cfg) => Combine(cfg, new string[] { "{0}{1}" }, "concat");
+        public CFGrammer Join(CFGrammer cfg) => Combine(cfg, new string[] { "{0}" }, "join");
+        public CFGrammer HomomorphismChar(Dictionary<char, char> translate) => throw new NotImplementedException();
 
         #endregion
     } //end class

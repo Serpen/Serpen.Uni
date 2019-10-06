@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Reflection;
 
 namespace Serpen.Uni.Automat {
-     public static partial class KnownAutomat {
-        
+    public static partial class KnownAutomat {
+
         public static readonly char[] binAlp = new char[] { '0', '1' };
 
 
@@ -43,7 +43,7 @@ namespace Serpen.Uni.Automat {
         /// <returns></returns>
         public static Finite.NFA[] GetNFAModels() {
             var list = GetTypes<Finite.NFA>();
-            
+
             list.Add(KnownAutomat.NEA_XlastIsOne(5));
 
             for (int i = 0; i < 10; i++)
@@ -102,15 +102,15 @@ namespace Serpen.Uni.Automat {
         }
 
         static bool MemberTypeFilter(MemberInfo objMemberInfo, object objSearch) {
-            if (objMemberInfo is PropertyInfo objPropertyInfo) 
+            if (objMemberInfo is PropertyInfo objPropertyInfo)
                 if (objSearch is System.Type objSearchType)
-                    return objPropertyInfo.PropertyType == objSearchType;
-            return false;            
+                    return objPropertyInfo.PropertyType == objSearchType | objSearchType.IsAssignableFrom(objPropertyInfo.PropertyType);
+            return false;
         }
 
-        static bool MemberNameFilter(MemberInfo objMemberInfo, object objSearch) 
+        static bool MemberNameFilter(MemberInfo objMemberInfo, object objSearch)
             => objMemberInfo.Name.StartsWith(objSearch.ToString());
 
-        
+
     }
 }
