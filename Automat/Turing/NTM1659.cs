@@ -88,7 +88,7 @@ namespace Serpen.Uni.Automat.Turing {
             int stateCount = rnd.Next(1, MAX_STATES);
 
             char[] inputAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR);
-            char[] bandAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR, inputAlphabet.Append(BLANK), 0);
+            char[] bandAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR, inputAlphabet.Append(BLANK));
 
 
             int transformsRnd = rnd.Next(0, stateCount*inputAlphabet.Length);
@@ -106,19 +106,17 @@ namespace Serpen.Uni.Automat.Turing {
         public override IAutomat PurgeStates() {
             (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
 
-            var newT = new TuringTransformSingleBand();
+            var newT = new NTM1659Transform();
             foreach (var ti in Transform)
                 if (translate.Contains(ti.Key.q))
                     foreach (var tv in ti.Value) {
                         if (translate.Contains(tv.qNext)) {
-                            var ntk = new TuringTransformSingleBand.TuringKey(Utils.ArrayIndex(translate, ti.Key.q), ti.Key.c);
-                            var ntv = new TuringTransformSingleBand.TuringVal(Utils.ArrayIndex(translate, tv.qNext), tv.c2, tv.Direction);
-                            newT.Add(ntk, ntv);
+                            newT.AddM(Utils.ArrayIndex(translate, ti.Key.q), ti.Key.c, Utils.ArrayIndex(translate, tv.qNext), tv.c2, tv.Direction);
 
                         }
                     }
 
-            return new TuringMachineSingleBand1659($"{Name}_purged", (uint)names.Length, Alphabet, BandAlphabet, newT, Utils.ArrayIndex(translate, StartState), BlankSymbol, Utils.ArrayIndex(translate, AcceptedState), Utils.ArrayIndex(translate, DiscardState));
+            return new NTM1659($"{Name}_purged", (uint)names.Length, Alphabet, BandAlphabet, newT, Utils.ArrayIndex(translate, StartState), BlankSymbol, Utils.ArrayIndex(translate, AcceptedState), Utils.ArrayIndex(translate, DiscardState));
         }
 
         public override System.Tuple<int, int, string>[] VisualizationLines() {

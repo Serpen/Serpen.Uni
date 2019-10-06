@@ -173,7 +173,7 @@ namespace Serpen.Uni.Automat {
             foreach (IAutomat a in automats) {
                 if (a is NFA nfa) {
                     var nfa_removed = nfa.PurgeStates();
-                    string[] rwords = nfa.GetRandomWords(words, words); 
+                    string[] rwords = nfa.GetRandomWords(words, 0, words); 
                     for (int i = 0; i < rwords.Length; i++)
                     {
                         if (!nfa.AcceptWord(rwords[i]) == nfa_removed.AcceptWord(rwords[i]))
@@ -206,14 +206,11 @@ namespace Serpen.Uni.Automat {
             var ret = new List<FABase>(finiteAutomats.Length*finiteAutomats.Length);
 
             foreach (var d1 in finiteAutomats)
-            {
                 foreach (var d2 in finiteAutomats)
-                {
                     if (d1.GetType()==d2.GetType())
                         if (Utils.SameAlphabet(d1,d2))
                             ret.Add(d1.Join(d2));
-                }
-            }
+                            
             return ret.ToArray();
         }
 
@@ -308,9 +305,9 @@ namespace Serpen.Uni.Automat {
             var ret = new List<IAutomat>(finiteAutomats.Length*finiteAutomats.Length);
 
             foreach (var fa1 in finiteAutomats)
-            foreach (var fa2 in finiteAutomats)
-                ret.Add(fa1.Concat(fa2));
-            
+                foreach (var fa2 in finiteAutomats)
+                    if (Utils.SameAlphabet(fa1,fa2))
+                        ret.Add(fa1.Concat(fa2));
             return ret.ToArray();
         }
 
@@ -323,7 +320,7 @@ namespace Serpen.Uni.Automat {
 
             int count = 0;
             while ((onceTrue < passLevel | onceFalse < passLevel) && count < initialCount*2) {
-                string[] words = A1.GetRandomWords(initialCount/2, initialCount/2);
+                string[] words = A1.GetRandomWords(initialCount/2, 0, initialCount/2);
                 foreach (string w in words)
                 {
                     var erg1 = A1.AcceptWord(w);
@@ -332,7 +329,7 @@ namespace Serpen.Uni.Automat {
                     if (erg1) onceTrue++;
                     if (!erg1) onceFalse++;
                     if (erg1 != erg2) {
-                        Utils.DebugMessage($"{count}. word '{w}' divides Automates", A1, Utils.eDebugLogLevel.Low);
+                        Utils.DebugMessage($"{count}. word '{w}' divides Automates", A1, Utils.eDebugLogLevel.Always);
                         return false;
                     }
                         Utils.DebugMessage($"{count}. word '{w}' passes", A1, Utils.eDebugLogLevel.Verbose);
@@ -345,10 +342,10 @@ namespace Serpen.Uni.Automat {
                 return true;
             } else {
                 if (A1.Equals(A2)) {
-                    Utils.DebugMessage($"{count} words passed, but not both tested, but Equals works", A1, Utils.eDebugLogLevel.Low);
+                    Utils.DebugMessage($"{count} words passed, but not both tested, but Equals works", A1, Utils.eDebugLogLevel.Always);
                     return true;
                 } else {
-                    Utils.DebugMessage($"{count} words passed, but not both tested, Equals not working", A1, Utils.eDebugLogLevel.Low);
+                    Utils.DebugMessage($"{count} words passed, but not both tested, Equals not working", A1, Utils.eDebugLogLevel.Always);
                     return true;
                 }
                 

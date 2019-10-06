@@ -7,8 +7,10 @@ namespace Serpen.Uni.Automat {
         bool AcceptWord(string w);
 
         string GetRandomWord();
-        string[] GetRandomWords(int count, int maxLen);
+        string[] GetRandomWords(int count, int minLen, int maxLen);
         char[] Alphabet { get; }
+
+        // System.Func<string,bool> SimplifiedAcceptFunction {get; internal set;}
         //protected void CheckConstraints();
     }
 
@@ -55,6 +57,8 @@ namespace Serpen.Uni.Automat {
             States = states;
         }
         protected virtual void CheckConstraints() {
+            if (StatesCount == 0)
+                throw new Automat.StateException(StatesCount, "automat must have at least a startstate");
             if (StartState >= StatesCount)
                 throw new Automat.StateException(StartState);
             foreach (uint acc in AcceptedStates) {
@@ -81,6 +85,11 @@ namespace Serpen.Uni.Automat {
                     } else if (t.Value is ITransformValue tt) {
                         if (!fromStartReachable[tt.qNext])
                             fromStartReachable[tt.qNext] = foundnew = true;
+                    } else if (t.Value is System.Array tarray) { //why is [is ITransformValue[]] not working? 
+                        foreach (var tt1 in tarray)
+                            if (tt1 is ITransformValue tt1v)
+                                if (!fromStartReachable[tt1v.qNext])
+                                    fromStartReachable[tt1v.qNext] = foundnew = true;
                     } else
                         throw new System.NotImplementedException();
                 }
@@ -146,15 +155,18 @@ namespace Serpen.Uni.Automat {
             return w;
         }
 
-        public string[] GetRandomWords(int count, int maxLen) {
+        public string[] GetRandomWords(int count, int minLen, int maxLen) {
             var words = new System.Collections.Specialized.StringCollection();
             var rnd = Utils.RND;
 
             int i = 0;
 
+            //count shouldn't be higher than words available with maxLen
+            count = System.Math.Min(count, Alphabet.Length*maxLen);
+
             while (words.Count < count) {
                 string w = "";
-                var wLen = rnd.Next(0, maxLen);
+                var wLen = rnd.Next(minLen, maxLen);
                 for (int k = 0; k < wLen; k++)
                     w = w.Insert(k, Alphabet[rnd.Next(0, Alphabet.Length)].ToString());
 

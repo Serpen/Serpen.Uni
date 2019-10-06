@@ -126,7 +126,7 @@ namespace Serpen.Uni.Automat.Finite {
         public override FABase Join(FABase A) {
             var N2 = A as NFA;
 
-            if (!(N2 is null))
+            if (N2 is null)
                 throw new System.NotSupportedException();
             else {
                 var neat = new NFAeTransform();

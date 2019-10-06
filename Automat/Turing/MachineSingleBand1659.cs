@@ -75,7 +75,7 @@ namespace Serpen.Uni.Automat.Turing {
             int stateCount = rnd.Next(1, MAX_STATES);
             
             char[] inputAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR);
-            char[] bandAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR, inputAlphabet.Append(BLANK), 0);
+            char[] bandAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR, inputAlphabet.Append(BLANK));
                         
             for (uint i = 0; i < stateCount; i++) {
                 int transformsRnd = rnd.Next(0, inputAlphabet.Length);

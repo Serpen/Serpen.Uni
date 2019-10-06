@@ -52,8 +52,10 @@ namespace Serpen.Uni.Automat.ContextFree {
             base.CheckConstraints();
             foreach (var t in Transform) {
                 for (int i = 0; i < t.Value.Length; i++) {
-                    if (t.Key.q > StatesCount | t.Value[i].qNext > StatesCount)
+                    if (t.Key.q > StatesCount)
                         throw new StateException(t.Key.q);
+                    else if (t.Value[i].qNext > StatesCount)
+                        throw new StateException(t.Value[i].qNext);
                     else if (t.Key.ci.HasValue && !Alphabet.Contains(t.Key.ci.Value))
                         throw new AlphabetException(t.Key.ci.Value);
                     else if (t.Key.cw.HasValue && !WorkAlphabet.Contains(t.Key.cw.Value))
@@ -74,7 +76,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             var retCfgs = new List<PDAConfig>();
 
             if (pcfgs.Length > MAX_RUNS_OR_STACK) {
-                Utils.DebugMessage($"Stack >= {pcfgs.Length}, abort", this, Utils.eDebugLogLevel.Low);
+                Utils.DebugMessage($"Stack >= {pcfgs.Length}, abort", this, Utils.eDebugLogLevel.Always);
                 return new PDAConfig[0];
             }
 

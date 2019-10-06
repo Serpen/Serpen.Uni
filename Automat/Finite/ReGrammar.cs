@@ -37,7 +37,7 @@ namespace Serpen.Uni.Automat {
             return w;
         }
 
-        public string[] GetRandomWords(int count, int maxLen) {
+        public string[] GetRandomWords(int count, int minLen, int maxLen) {
             var words = new System.Collections.Specialized.StringCollection();
             var rnd = Utils.RND;
 
@@ -45,7 +45,7 @@ namespace Serpen.Uni.Automat {
 
             while (words.Count < count) {
                 string w = "";
-                var wLen = rnd.Next(0, maxLen);
+                var wLen = rnd.Next(minLen, maxLen);
                 for (int k = 0; k < wLen; k++)
                     w = w.Insert(k, Terminals[rnd.Next(0, Terminals.Length)].ToString());
 

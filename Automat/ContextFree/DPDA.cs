@@ -141,7 +141,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             int stateCount = rnd.Next(1, MAX_STATES);
 
             char[] inputAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR);
-            char[] workAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR, new char[] {START}, 0);
+            char[] workAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR, new char[] {START});
             uint[] accState = RandomGenerator.RandomAcceptedStates(1, stateCount/3, stateCount); 
 
             for (uint i = 0; i < stateCount; i++) {

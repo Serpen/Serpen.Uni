@@ -145,9 +145,8 @@ namespace Serpen.Uni.Automat.Finite {
                 }
             }
 
-
-            var ret = new NFAe("NFAe_Random", (uint)stateCount, alphabet, t, (uint)rnd.Next(0, stateCount), accState);
-            ret.Name = $"NFAe_Random_{ret.GetHashCode()}";
+            var ret = new NFAe("NFAe_Random", (uint)stateCount, alphabet, t, (uint)rnd.Next(0, stateCount), accState)
+                {Name = $"NFAe_Random_q{stateCount}_a{alphabet.Length}_t{t.Count}_a{accState.Length}"};
             return ret;
 
         }
@@ -160,7 +159,7 @@ namespace Serpen.Uni.Automat.Finite {
                 if (translate.Contains(t2.Key.q))
                     foreach (var v in t2.Value)
                         if (translate.Contains(v))
-                            newT.AddM(Utils.ArrayIndex(translate,t2.Key.q), t2.Key.c.Value, Utils.ArrayIndex(translate,v));
+                            newT.AddM(Utils.ArrayIndex(translate,t2.Key.q), t2.Key.c, Utils.ArrayIndex(translate,v));
             
             return new NFAe($"{Name}_purged", names, Alphabet, newT, Utils.ArrayIndex(translate,StartState), aStates);
         

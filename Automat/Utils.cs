@@ -44,7 +44,7 @@ namespace Serpen.Uni.Automat {
             return true;
         }
 
-        public enum eDebugLogLevel {Low, Normal, Verbose}
+        public enum eDebugLogLevel {Always, Normal, Verbose}
 
         internal static void DebugMessage(string message, IAcceptWord a, eDebugLogLevel level) {
             if (DebugLogLevel >= level) {
@@ -137,8 +137,12 @@ namespace Serpen.Uni.Automat {
 
         } //end function
 
-        public static uint ArrayIndex(System.Array array, object value)
-            => (uint)System.Array.IndexOf(array, value);
+        public static uint ArrayIndex(System.Array array, object value) {
+            uint index = (uint)System.Array.IndexOf(array, value);
+            if (index > array.Length)
+                throw new System.IndexOutOfRangeException();
+            return index;
+        } 
 
         public static void SaveAutomatImageToTemp(IAutomat automat)
             => Visualization.DrawAutomat(automat).Save(System.Environment.ExpandEnvironmentVariables($@"%temp%\automat\{automat.Name}.png"));

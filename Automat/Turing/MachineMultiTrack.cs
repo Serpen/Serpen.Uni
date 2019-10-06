@@ -64,7 +64,7 @@ namespace Serpen.Uni.Automat.Turing {
             uint lastQ = tcfg.q;
 
             while (tcfg != null && !IsAcceptedState(tcfg.q)) {
-                Utils.DebugMessage(tcfg.ToString(), this, Utils.eDebugLogLevel.Normal);
+                Utils.DebugMessage(tcfg.ToString(), this, Utils.eDebugLogLevel.Verbose);
                 tcfg = GoChar(tcfg);
                 if (tcfg != null)
                     lastQ = tcfg.q;
@@ -116,11 +116,13 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         public static TuringMachineMultiTrack GenerateRandom() {
-            int stateCount = Utils.RND.Next(1, 20);
+            var rnd = Utils.RND;
+
+            int stateCount = rnd.Next(1, 20);
             char[] inputAlphabet = RandomGenerator.RandomAlphabet(1,20);
-            char[] bandAlphabet = RandomGenerator.RandomAlphabet(1,20, inputAlphabet.Append(BLANK), 0);
-            uint trackCount = (uint)Utils.RND.Next(1,5);
-            string[] TrackTranslate = new string[Utils.RND.Next(1,10)];
+            char[] bandAlphabet = RandomGenerator.RandomAlphabet(1,20, inputAlphabet.Append(BLANK));
+            uint trackCount = (uint)rnd.Next(1,5);
+            string[] TrackTranslate = new string[rnd.Next(1,10)];
             for (int i = 0; i < TrackTranslate.Length; i++)
             {
                 var curChars = new string[trackCount];
@@ -132,7 +134,7 @@ namespace Serpen.Uni.Automat.Turing {
 
             var t = new TuringTransformMultiTrack(TrackTranslate);
             for (uint i = 0; i < stateCount; i++) {
-                int transformsRnd = Utils.RND.Next(0, inputAlphabet.Length);
+                int transformsRnd = rnd.Next(0, inputAlphabet.Length);
                 for (uint j = 0; j < transformsRnd; j++) {
                     var tk = new TuringTransformMultiTrack.TuringKey(i, Utils.GrAE(TrackTranslate).ToCharArray());
                     var tv = new TuringTransformMultiTrack.TuringVal(j, Utils.GrAE(TrackTranslate).ToCharArray(), TMDirection.Right);
@@ -140,7 +142,7 @@ namespace Serpen.Uni.Automat.Turing {
                 }
             }
 
-            var ret = new TuringMachineMultiTrack($"TM{trackCount}_Random", trackCount, (uint)stateCount, inputAlphabet, bandAlphabet , t, (uint)Utils.RND.Next(0,stateCount), BLANK , accState);
+            var ret = new TuringMachineMultiTrack($"TM{trackCount}_Random", trackCount, (uint)stateCount, inputAlphabet, bandAlphabet , t, (uint)rnd.Next(0,stateCount), BLANK , accState);
             ret.Name = $"TM{trackCount}_Random_{ret.GetHashCode()}";
             return ret;
         }

@@ -134,7 +134,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
                 runCount++;
                 if (pcfgs.Length > MAX_RUNS_OR_STACK || runCount > MAX_RUNS_OR_STACK) {
-                    Utils.DebugMessage($"{runCount}: Stack >= {pcfgs.Length}, abort", this, Utils.eDebugLogLevel.Low);
+                    Utils.DebugMessage($"{runCount}: Stack >= {pcfgs.Length}, abort", this, Utils.eDebugLogLevel.Always);
                     return false;
                 }
 
@@ -153,7 +153,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             int stateCount = rnd.Next(1, MAX_STATES);
 
             char[] inputAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR);
-            char[] workAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR, new char[] {START}, 0);
+            char[] workAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR, new char[] {START});
             uint[] accState = RandomGenerator.RandomAcceptedStates(1, stateCount/3, stateCount); 
 
             for (uint i = 0; i < stateCount; i++) {
@@ -177,7 +177,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                 if (translate.Contains(t2.Key.q))
                     foreach (var v in t2.Value)
                         if (translate.Contains(v.qNext))
-                            newT.AddM(Utils.ArrayIndex(translate,t2.Key.q), t2.Key.ci, t2.Key.cw, v.cw2, Utils.ArrayIndex(translate,v));
+                            newT.AddM(Utils.ArrayIndex(translate,t2.Key.q), t2.Key.ci, t2.Key.cw, v.cw2, Utils.ArrayIndex(translate,v.qNext));
             
             return new StatePDA($"{Name}_purged", names, Alphabet, WorkAlphabet, newT, Utils.ArrayIndex(translate,StartState), StartStackSymbol, aStates);
         
