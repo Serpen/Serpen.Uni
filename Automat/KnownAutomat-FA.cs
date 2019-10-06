@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Serpen.Uni.Automat.Finite;
 
 namespace Serpen.Uni.Automat {
@@ -9,6 +10,7 @@ namespace Serpen.Uni.Automat {
                 deaT.AddBinTuple(0, 1, 0);
                 deaT.AddBinTuple(1, 1, 2);
                 deaT.AddBinTuple(2, 2, 2);
+                Func<string, bool> SimplyfieldAcceptFunction = w => w.Contains("01");
                 return new DFA(nameof(DEA_Contains01), 3, binAlp, deaT, 0, new uint[] { 2 });
             }
         }
@@ -21,6 +23,7 @@ namespace Serpen.Uni.Automat {
                 deaT.AddBinTuple(3, 4, 3);
                 deaT.AddBinTuple(4, 4, 5);
                 deaT.AddBinTuple(5, 4, 3);
+                Func<string, bool> SimplyfieldAcceptFunction = w => w.StartsWith("01") | w.EndsWith("01");
                 return new DFA(nameof(DEA_StartOrEndsWith01), 6, binAlp, deaT, 0, 2, 5);
             }
         }
@@ -31,6 +34,11 @@ namespace Serpen.Uni.Automat {
                 deaT.AddBinTuple(1, 0, 3);
                 deaT.AddBinTuple(2, 3, 0);
                 deaT.AddBinTuple(3, 2, 1);
+                Func<string, bool> SimplyfieldAcceptFunction = delegate (string s) {
+                    int c1 = s.Count((c) => c == '1');
+                    int c0 = s.Count((c) => c == '0');
+                    return c0 == c1;
+                };
                 return new DFA(nameof(DEA_SameCount0And1), 4, binAlp, deaT, 0, 0);
             }
         }
@@ -39,6 +47,7 @@ namespace Serpen.Uni.Automat {
                 var deat = new FATransform();
                 deat.AddBinTuple(0, 1, 0);
                 deat.AddBinTuple(1, 0, 1);
+                Func<string, bool> SimplyfieldAcceptFunction = s => s.Count(c => c == '0') % 2 == 0;
                 return new DFA(nameof(DEA_1659_M1_A22_0even), 2, binAlp, deat, 0, 0);
             }
         }
@@ -150,14 +159,14 @@ namespace Serpen.Uni.Automat {
                 return new DFA(nameof(DEA_1659_A215_M3_TF), 5, binAlp, deaT, 0, 0, 2, 3);
             }
         }
-        public static DFA DEA_1659_A225_M4_pump {
+        public static DFA DEA_1659_A225_M4_pump_bba {
             get {
                 var deaT = new FATransform();
                 deaT.AddBinTuple(0, 0, 1);
                 deaT.AddBinTuple(1, 0, 2);
                 deaT.AddBinTuple(2, 3, 2);
                 deaT.AddBinTuple(3, 0, 1);
-                return new DFA(nameof(DEA_1659_A225_M4_pump), 4, binAlp, deaT, 0, 3);
+                return new DFA(nameof(DEA_1659_A225_M4_pump_bba), 4, binAlp, deaT, 0, 3);
             }
         }
         public static DFA DEA_1659_A227_T21 {
@@ -254,6 +263,7 @@ namespace Serpen.Uni.Automat {
                 neaT.Add(0, '0', 0, 1);
                 neaT.Add(0, '1', 0);
                 neaT.Add(1, '1', 2);
+                Func<string, bool> SimplyfieldAcceptFunction = s => s.EndsWith("01");
                 return new NFA(nameof(NEA_EndsWith01), 3, binAlp, neaT, 0, new uint[] { 2 });
             }
         }
@@ -369,6 +379,8 @@ namespace Serpen.Uni.Automat {
                     t.Add(i, '0', i);
             }
 
+            Func<string, bool> SimplyfieldAcceptFunction = s => s.EndsWith(new string('0', (int)count));
+
             return new DFA($"DEA_EndsWithNulls({count})", count + 1, binAlp, t, 0, count);
         }
 
@@ -381,6 +393,8 @@ namespace Serpen.Uni.Automat {
                 else
                     t.Add(i, '1', i);
             }
+
+            Func<string, bool> SimplyfieldAcceptFunction = s => s.Count(c => c == '1') == count;
 
             return new DFA($"DEA_ContainsOnes({count})", count + 1, binAlp, t, 0, count);
         }
@@ -421,6 +435,9 @@ namespace Serpen.Uni.Automat {
                 t.Add(i, '0', i + 1);
                 t.Add(i, '1', i + 1);
             }
+
+            Func<string, bool> SimplyfieldAcceptFunction = s => s.EndsWith("1" + new string('0', (int)count));
+
             return new NFA($"NEA_XlastIsOne({count})", count + 1, binAlp, t, 0, count);
         }
     }

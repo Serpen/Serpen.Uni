@@ -26,6 +26,9 @@ namespace Serpen.Uni.Automat {
             list.Add(KnownAutomat.DEA_BinFreq(3, 5));
             list.Add(KnownAutomat.DEA_ContainsOnes(6));
             list.Add(KnownAutomat.DEA_EndsWithNulls(4));
+
+            for (int i = 0; i < 10; i++)
+                list.Add(Finite.DFA.GenerateRandom());
             return list.ToArray();
         }
 
@@ -39,10 +42,14 @@ namespace Serpen.Uni.Automat {
         /// </summary>
         /// <returns></returns>
         public static Finite.NFA[] GetNFAModels() {
-            var Neas = GetTypes<Finite.NFA>();
+            var list = GetTypes<Finite.NFA>();
             
-            Neas.Add(KnownAutomat.NEA_XlastIsOne(5));
-            return Neas.ToArray();
+            list.Add(KnownAutomat.NEA_XlastIsOne(5));
+
+            for (int i = 0; i < 10; i++)
+                list.Add(Finite.NFA.GenerateRandom());
+
+            return list.ToArray();
         }
 
         /// <summary>
@@ -50,8 +57,12 @@ namespace Serpen.Uni.Automat {
         /// </summary>
         /// <returns></returns>
         public static Finite.NFAe[] GetNFAeModels() {
-            var NeaEs = GetTypes<Finite.NFAe>();
-            return NeaEs.ToArray();
+            var list = GetTypes<Finite.NFAe>();
+
+            for (int i = 0; i < 10; i++)
+                list.Add(Finite.NFAe.GenerateRandom());
+
+            return list.ToArray();
         }
 
         public static ContextFree.CFGrammer[] GetCFGrammer() {
