@@ -205,7 +205,7 @@ namespace Serpen.Uni.Automat {
             foreach (var a1 in automats)
                 foreach (var a2 in automats)
                     if (a1.GetType() == a2.GetType())
-                        if (!(a1 is DFA) || Utils.SameAlphabet(a1, a2))
+                        if (!(a1 is DFA) || a1.SameAlphabet(a2))
                             ret.Add(a1.Join(a2));
 
             return ret.ToArray();
@@ -218,7 +218,7 @@ namespace Serpen.Uni.Automat {
             foreach (var a1 in automats)
                 foreach (var a2 in automats)
                     if (a1.GetType() == a2.GetType())
-                        if (Utils.SameAlphabet(a1, a2))
+                        if (a1.SameAlphabet(a2))
                             try {
                                 ret.Add(a1.Diff(a2));
                             } catch (System.NotImplementedException) { }
@@ -233,7 +233,7 @@ namespace Serpen.Uni.Automat {
             foreach (var a1 in automats)
                 foreach (var a2 in automats)
                     if (a1.GetType() == a2.GetType())
-                        if (Utils.SameAlphabet(a1, a2))
+                        if (a1.SameAlphabet(a2))
                             try {
                                 ret.Add(a1.Union(a2));
                             } catch (System.NotImplementedException) { }
@@ -250,7 +250,7 @@ namespace Serpen.Uni.Automat {
             foreach (var a1 in automats)
                 foreach (var a2 in automats)
                     if (a1.GetType() == a2.GetType())
-                        if (Utils.SameAlphabet(a1, a2))
+                        if (a1.SameAlphabet(a2))
                             try {
                                 ret.Add(a1.Intersect(a2));
                             } catch (System.NotImplementedException) { }
@@ -303,9 +303,7 @@ namespace Serpen.Uni.Automat {
                 foreach (var a2 in automats)
                     try {
                         ret.Add(a1.Concat(a2));
-                    } 
-                    catch (System.NotSupportedException) {}
-                    catch (System.NotImplementedException) {}
+                    } catch (System.NotSupportedException) { } catch (System.NotImplementedException) { }
             return ret.ToArray();
         }
 

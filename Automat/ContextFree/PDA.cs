@@ -162,12 +162,12 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         public abstract override bool AcceptWord(string w);
 
-        public override System.Tuple<int, int, string>[] VisualizationLines() {
-            var tcol = new System.Collections.Generic.List<System.Tuple<int, int, string>>();
+        public override VisualizationTuple[] VisualizationLines() {
+            var tcol = new System.Collections.Generic.List<VisualizationTuple>();
             foreach (var t in Transform) {
                 foreach (var v in t.Value) {
                     string desc = $"{(t.Key.ci.HasValue ? t.Key.ci.Value : Utils.EPSILON)}|{(t.Key.cw.HasValue ? t.Key.cw.Value : Utils.EPSILON)}->{(!string.IsNullOrEmpty(v.cw2) ? v.cw2 : Utils.EPSILON.ToString())}";
-                    var vt = new System.Tuple<int, int, string>((int)t.Key.q, (int)v.qNext, desc);
+                    var vt = new VisualizationTuple(t.Key.q, v.qNext, desc);
                     tcol.Add(vt);
                 }
             }

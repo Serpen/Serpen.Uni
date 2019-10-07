@@ -12,7 +12,7 @@ namespace Serpen.Uni.Automat {
         public static int Log2(int z) => (int)System.Math.Log2(z);
         public static bool HasBitSet(byte i, int b) => (b & (1 << i)) > 0;
 
-        private static eDebugLogLevel DebugLogLevel = eDebugLogLevel.Normal; 
+        private static eDebugLogLevel DebugLogLevel = eDebugLogLevel.Normal;
 
         /// <summary>
         /// Get Random Array Elemet
@@ -36,15 +36,7 @@ namespace Serpen.Uni.Automat {
         public static bool CheckBitSet(int b, int bitNumber)
             => (b & (1 << bitNumber)) > 0;
 
-        internal static bool SameAlphabet(IAutomat A1, IAutomat A2) {
-            if (A1.Alphabet.Length != A2.Alphabet.Length) return false;
-            for (int i = 0; i < A1.Alphabet.Length; i++)
-                if (A1.Alphabet[i] != A2.Alphabet[i])
-                    return false;
-            return true;
-        }
-
-        public enum eDebugLogLevel {Always, Normal, Verbose}
+        public enum eDebugLogLevel { Always, Normal, Verbose }
 
         internal static void DebugMessage(string message, IAcceptWord a, eDebugLogLevel level) {
             if (DebugLogLevel >= level) {
@@ -142,13 +134,21 @@ namespace Serpen.Uni.Automat {
             if (index > array.Length)
                 throw new System.IndexOutOfRangeException();
             return index;
-        } 
+        }
 
         public static void SaveAutomatImageToTemp(IAutomat automat)
             => Visualization.DrawAutomat(automat).Save(System.Environment.ExpandEnvironmentVariables($@"%temp%\automat\{automat.Name}.png"));
-        
+
 
     } //end class Utils 
 
-
+    public static class ExtensionMethods {
+        public static bool EqualAlphabets(this char[] alphabet, char[] anotherAlphabet) {
+            if (alphabet.Length != anotherAlphabet.Length) return false;
+            for (int i = 0; i < alphabet.Length; i++)
+                if (alphabet[i] != anotherAlphabet[i])
+                    return false;
+            return true;
+        }
+    }
 }

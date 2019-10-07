@@ -23,14 +23,14 @@ namespace Serpen.Uni.Automat.Finite {
 
         protected abstract uint[] GoChar(uint q, char c); //maybe return only uint
 
-        public override System.Tuple<int, int, string>[] VisualizationLines() {
-            var tcol = new List<System.Tuple<int, int, string>>();
+        public override VisualizationTuple[] VisualizationLines() {
+            var tcol = new List<VisualizationTuple>();
             foreach (var t in Transform) {
                 string desc = t.Key.c.ToString();
                 if (desc == "")
                     desc = Utils.EPSILON.ToString();
                 foreach (uint v in t.Value) {
-                    var vt = new System.Tuple<int, int, string>((int)t.Key.q, (int)v, desc);
+                    var vt = new VisualizationTuple(t.Key.q, v, desc);
                     tcol.Add(vt);
                 }
             }
@@ -126,7 +126,7 @@ namespace Serpen.Uni.Automat.Finite {
         public FABase ProductEA(FABase A, DFA.eProductDeaMode mode) {
             uint len = (this.StatesCount * A.StatesCount);
 
-            if (!Utils.SameAlphabet(this, A)) {
+            if (!this.SameAlphabet(A)) {
                 char[] Alphabet = this.Alphabet;
                 var accStates = new List<uint>();
                 string[] stateNames = new string[len];

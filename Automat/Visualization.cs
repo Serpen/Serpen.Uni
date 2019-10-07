@@ -2,6 +2,12 @@ using System.Drawing;
 using Math = System.Math;
 
 namespace Serpen.Uni.Automat {
+
+    public class VisualizationTuple : System.Tuple<int, int, string> {
+        public VisualizationTuple(int q, int q2, string desc) : base(q, q2, desc) { }
+        public VisualizationTuple(uint q, uint q2, string desc) : base((int)q, (int)q2, desc) { }
+    }
+
     public static class Visualization {
 
         const int STATE_DIAMETER = 45;
@@ -93,14 +99,14 @@ namespace Serpen.Uni.Automat {
             } catch { }
 
             var FullDescSize = g.MeasureString(new string(' ', 10) + FullDesc + new string(' ', 10), FONT);
-            if (FullDescSize.Width < bmpwidth-30)
+            if (FullDescSize.Width < bmpwidth - 30)
                 g.DrawString(FullDesc, FONT, Brushes.Black, 15, bmp.Height - FullDescSize.Height * 2);
             else {
-                int DescPartCount = (int)Math.Ceiling((bmpwidth-15*3) / (FullDescSize.Width+10)) + 2;
+                int DescPartCount = (int)Math.Ceiling((bmpwidth - 15 * 3) / (FullDescSize.Width + 10)) + 2;
                 int toStringSplitFactor = FullDesc.Length / DescPartCount;
                 for (int i = 0; i < DescPartCount; i++) {
                     g.DrawString(FullDesc.Substring(i * toStringSplitFactor, toStringSplitFactor),
-                        FONT, Brushes.Black, 15, bmp.Height - (DescPartCount-i+1) * (FullDescSize.Height+2));
+                        FONT, Brushes.Black, 15, bmp.Height - (DescPartCount - i + 1) * (FullDescSize.Height + 2));
                 }
             }
 

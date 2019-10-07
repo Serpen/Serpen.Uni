@@ -152,7 +152,7 @@ namespace Serpen.Uni.Automat.Finite {
             if (D2 != null) {
                 var deat = new FATransform();
 
-                if (!Utils.SameAlphabet(this, A)) {
+                if (!this.SameAlphabet(A)) {
                     throw new NotImplementedException("Different Alphabets are not implemented");
                 }
 
@@ -190,7 +190,7 @@ namespace Serpen.Uni.Automat.Finite {
 
             uint len = (D1.StatesCount * D2.StatesCount);
 
-            if (!Utils.SameAlphabet(D1, D2))
+            if (!D1.SameAlphabet(D2))
                 throw new NotImplementedException("Different Alphabets are not implemented");
             else {
                 var accStates = new List<uint>();

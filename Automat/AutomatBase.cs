@@ -23,7 +23,9 @@ namespace Serpen.Uni.Automat {
 
         IAutomat PurgeStates();
 
-        System.Tuple<int, int, string>[] VisualizationLines();
+        bool SameAlphabet(IAutomat A2);
+
+        VisualizationTuple[] VisualizationLines();
     }
 
     public abstract class AutomatBase<TKey, TVal> : IAutomat where TKey : struct, ITransformKey {
@@ -65,7 +67,14 @@ namespace Serpen.Uni.Automat {
                 if (acc >= StatesCount)
                     throw new Automat.StateException(acc);
             }
+        }
 
+        public bool SameAlphabet(IAutomat A2) {
+            if (this.Alphabet.Length != A2.Alphabet.Length) return false;
+            for (int i = 0; i < this.Alphabet.Length; i++)
+                if (this.Alphabet[i] != A2.Alphabet[i])
+                    return false;
+            return true;
         }
 
         public bool[] ReachableStates() {
@@ -141,7 +150,7 @@ namespace Serpen.Uni.Automat {
 
         public abstract IAutomat PurgeStates();
 
-        public abstract System.Tuple<int, int, string>[] VisualizationLines();
+        public abstract VisualizationTuple[] VisualizationLines();
 
         public abstract override string ToString();
 
@@ -162,7 +171,7 @@ namespace Serpen.Uni.Automat {
             int i = 0;
 
             //count shouldn't be higher than words available with maxLen
-            count = System.Math.Min(count, Alphabet.Length*maxLen);
+            count = System.Math.Min(count, Alphabet.Length * maxLen);
 
             while (words.Count < count) {
                 string w = "";
@@ -172,8 +181,8 @@ namespace Serpen.Uni.Automat {
 
                 if (!words.Contains(w))
                     words.Add(w);
-                
-                if (i > count*10) {
+
+                if (i > count * 10) {
                     Utils.DebugMessage($"Unable to get enough random words {i} tries>{words.Count}>{count}", this, Utils.eDebugLogLevel.Verbose);
                     break;
                 }
