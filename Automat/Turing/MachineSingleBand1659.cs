@@ -5,12 +5,12 @@ namespace Serpen.Uni.Automat.Turing {
 
         public TuringMachineSingleBand1659(string name, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, TuringTransformSingleBand transform, uint startState, char blankSymbol, uint acceptedState, uint discardState)
             : base(name, stateCount, inputAlphabet, bandAlphabet, startState, blankSymbol, new uint[] { acceptedState }) {
-            Transform = transform;
+            Transforms = transform;
             DiscardState = discardState;
         }
         public TuringMachineSingleBand1659(string name, string[] states, char[] inputAlphabet, char[] bandAlphabet, TuringTransformSingleBand transform, uint startState, char blankSymbol, uint acceptedState, uint discardState)
             : base(name, states, inputAlphabet, bandAlphabet, startState, blankSymbol, new uint[] { acceptedState }) {
-            Transform = transform;
+            Transforms = transform;
             DiscardState = discardState;
         }
 
@@ -20,7 +20,7 @@ namespace Serpen.Uni.Automat.Turing {
 
         TuringConfigSingleBand GoChar(TuringConfigSingleBand tcfg) {
             TuringTransformSingleBand.TuringVal tva;
-            if (Transform.TryGetValue(new TuringTransformSingleBand.TuringKey(tcfg.State, tcfg.CurSymbol), out tva)) {
+            if (Transforms.TryGetValue(new TuringTransformSingleBand.TuringKey(tcfg.State, tcfg.CurSymbol), out tva)) {
                 tcfg.ReplaceChar(tva.c2, tva.Direction);
                 tcfg.State = tva.qNext;
                 return tcfg;
@@ -95,7 +95,7 @@ namespace Serpen.Uni.Automat.Turing {
             (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
 
             var newT = new TuringTransformSingleBand();
-            foreach (var t2 in Transform)
+            foreach (var t2 in Transforms)
                 if (translate.Contains(t2.Key.q))
                     if (translate.Contains(t2.Value.qNext)) {
                         var tk = new TuringTransformSingleBand.TuringKey(Utils.ArrayIndex(translate, t2.Key.q), t2.Key.c);
@@ -108,7 +108,7 @@ namespace Serpen.Uni.Automat.Turing {
 
         public override VisualizationTuple[] VisualizationLines() {
             var tcol = new System.Collections.Generic.List<VisualizationTuple>();
-            foreach (var t in Transform) {
+            foreach (var t in Transforms) {
                 var vt = new VisualizationTuple(t.Key.q, t.Value.qNext,
                  $"{t.Key.c}|{t.Value.c2} {t.Value.Direction}");
                 tcol.Add(vt);
@@ -117,7 +117,7 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         public override string ToString()
-            => $"{Name} TM(|{States.Length}|={string.Join(";", States)}), {{{string.Join(',', Alphabet)}}},{{{string.Join(',', BandAlphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {BlankSymbol}, {AcceptedState}, {DiscardState})".Trim();
+            => $"{Name} TM(|{States.Length}|={string.Join(";", States)}), {{{string.Join(',', Alphabet)}}},{{{string.Join(',', BandAlphabet)}}}, {{{Transforms.ToString()}}}, {StartState}, {BlankSymbol}, {AcceptedState}, {DiscardState})".Trim();
 
     }
 }

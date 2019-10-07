@@ -22,9 +22,9 @@ namespace Serpen.Uni.Automat.ContextFree {
             char extra_symbol = Utils.NextFreeCapitalLetter(pda.Alphabet.Concat(pda.WorkAlphabet).ToArray(), EXTRASYMBOLS[0], EXTRASYMBOLS);
 
             newt.Add(0, null, null, extra_symbol.ToString(), 1);
-            for (int i = 0; i < pda.Transform.Count; i++)
+            for (int i = 0; i < pda.Transforms.Count; i++)
             {
-                var t = pda.Transform.ElementAt(i);
+                var t = pda.Transforms.ElementAt(i);
                 for (int j = 0; j < t.Value.Length; j++)
                 {
                     newt.AddM(t.Key.q+1, t.Key.ci, t.Key.cw, t.Value[j].cw2, t.Value[j].qNext+1);
@@ -39,7 +39,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         public static explicit operator StatePDA(Finite.NFAe N) {
             var newTrans = new PDATransform();
 
-            foreach (var t in (Finite.NFAeTransform)N.Transform) {
+            foreach (var t in (Finite.NFAeTransform)N.Transforms) {
                 var newVals = new PDATransformValue[t.Value.Length];
                 for (int i=0; i<newVals.Length; i++)
                     newVals[i] = new PDATransformValue(null, t.Value[i]);
@@ -126,7 +126,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                 Utils.DebugMessage(string.Join(',', (from a in pcfgs select a.ToString())), this, Utils.eDebugLogLevel.Verbose);
                 foreach (var p in pcfgs) {
                     if (p.word.Length == 0)
-                        if (IsAcceptedState(p.q))
+                        if (IsAcceptedState(p.State))
                             return true;
                 } //next p
 
@@ -173,7 +173,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
 
             var newT = new PDATransform();
-            foreach (var t2 in Transform)
+            foreach (var t2 in Transforms)
                 if (translate.Contains(t2.Key.q))
                     foreach (var v in t2.Value)
                         if (translate.Contains(v.qNext))

@@ -4,7 +4,7 @@ namespace Serpen.Uni.Automat.Turing {
         public TuringConfigSingleBand(char blankSymbol, string band, int bandPos) : base(blankSymbol) {
             base.band = new string[] { band };
             position = new int[] { bandPos };
-            state = new uint[1];
+            base.state = new uint[1];
         }
 
         public string Band {
@@ -16,10 +16,10 @@ namespace Serpen.Uni.Automat.Turing {
 
         public uint State {
             get {
-                return state[0];
+                return base.state[0];
             }
             internal set {
-                state[0] = value;
+                base.state[0] = value;
             }
         }
 

@@ -10,7 +10,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         public DPDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, DPDATransform Transform, uint StartState, char Startsymbol, uint[] acceptedStates)
         : base(StatesCount, InputAlphabet, StartState, name, acceptedStates) {
             this.WorkAlphabet = Workalphabet;
-            this.Transform = Transform;
+            this.Transforms = Transform;
             this.StartSymbol = Startsymbol;
 
             CheckConstraints();
@@ -18,7 +18,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         public static explicit operator DPDA(Finite.DFA D) {
             var t = new DPDATransform();
-            foreach (var t2 in (Finite.FATransform)D.Transform)
+            foreach (var t2 in (Finite.FATransform)D.Transforms)
                 t.Add(t2.Key.q, t2.Key.c, null, null, t2.Value[0]);
             for (int i = 0; i < D.AcceptedStates.Length; i++) {
                 t.Add(D.AcceptedStates[i], null, DPDA.START, null, D.StatesCount);
@@ -30,7 +30,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         protected override void CheckConstraints() {
             base.CheckConstraints();
-            foreach (var t in Transform) {
+            foreach (var t in Transforms) {
                 if (t.Key.q > StatesCount | t.Value.qNext > StatesCount) //transform states within states
                     throw new StateException(t.Key.q);
                 else if (t.Key.ci.HasValue && !Alphabet.Contains(t.Key.ci.Value)) //input alphabet of transform key
@@ -57,15 +57,15 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             //if word is empty, maybe only e-Transform is needed
             if (pcfg.word != "")
-                qStart = new PDATransformKey(pcfg.q, pcfg.word[0], pcfg.Stack[pcfg.Stack.Length - 1]);
+                qStart = new PDATransformKey(pcfg.State, pcfg.word[0], pcfg.Stack[pcfg.Stack.Length - 1]);
             else
-                qStart = new PDATransformKey(pcfg.q, null, pcfg.Stack[pcfg.Stack.Length - 1]);
+                qStart = new PDATransformKey(pcfg.State, null, pcfg.Stack[pcfg.Stack.Length - 1]);
 
 
             PDATransformValue qNext;
 
             //get all possible (e-)transforms
-            if (((DPDATransform)Transform).TryGetValue(ref qStart, out qNext)) {
+            if (((DPDATransform)Transforms).TryGetValue(ref qStart, out qNext)) {
                 var newStack = new Stack<char>(pcfg.Stack); //new stack vor pcfg
 
                 //stack symbol cw2 replaces cw
@@ -114,7 +114,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             if (pcfg == null || pcfg.word.Length > 0)
                 return false;
             else
-                if (IsAcceptedState(pcfg.q))
+                if (IsAcceptedState(pcfg.State))
                 return true;
             else
                 return false;
@@ -122,7 +122,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         public override VisualizationTuple[] VisualizationLines() {
             var tcol = new System.Collections.Generic.List<VisualizationTuple>();
-            foreach (var t in Transform) {
+            foreach (var t in Transforms) {
                 string desc = $"{(t.Key.ci.HasValue ? t.Key.ci.Value : Utils.EPSILON)}|{(t.Key.cw.HasValue ? t.Key.cw.Value : Utils.EPSILON)}->{(!string.IsNullOrEmpty(t.Value.cw2) ? t.Value.cw2 : Utils.EPSILON.ToString())}";
                 var vt = new VisualizationTuple(t.Key.q, t.Value.qNext, desc);
                 tcol.Add(vt);
@@ -163,7 +163,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
 
             var newT = new DPDATransform();
-            foreach (var t2 in Transform)
+            foreach (var t2 in Transforms)
                 if (translate.Contains(t2.Key.q))
                     if (translate.Contains(t2.Value.qNext))
                         newT.Add(Utils.ArrayIndex(translate, t2.Key.q), t2.Key.ci, t2.Key.cw, t2.Value.cw2, Utils.ArrayIndex(translate, t2.Value));
@@ -171,7 +171,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             return new DPDA($"{Name}_purged", (uint)names.Length, Alphabet, WorkAlphabet, newT, Utils.ArrayIndex(translate, StartState), StartSymbol, aStates);
         }
 
-        public override string ToString() => $"{Name} DPDA(|{States.Length}|={string.Join(";", States)}), {{{string.Join(',', Alphabet)}}},{{{string.Join(',', WorkAlphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {StartSymbol} {{{string.Join(',', AcceptedStates)}}})".Trim();
+        public override string ToString() => $"{Name} DPDA(|{States.Length}|={string.Join(";", States)}), {{{string.Join(',', Alphabet)}}},{{{string.Join(',', WorkAlphabet)}}}, {{{Transforms.ToString()}}}, {StartState}, {StartSymbol} {{{string.Join(',', AcceptedStates)}}})".Trim();
 
     } //end class
 } //end ns

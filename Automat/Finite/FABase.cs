@@ -7,13 +7,13 @@ namespace Serpen.Uni.Automat.Finite {
 
         public FABase(uint stateCount, char[] alphabet, TransformBase<EATuple, uint[]> eat, uint startState, uint[] acceptedStates, string name = "")
         : base(stateCount, alphabet, startState, name, acceptedStates) {
-            this.Transform = eat;
+            this.Transforms = eat;
             CheckConstraints();
         }
 
         public FABase(string[] names, char[] alphabet, TransformBase<EATuple, uint[]> eat, uint startState, uint[] acceptedStates, string name = "")
         : base(names, alphabet, startState, name, acceptedStates) {
-            this.Transform = eat;
+            this.Transforms = eat;
             CheckConstraints();
         }
 
@@ -25,7 +25,7 @@ namespace Serpen.Uni.Automat.Finite {
 
         public override VisualizationTuple[] VisualizationLines() {
             var tcol = new List<VisualizationTuple>();
-            foreach (var t in Transform) {
+            foreach (var t in Transforms) {
                 string desc = t.Key.c.ToString();
                 if (desc == "")
                     desc = Utils.EPSILON.ToString();
@@ -60,10 +60,10 @@ namespace Serpen.Uni.Automat.Finite {
             var accStates = new List<uint>(A.AcceptedStates.Length);
             uint offset = this.StatesCount;
 
-            foreach (var t in this.Transform)
+            foreach (var t in this.Transforms)
                 neaET.Add(t.Key.q, t.Key.c, t.Value);
 
-            foreach (var t in A.Transform) {
+            foreach (var t in A.Transforms) {
                 uint[] qnexts = new uint[t.Value.Length];
                 for (int i = 0; i < t.Value.Length; i++)
                     qnexts[i] = t.Value[i] + offset;
@@ -99,12 +99,14 @@ namespace Serpen.Uni.Automat.Finite {
             neat.Add(0, null, 1, offsetD2);
 
             //add each D1 transform, +1
-            foreach (var item in this.Transform)
-                neat.Add(item.Key.q + 1, item.Key.c, item.Value[0] + 1);
+            foreach (var item in this.Transforms)
+                foreach (uint val in item.Value)
+                    neat.AddM(item.Key.q + 1, item.Key.c, val + 1);
 
             //add each D1 transform, +offset
-            foreach (var item in fa.Transform)
-                neat.Add(item.Key.q + offsetD2, item.Key.c, item.Value[0] + offsetD2);
+            foreach (var item in fa.Transforms)
+                foreach (uint val in item.Value)
+                    neat.AddM(item.Key.q + offsetD2, item.Key.c, val + offsetD2);
 
 
             int i; //store where D1 acc ends
@@ -123,69 +125,70 @@ namespace Serpen.Uni.Automat.Finite {
         public abstract IAutomat Intersect(IIntersect a);
         public abstract IAutomat Diff(IDiff a);
 
-        public FABase ProductEA(FABase A, DFA.eProductDeaMode mode) {
+        FABase ProductEA(FABase A, DFA.eProductDeaMode mode) {
             uint len = (this.StatesCount * A.StatesCount);
 
-            if (!this.SameAlphabet(A)) {
-                char[] Alphabet = this.Alphabet;
-                var accStates = new List<uint>();
-                string[] stateNames = new string[len];
+            if (!this.SameAlphabet(A))
+                throw new System.NotImplementedException("Different Alphabets are not implemented");
 
-                var deat = new FATransform();
+            char[] Alphabet = this.Alphabet;
+            var accStates = new List<uint>();
+            string[] stateNames = new string[len];
 
-                //iterate Cross D1xD2, chars
-                for (uint i = 0; i < this.StatesCount; i++) {
-                    for (uint j = 0; j < A.StatesCount; j++) {
-                        //index of state in matrix
-                        uint index = (i * A.StatesCount + j);
-                        stateNames[index] = $"{i},{j}";
+            var deat = new FATransform();
 
-                        foreach (char c in Alphabet) {
-                            uint qNext1, qNext2; //next states for D1, D2
+            //iterate Cross D1xD2, chars
+            for (uint i = 0; i < this.StatesCount; i++) {
+                for (uint j = 0; j < A.StatesCount; j++) {
+                    //index of state in matrix
+                    uint index = (i * A.StatesCount + j);
+                    stateNames[index] = $"{i},{j}";
 
-                            //tuple for D1,D2
+                    foreach (char c in Alphabet) {
+                        uint qNext1, qNext2; //next states for D1, D2
 
-                            //Transform exists, out qNext
-                            var exist1 = ((Finite.FATransform)this.Transform).TryGetValue(i, c, out qNext1);
-                            var exist2 = ((Finite.FATransform)A.Transform).TryGetValue(j, c, out qNext2);
+                        //tuple for D1,D2
 
-                            //same calc logic for dstIndex
-                            uint dstIndex;
-                            if (exist1 & exist2)
-                                dstIndex = (qNext1 * A.StatesCount + qNext2);
-                            else if (exist1)
-                                dstIndex = (qNext1 * A.StatesCount + qNext1);
-                            else if (exist2)
-                                dstIndex = qNext2;
-                            else
-                                throw new System.ApplicationException();
+                        //Transform exists, out qNext
+                        var exist1 = ((Finite.FATransform)this.Transforms).TryGetValue(i, c, out qNext1);
+                        var exist2 = ((Finite.FATransform)A.Transforms).TryGetValue(j, c, out qNext2);
 
-                            //add non existing tuple
-                            if (!deat.ContainsKey(index, c)) // & exist1 & exist2)
-                                deat.Add(index, c, dstIndex);
-                            else
-                                throw new System.ApplicationException();
+                        //same calc logic for dstIndex
+                        uint dstIndex;
+                        if (exist1 & exist2)
+                            dstIndex = (qNext1 * A.StatesCount + qNext2);
+                        else if (exist1)
+                            dstIndex = (qNext1 * A.StatesCount + qNext1);
+                        else if (exist2)
+                            dstIndex = qNext2;
+                        else
+                            throw new System.ApplicationException();
 
-                            if (mode == DFA.eProductDeaMode.Intersect) {
-                                //add to accStates if one dea state ist acc
-                                if (this.IsAcceptedState(i) & A.IsAcceptedState(j))
-                                    accStates.Add(index);
-                            } else if (mode == DFA.eProductDeaMode.Union) {
-                                //add to accStates if both dea state ist acc
-                                if (this.IsAcceptedState(i) | A.IsAcceptedState(j))
-                                    accStates.Add(index);
-                            } else if (mode == DFA.eProductDeaMode.Diff) {
-                                //add to accStates if both dea state ist acc
-                                if (this.IsAcceptedState(i) & !A.IsAcceptedState(j))
-                                    accStates.Add(index);
-                            }
+                        //add non existing tuple
+                        if (!deat.ContainsKey(index, c)) // & exist1 & exist2)
+                            deat.Add(index, c, dstIndex);
+                        else
+                            throw new System.ApplicationException();
+
+                        if (mode == DFA.eProductDeaMode.Intersect) {
+                            //add to accStates if one dea state ist acc
+                            if (this.IsAcceptedState(i) & A.IsAcceptedState(j))
+                                accStates.Add(index);
+                        } else if (mode == DFA.eProductDeaMode.Union) {
+                            //add to accStates if both dea state ist acc
+                            if (this.IsAcceptedState(i) | A.IsAcceptedState(j))
+                                accStates.Add(index);
+                        } else if (mode == DFA.eProductDeaMode.Diff) {
+                            //add to accStates if both dea state ist acc
+                            if (this.IsAcceptedState(i) & !A.IsAcceptedState(j))
+                                accStates.Add(index);
                         }
                     }
                 }
+            }
 
-                return new DFA($"DFA_Product({mode}, {this.Name}+{A.Name})", stateNames, Alphabet, deat, 0, accStates.ToArray());
-            } else
-                throw new System.NotImplementedException("Different Alphabets are not implemented");
+            return new DFA($"DFA_Product({mode}, {this.Name}+{A.Name})", stateNames, Alphabet, deat, 0, accStates.ToArray());
+
         }
 
 
@@ -208,7 +211,7 @@ namespace Serpen.Uni.Automat.Finite {
             names[0] = "new";
 
             //turn and add each transform
-            foreach (var dt in this.Transform.Reverse())
+            foreach (var dt in this.Transforms.Reverse())
                 foreach (var dtv in dt.Value)
                     neaET.AddM(newstate[dtv], dt.Key.c, newstate[dt.Key.q]);
 
@@ -226,7 +229,7 @@ namespace Serpen.Uni.Automat.Finite {
             neaET.Add(0, null, 1);
 
             //add transforms, +1
-            foreach (var item in this.Transform) {
+            foreach (var item in this.Transforms) {
                 uint[] qnext = new uint[item.Value.Length];
                 for (int i = 0; i < item.Value.Length; i++)
                     qnext[i] = item.Value[i] + 1;
@@ -241,7 +244,6 @@ namespace Serpen.Uni.Automat.Finite {
         }
 
         public abstract IAutomat HomomorphismChar(System.Collections.Generic.Dictionary<char, char> Translate);
-
         public abstract IAutomat Join(IJoin A);
 
         public abstract override bool Equals(object obj);

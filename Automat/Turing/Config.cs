@@ -1,14 +1,12 @@
 namespace Serpen.Uni.Automat.Turing {
-    public interface ITuringConfig : IConfig { 
-        
-    }
-    public abstract class TuringConfigBase<TChar> : ITuringConfig {
+    public abstract class TuringConfigBase<TChar> : IConfig {
 
         protected TuringConfigBase(char blankSymbol) {
             BlankSymbol = blankSymbol;
         }
         protected char BlankSymbol;
-        protected uint[] state;
+        public uint[] state {get; protected set;}
+        uint[] IConfig.State => state;
         protected string[] band;
         protected int[] position;
 

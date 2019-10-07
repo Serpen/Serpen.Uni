@@ -308,7 +308,7 @@ namespace Serpen.Uni.Automat {
                 t.Add(q[1], '0', q[1], '0', TMDirection.Left);
                 t.Add(q[2], '0', q[2], '0', TMDirection.Right);
                 t.Add(q[2], '1', q[3], '1', TMDirection.Right);
-                t.Insert((TuringTransformSingleBand)TM_EFAK_A812_copy.Transform,1);
+                t.Insert((TuringTransformSingleBand)TM_EFAK_A812_copy.Transforms,1);
                 t.Add(q[4], '0', q[5], '0', TMDirection.Left);
                 t.Add(q[5], '1', q[6], '1', TMDirection.Left);
                 t.Add(q[6], BLK, q[7], BLK, TMDirection.Right);

@@ -208,7 +208,7 @@ namespace Serpen.Uni.Automat.Finite {
             for (int i = 0; i < stateChars.Length; i++)
                 stateChars[i] = (char)(((int)'A')+i);
             
-            foreach (var eat in A.Transform) {
+            foreach (var eat in A.Transforms) {
                 char fromChar = stateChars[eat.Key.q];
                 var newVals = new List<string>();
                 for (int i = 0; i < eat.Value.Length; i++)

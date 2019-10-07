@@ -15,7 +15,9 @@ namespace Serpen.Uni.Automat {
     public enum SourceMode { K1659, EAFK }
 
     public enum RuleConstaint { None, Left, Right }
-    public interface IConfig { }
+    public interface IConfig {
+        uint[] State {get;}
+    }
 
     [System.AttributeUsage(System.AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
     sealed class AcceptedWordSamples : System.Attribute {

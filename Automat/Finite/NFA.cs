@@ -17,11 +17,11 @@ namespace Serpen.Uni.Automat.Finite {
         uint[] INFA.GoChar(uint[] q, char w) => GoChar(q, w);
         internal uint[] GoChar(uint[] q, char w) {
             var retQ = new List<uint>();
+            var neat = Transforms as NFAeTransform;
 
             for (int i = 0; i < q.Length; i++) {
-                var t = new EATuple(q[i], w);
-                if (((NFAeTransform)Transform).ContainsKey(t.q, t.c.Value))
-                    retQ.AddRange((Transform as NFAeTransform)[t.q, t.c.Value]);
+                if (neat.ContainsKey(q[i], w))
+                    retQ.AddRange(neat[q[i], w]);
             }
             retQ.Sort();
             return retQ.Distinct().ToArray();
@@ -33,7 +33,6 @@ namespace Serpen.Uni.Automat.Finite {
             CheckWordInAlphabet(w);
 
             uint[] qs = new uint[] { StartState };
-
 
             for (int i = 0; i < w.Length; i++) {
                 qs = GoChar(qs, w[i]);
@@ -68,7 +67,7 @@ namespace Serpen.Uni.Automat.Finite {
             (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
 
             var newT = new NFAeTransform();
-            foreach (var t2 in Transform)
+            foreach (var t2 in Transforms)
                 if (translate.Contains(t2.Key.q))
                     foreach (var v in t2.Value)
                         if (translate.Contains(v))
@@ -109,7 +108,7 @@ namespace Serpen.Uni.Automat.Finite {
             var neat = new NFAeTransform();
             var Alp = (char[])this.Alphabet.Clone();
 
-            foreach (var dt in this.Transform)
+            foreach (var dt in this.Transforms)
                 if (translate.ContainsKey(dt.Key.c.Value))
                     neat.Add(dt.Key.q, translate[dt.Key.c.Value], dt.Value);
                 else
@@ -121,34 +120,32 @@ namespace Serpen.Uni.Automat.Finite {
 
             return new NFA($"NFA_HomomorphismChar({Name})", StatesCount, Alp, neat, StartState, AcceptedStates);
         }
-        public override IAutomat Join(IJoin A) {
-            var N2 = A as NFA;
-
-            if (N2 is null)
+        public override IAutomat Join(IJoin automat) {
+            if (!(automat is NFA nfa))
                 throw new System.NotSupportedException();
-            else {
-                var neat = new NFAeTransform();
 
-                var accStates = new List<uint>(this.AcceptedStates.Length + N2.AcceptedStates.Length);
-                uint sc = this.StatesCount;
+            var neat = new NFAeTransform();
 
-                foreach (var t in this.Transform)
-                    neat.Add(t.Key.q, t.Key.c.Value, t.Value);
-                foreach (var t in N2.Transform) {
-                    uint[] qnexts = new uint[t.Value.Length];
-                    for (int i = 0; i < t.Value.Length; i++)
-                        qnexts[i] = t.Value[i] + sc;
-                    neat.Add(t.Key.q + sc, t.Key.c.Value, qnexts);
-                }
+            var accStates = new List<uint>(this.AcceptedStates.Length + nfa.AcceptedStates.Length);
+            uint sc = this.StatesCount;
 
-                accStates.AddRange(this.AcceptedStates);
-                for (int i = 0; i < N2.AcceptedStates.Length; i++)
-                    accStates.Add(N2.AcceptedStates[i] + sc);
+            foreach (var t in this.Transforms)
+                neat.Add(t.Key.q, t.Key.c.Value, t.Value);
 
-                accStates.Sort();
-
-                return new NFA($"Join({Name}+{N2.Name})", (N2.StatesCount + sc), this.Alphabet, neat, this.StartState, accStates.ToArray());
+            foreach (var t in nfa.Transforms) {
+                uint[] qnexts = new uint[t.Value.Length];
+                for (int i = 0; i < t.Value.Length; i++)
+                    qnexts[i] = t.Value[i] + sc;
+                neat.Add(t.Key.q + sc, t.Key.c.Value, qnexts);
             }
+
+            accStates.AddRange(this.AcceptedStates);
+            for (int i = 0; i < nfa.AcceptedStates.Length; i++)
+                accStates.Add(nfa.AcceptedStates[i] + sc);
+
+            accStates.Sort();
+
+            return new NFA($"Join({Name}+{nfa.Name})", (nfa.StatesCount + sc), this.Alphabet, neat, this.StartState, accStates.ToArray());
         }
         public override IAutomat Union(IUnion A) => throw new System.NotImplementedException();
         public override IAutomat Intersect(IIntersect A) => throw new System.NotImplementedException();
@@ -158,15 +155,15 @@ namespace Serpen.Uni.Automat.Finite {
 
 
         public static explicit operator NFA(DFA D) {
-            var t = new NFAeTransform();
+            var neaet = new NFAeTransform();
             // Übergangsfunktion im NEA ist eine Menge, im Dea ein Element
-            foreach (var t2 in D.Transform)
-                t.Add(t2.Key.q, t2.Key.c.Value, t2.Value);
+            foreach (var dt in D.Transforms)
+                neaet.Add(dt.Key.q, dt.Key.c.Value, dt.Value);
 
-            return new NFA($"NFA_({D.Name})", D.StatesCount, D.Alphabet, t, D.StartState, D.AcceptedStates);
+            return new NFA($"NFA_({D.Name})", D.StatesCount, D.Alphabet, neaet, D.StartState, D.AcceptedStates);
         }
 
-        public override string ToString() => $"{Name} NEA(|{States.Length}|={string.Join(";", States)}, {{{string.Join(',', Alphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {{{string.Join(',', AcceptedStates)}}})".Trim();
+        public override string ToString() => $"{Name} NEA(|{States.Length}|={string.Join(";", States)}, {{{string.Join(',', Alphabet)}}}, {{{Transforms.ToString()}}}, {StartState}, {{{string.Join(',', AcceptedStates)}}})".Trim();
 
 
     }

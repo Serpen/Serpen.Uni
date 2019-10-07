@@ -34,8 +34,8 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             uint qPump = pda.StatesCount;
 
-            for (int i = 0; i < pda.Transform.Count; i++) {
-                var t = pda.Transform.ElementAt(i);
+            for (int i = 0; i < pda.Transforms.Count; i++) {
+                var t = pda.Transforms.ElementAt(i);
                 for (int j = 0; j < t.Value.Length; j++) {
                     //inc all States cause of new first § state
                     newt.AddM(t.Key.q + 1, t.Key.ci, t.Key.cw, t.Value[j].cw2, t.Value[j].qNext + 1);
@@ -125,7 +125,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
                 
             var newT = new PDATransform();
-            foreach (var t2 in Transform)
+            foreach (var t2 in Transforms)
                 if (translate.Contains(t2.Key.q))
                     foreach (var v in t2.Value)
                         if (translate.Contains(v.qNext))

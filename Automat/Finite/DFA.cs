@@ -18,7 +18,7 @@ namespace Serpen.Uni.Automat.Finite {
         protected override uint[] GoChar(uint q, char w) {
 
             uint qNext;
-            if (((FATransform)Transform).TryGetValue(q, w, out qNext))
+            if (((FATransform)Transforms).TryGetValue(q, w, out qNext))
                 return new uint[] { qNext };
             else
                 throw new NotImplementedException();
@@ -39,16 +39,16 @@ namespace Serpen.Uni.Automat.Finite {
         protected override void CheckConstraints() {
             base.CheckConstraints();
             //basic length check
-            if (Transform.Count != StatesCount * Alphabet.Length)
+            if (Transforms.Count != StatesCount * Alphabet.Length)
                 throw new Automat.DeterministicException($"Tranformation Count missmatch State*Alphabet");
 
             //check every state, char
             for (uint q = 0; q < StatesCount; q++)
                 foreach (char c in Alphabet)
-                    if (!((FATransform)Transform).ContainsKey(q, c))
+                    if (!((FATransform)Transforms).ContainsKey(q, c))
                         throw new Automat.DeterministicException($"q={q}, c={c} is missing");
 
-            foreach (var t in (FATransform)Transform) {
+            foreach (var t in Transforms) {
                 if (t.Key.q > StatesCount | t.Value[0] > StatesCount) //to high state
                     throw new Automat.StateException(t.Key.q);
                 if (!Alphabet.Contains(t.Key.c.Value)) //char not in alphabet
@@ -67,7 +67,7 @@ namespace Serpen.Uni.Automat.Finite {
 
             //generate Transform, and modify to eqclasses
             var deaT = new FATransform();
-            foreach (var item in (FATransform)Transform) {
+            foreach (var item in Transforms) {
                 //q,qnext EqClass
                 uint tSrcEqClass = State2eqClass[item.Key.q];
                 uint tDstEqClass = State2eqClass[item.Value[0]];
@@ -133,7 +133,7 @@ namespace Serpen.Uni.Automat.Finite {
             var deat = new FATransform();
             var Alp = (char[])this.Alphabet.Clone();
 
-            foreach (var dt in (FATransform)Transform)
+            foreach (var dt in (FATransform)Transforms)
                 if (Translate.ContainsKey(dt.Key.c.Value))
                     deat.Add(dt.Key.q, Translate[dt.Key.c.Value], dt.Value[0]);
                 else
@@ -159,9 +159,9 @@ namespace Serpen.Uni.Automat.Finite {
                 var accStates = new List<uint>(this.AcceptedStates.Length + D2.AcceptedStates.Length);
                 uint sc = this.StatesCount;
 
-                foreach (var t in (FATransform)Transform)
+                foreach (var t in (FATransform)Transforms)
                     deat.Add(t.Key.q, t.Key.c.Value, t.Value[0]);
-                foreach (var t in (FATransform)D2.Transform)
+                foreach (var t in (FATransform)D2.Transforms)
                     deat.Add(t.Key.q + sc, t.Key.c.Value, t.Value[0] + sc);
 
                 accStates.AddRange(this.AcceptedStates);
@@ -192,65 +192,64 @@ namespace Serpen.Uni.Automat.Finite {
 
             if (!D1.SameAlphabet(D2))
                 throw new NotImplementedException("Different Alphabets are not implemented");
-            else {
-                var accStates = new List<uint>();
 
-                string[] stateNames = new string[len];
+            var accStates = new List<uint>();
 
-                var deat = new FATransform();
+            string[] stateNames = new string[len];
 
-                //iterate Cross D1xD2, chars
-                for (uint i = 0; i < D1.StatesCount; i++) {
-                    for (uint j = 0; j < D2.StatesCount; j++) {
-                        //index of state in matrix
-                        uint index = (i * D2.StatesCount + j);
-                        stateNames[index] = $"{i},{j}";
+            var deat = new FATransform();
 
-                        foreach (char c in D1.Alphabet) {
-                            uint qNext1, qNext2; //next states for D1, D2
+            //iterate Cross D1xD2, chars
+            for (uint i = 0; i < D1.StatesCount; i++) {
+                for (uint j = 0; j < D2.StatesCount; j++) {
+                    //index of state in matrix
+                    uint index = (i * D2.StatesCount + j);
+                    stateNames[index] = $"{i},{j}";
 
-                            //tuple for D1,D2
+                    foreach (char c in D1.Alphabet) {
+                        uint qNext1, qNext2; //next states for D1, D2
 
-                            //Transform exists, out qNext
-                            bool exist1 = ((FATransform)D1.Transform).TryGetValue(i, c, out qNext1);
-                            bool exist2 = ((FATransform)D2.Transform).TryGetValue(j, c, out qNext2);
+                        //tuple for D1,D2
 
-                            //same calc logic for dstIndex in Matrix
-                            uint dstIndex;
-                            if (exist1 & exist2)
-                                dstIndex = (qNext1 * D2.StatesCount + qNext2);
-                            else if (exist1)
-                                dstIndex = (qNext1 * D2.StatesCount + qNext1);
-                            else if (exist2)
-                                dstIndex = qNext2;
-                            else
-                                throw new ApplicationException();
+                        //Transform exists, out qNext
+                        bool exist1 = ((FATransform)D1.Transforms).TryGetValue(i, c, out qNext1);
+                        bool exist2 = ((FATransform)D2.Transforms).TryGetValue(j, c, out qNext2);
 
-                            //add non existing tuple
-                            if (!deat.ContainsKey(index, c)) // & exist1 & exist2)
-                                deat.Add(index, c, dstIndex);
-                            else
-                                throw new ApplicationException();
+                        //same calc logic for dstIndex in Matrix
+                        uint dstIndex;
+                        if (exist1 & exist2)
+                            dstIndex = (qNext1 * D2.StatesCount + qNext2);
+                        else if (exist1)
+                            dstIndex = (qNext1 * D2.StatesCount + qNext1);
+                        else if (exist2)
+                            dstIndex = qNext2;
+                        else
+                            throw new ApplicationException();
 
-                            if (mode == eProductDeaMode.Intersect) {
-                                //add to accStates if one dea state ist acc
-                                if (D1.IsAcceptedState(i) & D2.IsAcceptedState(j))
-                                    accStates.Add(index);
-                            } else if (mode == eProductDeaMode.Union) {
-                                //add to accStates if both dea state ist acc
-                                if (D1.IsAcceptedState(i) | D2.IsAcceptedState(j))
-                                    accStates.Add(index);
-                            } else if (mode == eProductDeaMode.Diff) {
-                                //add to accStates if both dea state ist acc
-                                if (D1.IsAcceptedState(i) & !D2.IsAcceptedState(j))
-                                    accStates.Add(index);
-                            }
+                        //add non existing tuple
+                        if (!deat.ContainsKey(index, c)) // & exist1 & exist2)
+                            deat.Add(index, c, dstIndex);
+                        else
+                            throw new ApplicationException();
+
+                        if (mode == eProductDeaMode.Intersect) {
+                            //add to accStates if one dea state ist acc
+                            if (D1.IsAcceptedState(i) & D2.IsAcceptedState(j))
+                                accStates.Add(index);
+                        } else if (mode == eProductDeaMode.Union) {
+                            //add to accStates if both dea state ist acc
+                            if (D1.IsAcceptedState(i) | D2.IsAcceptedState(j))
+                                accStates.Add(index);
+                        } else if (mode == eProductDeaMode.Diff) {
+                            //add to accStates if both dea state ist acc
+                            if (D1.IsAcceptedState(i) & !D2.IsAcceptedState(j))
+                                accStates.Add(index);
                         }
                     }
                 }
-
-                return new DFA($"DEA_Product_({mode},{D1.Name}+{D2.Name})", stateNames, D1.Alphabet, deat, 0, accStates.Distinct().ToArray());
             }
+
+            return new DFA($"DEA_Product_({mode},{D1.Name}+{D2.Name})", stateNames, D1.Alphabet, deat, 0, accStates.Distinct().ToArray());
         }
 
         #endregion
@@ -270,15 +269,13 @@ namespace Serpen.Uni.Automat.Finite {
             var t = new FATransform();
             for (uint i = 0; i < stateCount; i++) {
                 char[] rndAlph = Utils.RandomizeArray(alphabet);
-                for (int j = 0; j < rndAlph.Length; j++) {
+                for (int j = 0; j < rndAlph.Length; j++)
                     t.AddM(i, alphabet[j], (uint)rnd.Next(0, stateCount));
-                }
             }
 
             var ret = new DFA("DFA_Random", (uint)stateCount, alphabet, t, (uint)rnd.Next(0, stateCount), accState);
             ret.Name = $"DFA_Random_{ret.GetHashCode()}";
             return ret;
-
         }
 
         public override IAutomat PurgeStates() {
@@ -286,7 +283,7 @@ namespace Serpen.Uni.Automat.Finite {
             (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
 
             var newT = new FATransform();
-            foreach (var t2 in Transform)
+            foreach (var t2 in Transforms)
                 if (translate.Contains(t2.Key.q))
                     foreach (var v in t2.Value)
                         if (translate.Contains(v))
@@ -325,7 +322,7 @@ namespace Serpen.Uni.Automat.Finite {
         public override int GetHashCode() => ToString().GetHashCode();
 
         public override string ToString()
-            => $"{Name} DEA(|{StatesCount}|={string.Join(";", States)}, {{{String.Join(',', Alphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {{{string.Join(',', AcceptedStates)}}})".Trim();
+            => $"{Name} DEA(|{StatesCount}|={string.Join(";", States)}, {{{String.Join(',', Alphabet)}}}, {{{Transforms.ToString()}}}, {StartState}, {{{string.Join(',', AcceptedStates)}}})".Trim();
 
         /// <summary>
         /// Table Filling Algorithm for minimize a DEA
@@ -354,10 +351,8 @@ namespace Serpen.Uni.Automat.Finite {
                             //calculate based on previous iterations
                             //if next states for both x,y has been set to different and not already processed
                             //set current pair to be different, and enable loop
-                            if (t[xNext, yNext] & !t[x, y]) {
-                                t[x, y] = true;
-                                found = true;
-                            }
+                            if (t[xNext, yNext] & !t[x, y]) 
+                                t[x, y] = found = true;
                         }
                     }
                 }
@@ -376,8 +371,8 @@ namespace Serpen.Uni.Automat.Finite {
             var State2eqClass = new uint?[D.States.Length];
 
             //iterate table and process false(/double) values
-            for (uint x = 0; x < tf.GetLength(0); x++)
-                for (uint y = x + 1; y < tf.GetLength(1); y++)
+            for (uint x = 0; x < tf.GetLength(0); x++) {
+                for (uint y = x + 1; y < tf.GetLength(1); y++) {
                     if (!tf[x, y]) {
                         //add class and mark as processed
 
@@ -401,6 +396,8 @@ namespace Serpen.Uni.Automat.Finite {
                         }
 
                     }
+                }
+            }
 
             //add all none processed states
             for (uint i = 0; i < qAlready.Length; i++)
@@ -410,7 +407,7 @@ namespace Serpen.Uni.Automat.Finite {
             eqClasses.Sort((first, second) => first[0].CompareTo(second[0]));
 
             return eqClasses.ToArray();
-        } //end function
+        } //end function TableFillingAlgEqClasses
 
     } // end class
 } //end ns

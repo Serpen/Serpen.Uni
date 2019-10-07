@@ -29,7 +29,7 @@ namespace Serpen.Uni.Automat {
     }
 
     public abstract class AutomatBase<TKey, TVal> : IAutomat where TKey : struct, ITransformKey {
-        public TransformBase<TKey, TVal> Transform { get; protected set; }
+        public TransformBase<TKey, TVal> Transforms { get; protected set; }
         public string[] States { get; }
         public uint StatesCount => (uint)States.Length;
         public uint StartState { get; } = 0;
@@ -83,7 +83,7 @@ namespace Serpen.Uni.Automat {
             bool foundnew = true;
             while (foundnew) {
                 foundnew = false;
-                foreach (var t in (from tr in Transform where fromStartReachable[tr.Key.q] select tr)) {
+                foreach (var t in (from tr in Transforms where fromStartReachable[tr.Key.q] select tr)) {
                     if (t.Value is uint qnext) {
                         if (!fromStartReachable[qnext])
                             fromStartReachable[qnext] = foundnew = true;

@@ -20,7 +20,7 @@ namespace Serpen.Uni.Automat.Finite {
         public static explicit operator NFAe(NFA A) {
             var t = new NFAeTransform();
             // Übergangsfunktion im NEA ist eine Menge, im Dea ein Element
-            foreach (var t2 in A.Transform)
+            foreach (var t2 in A.Transforms)
                 t.Add(t2.Key.q, t2.Key.c, t2.Value);
 
             return new NFAe($"NFAe_({A.Name})", A.StatesCount, A.Alphabet, t, A.StartState, A.AcceptedStates);
@@ -29,7 +29,7 @@ namespace Serpen.Uni.Automat.Finite {
         public static explicit operator NFAe(DFA D) {
             var t = new NFAeTransform();
             // Übergangsfunktion im NEA ist eine Menge, im Dea ein Element
-            foreach (var t2 in D.Transform)
+            foreach (var t2 in D.Transforms)
                 t.Add(t2.Key.q, t2.Key.c, t2.Value);
 
             return new NFAe($"NFAe_({D.Name})", D.StatesCount, D.Alphabet, t, D.StartState, D.AcceptedStates);
@@ -55,7 +55,7 @@ namespace Serpen.Uni.Automat.Finite {
             {
                 var t = new EATuple(eh[i], w); //e Transform
                 uint[] qNext; //Transform results
-                if ((Transform as NFAeTransform).TryGetValue(t, out qNext))
+                if (Transforms.TryGetValue(t, out qNext))
                     retQ.AddRange(qNext);
             }
             retQ.Sort();
@@ -93,10 +93,10 @@ namespace Serpen.Uni.Automat.Finite {
                 var t = new EATuple(curQ, null); //e Transform
                 uint[] eQs;
 
-                if ((Transform as NFAeTransform).TryGetValue(t, out eQs)) { //Exists e Transform?
-                    for (int i = 0; i < eQs.Length; i++) //for every e Transform
-                        if (!Processed.Contains(eQs[i])) //only add if not already processed
-                            toProcess.Push(eQs[i]);
+                if (Transforms.TryGetValue(t, out eQs)) { //Exists e Transform?
+                    foreach (var eQ in eQs) //for every e Transform
+                        if (!Processed.Contains(eQ)) //only add if not already processed
+                            toProcess.Push(eQ);
                 }
                 Processed.Add(curQ);
             }
@@ -154,7 +154,7 @@ namespace Serpen.Uni.Automat.Finite {
             (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
 
             var newT = new NFAeTransform();
-            foreach (var t2 in Transform)
+            foreach (var t2 in Transforms)
                 if (translate.Contains(t2.Key.q))
                     foreach (var v in t2.Value)
                         if (translate.Contains(v))
@@ -169,7 +169,7 @@ namespace Serpen.Uni.Automat.Finite {
             var neat = new NFAeTransform();
             var Alp = (char[])this.Alphabet.Clone();
 
-            foreach (var dt in this.Transform)
+            foreach (var dt in this.Transforms)
                 if (dt.Key.c.HasValue) {
                     if (Translate.ContainsKey(dt.Key.c.Value))
                         neat.Add(dt.Key.q, Translate[dt.Key.c.Value], dt.Value);
@@ -186,35 +186,31 @@ namespace Serpen.Uni.Automat.Finite {
             return new NFAe($"NFAe_HomomorphismChar({Name})", this.StatesCount, Alp, neat, this.StartState, this.AcceptedStates);
         }
 
-        public override IAutomat Join(IJoin A) {
-            var N2 = A as NFAe;
-
-            if ((N2 is null))
+        public override IAutomat Join(IJoin automat) {
+            if (!(automat is NFAe nfae))
                 throw new NotSupportedException();
-            else {
-                var neat = new NFAeTransform();
 
-                var accStates = new List<uint>(this.AcceptedStates.Length + N2.AcceptedStates.Length);
-                uint sc = this.StatesCount;
+            var neat = new NFAeTransform();
 
-                foreach (var t in this.Transform)
-                    neat.Add(t.Key.q, t.Key.c, t.Value);
-                foreach (var t in N2.Transform) {
-                    uint[] qnexts = new uint[t.Value.Length];
-                    for (int i = 0; i < t.Value.Length; i++)
-                        qnexts[i] = t.Value[i] + sc;
-                    neat.Add(t.Key.q + sc, t.Key.c, qnexts);
-                }
+            var accStates = new List<uint>(this.AcceptedStates.Length + nfae.AcceptedStates.Length);
+            uint sc = this.StatesCount;
 
-                accStates.AddRange(this.AcceptedStates);
-                for (int i = 0; i < N2.AcceptedStates.Length; i++)
-                    accStates.Add(N2.AcceptedStates[i] + sc);
-
-                accStates.Sort();
-
-                return new NFAe($"NFAe_Join({Name}+{A.Name})", N2.StatesCount + sc, this.Alphabet, neat, this.StartState, accStates.ToArray());
+            foreach (var t in this.Transforms)
+                neat.Add(t.Key.q, t.Key.c, t.Value);
+            foreach (var t in nfae.Transforms) {
+                uint[] qnexts = new uint[t.Value.Length];
+                for (int i = 0; i < t.Value.Length; i++)
+                    qnexts[i] = t.Value[i] + sc;
+                neat.Add(t.Key.q + sc, t.Key.c, qnexts);
             }
 
+            accStates.AddRange(this.AcceptedStates);
+            for (int i = 0; i < nfae.AcceptedStates.Length; i++)
+                accStates.Add(nfae.AcceptedStates[i] + sc);
+
+            accStates.Sort();
+
+            return new NFAe($"NFAe_Join({Name}+{automat.Name})", nfae.StatesCount + sc, this.Alphabet, neat, this.StartState, accStates.ToArray());
         }
         public override IAutomat Union(IUnion A) => throw new System.NotImplementedException();
         public override IAutomat Intersect(IIntersect A) => throw new System.NotImplementedException();
@@ -241,7 +237,7 @@ namespace Serpen.Uni.Automat.Finite {
 
 
         public override string ToString()
-            => $"{Name} NEAe(|{StatesCount}|={string.Join(";", States)}, {{{String.Join(',', Alphabet)}}}, {{{Transform.ToString()}}}, {StartState}, {{{string.Join(',', AcceptedStates)}}})".Trim();
+            => $"{Name} NEAe(|{StatesCount}|={string.Join(";", States)}, {{{String.Join(',', Alphabet)}}}, {{{Transforms.ToString()}}}, {StartState}, {{{string.Join(',', AcceptedStates)}}})".Trim();
 
     } //end class
 } //end ns

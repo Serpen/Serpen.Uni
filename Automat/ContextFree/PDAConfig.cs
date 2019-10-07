@@ -1,6 +1,7 @@
 namespace Serpen.Uni.Automat.ContextFree {
     public class PDAConfig : IConfig {
-        public uint q { get; }
+        public uint State { get; }
+        uint[] IConfig.State => new uint[] {State};
         public string word { get; }
         public char[] Stack { get; }
         public PDAConfig Origin { get; }
@@ -16,12 +17,12 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
         public PDAConfig(uint q, string w, char[] stack, PDAConfig origin) {
-            this.q = q;
+            this.State = q;
             this.word = w;
             this.Stack = stack;
             this.Origin = origin;
         }
 
-        public override string ToString() => $"({q},'{word}','{string.Join("", Stack)}')";
+        public override string ToString() => $"({State},'{word}','{string.Join("", Stack)}')";
     }
 }

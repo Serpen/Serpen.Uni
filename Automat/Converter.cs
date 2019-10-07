@@ -97,7 +97,7 @@ namespace Serpen.Uni.Automat.Finite {
                             foreach (char c in D.Alphabet)
                             {
                                 uint qNext;
-                                if (((Finite.FATransform)D.Transform).TryGetValue(i,c, out qNext) & qNext==j)
+                                if (((Finite.FATransform)D.Transforms).TryGetValue(i,c, out qNext) & qNext==j)
                                     toAdd.Add(c.ToString());
                             }
                             R[i,j,0] = string.Join('+', toAdd);

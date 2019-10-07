@@ -3,11 +3,7 @@ using System.Linq;
 namespace Serpen.Uni.Automat {
     public static class PumpingLemma {
 
-        public enum PumpResult
-        {
-            Unknown, Pumpable, NotPumpable, NoAcceptedWordFound, NoAcceptedWordExists
-        }
-        
+
         //should return certificate instead of true/false, cover more possible outcomes 
         /// <returns>bool empiric _guess_ if its pumpbar</returns>
         public static PumpResult TestPumpbar(IAutomat Automat, int pumpLaenge, int words = 200, int maxWordLen = 50, int exponentMax = 20, int exponentCount = 10) {
@@ -73,18 +69,42 @@ namespace Serpen.Uni.Automat {
         }
 
         static string[][] StringParts3(string w) {
-            const int PARTS = 3;
             var words = new System.Collections.Generic.List<string[]>();
-            for (int i = 0; i < w.Length; i++)
-                for (int j = 0; j < w.Length - i; j++) {
-                    string[] strParts = new string[PARTS];
-                    strParts[0] = w.Substring(0, i);
-                    strParts[1] = w.Substring(i, j);
-                    strParts[2] = w.Substring(i + j, w.Length - i - j);
-                    words.Add(strParts);
+            for (int i = 0; i <= w.Length; i++) {
+                for (int j = i; j <= w.Length; j++) {
+                    string[] parts = new string[3];
+                    parts[0] = w.Substring(0, i);
+                    parts[1] = w.Substring(i, j - i);
+                    parts[2] = w.Substring(j, w.Length - j);
+                    words.Add(parts);
                 }
+            }
             return words.Distinct().ToArray();
         }
+
+        static string[][] StringParts5(string w) {
+            var words = new System.Collections.Generic.List<string[]>();
+            for (int i = 0; i <= w.Length; i++) {
+                for (int j = i; j <= w.Length; j++) {
+                    for (int k = j; k <= w.Length; k++) {
+                        for (int l = k; l <= w.Length; l++) {
+                            string[] parts = new string[5];
+                            parts[0] = w.Substring(0, i);
+                            parts[1] = w.Substring(i, j - i);
+                            parts[2] = w.Substring(j, k - j);
+                            parts[3] = w.Substring(k, l - k);
+                            parts[4] = w.Substring(l, w.Length - l);
+                            words.Add(parts);
+                        }
+                    }
+                }
+            }
+            return words.Distinct().ToArray();
+        }
+    }
+
+    public enum PumpResult {
+        Unknown, Pumpable, NotPumpable, NoAcceptedWordFound, NoAcceptedWordExists
     }
 
     public sealed class PumpingException : System.ApplicationException {
