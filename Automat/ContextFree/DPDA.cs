@@ -6,9 +6,18 @@ namespace Serpen.Uni.Automat.ContextFree {
     /// <summary>
     /// deterministic PDA with Stack Symbol, which must end as empty stack and accepted state
     /// </summary>
-    public class DPDA : AutomatBase<PDATransformKey, PDATransformValue> {
+    public class DPDA : AutomatBase<PDATransformKey, PDATransformValue>, IPDA {
         public DPDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, DPDATransform Transform, uint StartState, char Startsymbol, uint[] acceptedStates)
         : base(StatesCount, InputAlphabet, StartState, name, acceptedStates) {
+            this.WorkAlphabet = Workalphabet;
+            this.Transforms = Transform;
+            this.StartSymbol = Startsymbol;
+
+            CheckConstraints();
+        }
+
+        public DPDA(string name, string[] names, char[] InputAlphabet, char[] Workalphabet, DPDATransform Transform, uint StartState, char Startsymbol, uint[] acceptedStates)
+        : base(names, InputAlphabet, StartState, name, acceptedStates) {
             this.WorkAlphabet = Workalphabet;
             this.Transforms = Transform;
             this.StartSymbol = Startsymbol;
@@ -49,9 +58,10 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
         public const char START = '$';
-        public readonly char[] WorkAlphabet;
-        public readonly char StartSymbol;
+        public char[] WorkAlphabet {get;}
+        public char StartSymbol {get;}
 
+        PDAConfig[] IPDA.GoChar(PDAConfig[] pcfgs) => new PDAConfig[] {GoChar(pcfgs[0])};
         public PDAConfig GoChar(PDAConfig pcfg) {
             PDATransformKey qStart;
 
@@ -169,6 +179,30 @@ namespace Serpen.Uni.Automat.ContextFree {
                         newT.Add(Utils.ArrayIndex(translate, t2.Key.q), t2.Key.ci, t2.Key.cw, t2.Value.cw2, Utils.ArrayIndex(translate, t2.Value));
 
             return new DPDA($"{Name}_purged", (uint)names.Length, Alphabet, WorkAlphabet, newT, Utils.ArrayIndex(translate, StartState), StartSymbol, aStates);
+        }
+
+        public virtual IAutomat Reverse() {
+            var pdat = new DPDATransform();
+
+            string[] names = new string[this.StatesCount + 1];
+
+            //array pointer old to new state            
+            uint[] newstate = new uint[this.StatesCount];
+            for (uint i = 0; i < newstate.Length; i++) {
+                newstate[i] = this.StatesCount - i;
+                names[i + 1] = (newstate[i] - 1).ToString();
+            }
+            names[0] = "new";
+
+            //turn and add each transform
+            foreach (var dt in this.Transforms.Reverse())
+                    pdat.Add(newstate[dt.Value.qNext], dt.Key.ci, dt.Key.cw, dt.Value.cw2, newstate[dt.Key.q]);
+
+            //start state is qe, which leads to every old accepted state
+            for (int i = 0; i < this.AcceptedStates.Length; i++)
+                pdat.Add(0, null, null, null, newstate[this.AcceptedStates[i]]);
+
+            return new DPDA($"Reverse({Name})", names, this.Alphabet, this.WorkAlphabet, pdat, 0, START, new uint[] { this.StatesCount });
         }
 
         public override string ToString() => $"{Name} DPDA(|{States.Length}|={string.Join(";", States)}), {{{string.Join(',', Alphabet)}}},{{{string.Join(',', WorkAlphabet)}}}, {{{Transforms.ToString()}}}, {StartState}, {StartSymbol} {{{string.Join(',', AcceptedStates)}}})".Trim();

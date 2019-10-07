@@ -231,16 +231,16 @@ namespace Serpen.Uni.Automat.Finite {
             foreach (var r in Rules) {
                 foreach (string body in r.Value) {
                     if (body.Length > 2)
-                        throw new Uni.Exception($"body {body} longer than 2");
+                        throw new GrammerException($"body {body} longer than 2");
                     else if (body.Length == 0) { } 
                     else if (body.Length == 1) {
                         if (Variables.Contains(body[0]))
-                            throw new Uni.Exception($"only body {body} is Var");
+                            throw new GrammerException($"only body {body} is Var");
                     } else {
                         if (Variables.Contains(body[0]))
-                            throw new Uni.Exception($"first char in {body} isn't var");
+                            throw new GrammerException($"first char in {body} isn't var");
                         if (!Variables.Contains(body[1]))
-                            throw new Uni.Exception($"second char in {body} isn't terminal");
+                            throw new GrammerException($"second char in {body} isn't terminal");
                     }
                 }
             }

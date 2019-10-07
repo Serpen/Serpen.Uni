@@ -8,12 +8,22 @@ namespace Serpen.Uni.Automat.Turing {
 
         public string Band {
             get => band[0];
-            set => band[0] = value;
+            set {
+                if (band == null)
+                    band = new string[] {value};
+                else
+                    band[0] = value;
+            }
         }
 
         public int Position {
             get => position[0];
-            private set => position[0] = value;
+            set {
+                if (position == null)
+                    position = new int[] {value};
+                else
+                    position[0] = value;
+            }
         }
 
         public override char CurSymbol {

@@ -5,36 +5,59 @@
 namespace Serpen.Uni {
     static class Program {
         static void Main(string[] args) {
-            KnownAutomat.NEAe_1659_A220.Join(KnownAutomat.NEAe_1659_A27_N1);
 
-            return;
-            var fo = new System.IO.StreamWriter(System.Environment.ExpandEnvironmentVariables("%temp%\\automat\\automats.txt"));
-            foreach (var automat2 in KnownAutomat.GetAllAutomats())
-            {
-                var automat = automat2.PurgeStates();
-                PumpResult pumpbar = PumpResult.Unknown;
-                try {
-                    pumpbar = PumpingLemma.TestPumpbar(automat, 6, 400);
-                } catch (TuringCycleException) {}
-                if (pumpbar == PumpResult.NotPumpable) {
-                    Utils.SaveAutomatImageToTemp(automat);
-                    fo.WriteLine(automat.ToString());
-                    fo.Flush();
-                }
-                System.Console.WriteLine($"{automat.Name.PadRight(40)}: {pumpbar}");
+            System.Console.WriteLine(Tests.CastingEquality());
+
+            var cas = Tests.CastToEveryPossibility(KnownAutomat.GetAllAutomats());
+            foreach (var ca in cas) {
+                for (int i = 1; i < ca.Length; i++)
+                    Tests.TestEqualWithWords(ca[i], ca[0], 20);
             }
-            fo.Close();
-
-
-            Tests.GenerateComplements();
-            Tests.GenerateConcats();
-            Tests.GenerateDiffs();
-            Tests.GenerateIntersects();
-            Tests.GenerateJoins();
-            Tests.GenerateReverses();
-            Tests.GenerateUnions();
-            Tests.GenerateKleeneStern();
             return;
+            var nea = KnownAutomat.NEA_EAFK_A211_webay;
+            Utils.SaveAutomatImageToTemp(nea);
+            var qpda = (Automat.ContextFree.StatePDA)nea;
+            Utils.SaveAutomatImageToTemp(qpda);
+
+            Utils.TestEqualWithWord(nea, qpda, "web");
+            Utils.TestEqualWithWord(nea, qpda, "ebay");
+            Utils.TestEqualWithWord(nea, qpda, "wbewaebayaweb");
+
+            Tests.TestEqualWithWords(nea,qpda, 100);
+            
+
+            Utils.AcceptWordConsoleLine(KnownAutomat.TM_1659_A414_M1, "00");
+            return;
+            // KnownAutomat.NEAe_1659_A220.Join(KnownAutomat.NEAe_1659_A27_N1);
+
+            // return;
+            // var fo = new System.IO.StreamWriter(System.Environment.ExpandEnvironmentVariables("%temp%\\automat\\automats.txt"));
+            // foreach (var automat2 in KnownAutomat.GetAllAutomats())
+            // {
+            //     var automat = automat2.PurgeStates();
+            //     PumpResult pumpbar = PumpResult.Unknown;
+            //     try {
+            //         pumpbar = PumpingLemma.TestPumpbar(automat, 6, 400);
+            //     } catch (TuringCycleException) {}
+            //     if (pumpbar == PumpResult.NotPumpable) {
+            //         Utils.SaveAutomatImageToTemp(automat);
+            //         fo.WriteLine(automat.ToString());
+            //         fo.Flush();
+            //     }
+            //     System.Console.WriteLine($"{automat.Name.PadRight(40)}: {pumpbar}");
+            // }
+            // fo.Close();
+
+
+            // Tests.GenerateComplements();
+            // Tests.GenerateConcats();
+            // Tests.GenerateDiffs();
+            // Tests.GenerateIntersects();
+            // Tests.GenerateJoins();
+            // Tests.GenerateReverses();
+            // Tests.GenerateUnions();
+            // Tests.GenerateKleeneStern();
+            // return;
 
             // Utils.SaveAutomatImageToTemp(KnownAutomat.TM_EFAK_A812_copy);
             // Utils.SaveAutomatImageToTemp(KnownAutomat.TM_EFAK_A813);

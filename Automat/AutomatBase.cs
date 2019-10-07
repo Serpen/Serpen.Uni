@@ -28,7 +28,7 @@ namespace Serpen.Uni.Automat {
         VisualizationTuple[] VisualizationLines();
     }
 
-    public abstract class AutomatBase<TKey, TVal> : IAutomat where TKey : struct, ITransformKey {
+    public abstract class AutomatBase<TKey, TVal> : IAutomat where TKey : ITransformKey {
         public TransformBase<TKey, TVal> Transforms { get; protected set; }
         public string[] States { get; }
         public uint StatesCount => (uint)States.Length;
@@ -200,8 +200,5 @@ namespace Serpen.Uni.Automat {
 namespace Serpen.Uni.Automat.Finite {
     public interface INFA : IAutomat {
         uint[] GoChar(uint[] q, char w);
-    }
-    public interface IDFA : IAutomat {
-        uint[] GoChar(uint q, char w);
     }
 }

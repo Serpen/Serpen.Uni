@@ -12,7 +12,7 @@ namespace Serpen.Uni.Automat {
         public static int Log2(int z) => (int)System.Math.Log2(z);
         public static bool HasBitSet(byte i, int b) => (b & (1 << i)) > 0;
 
-        private static eDebugLogLevel DebugLogLevel = eDebugLogLevel.Normal;
+        private static eDebugLogLevel DebugLogLevel = eDebugLogLevel.Always;
 
         /// <summary>
         /// Get Random Array Elemet
@@ -54,7 +54,19 @@ namespace Serpen.Uni.Automat {
                 System.Console.WriteLine($"{A.Name} accepts '{w}': {A.AcceptWord(w)}");
             } catch (Serpen.Uni.Automat.TuringCycleException e) {
                 System.Console.WriteLine($"{A.Name} {e.Message}");
+            } catch (Serpen.Uni.Automat.PDAStackException e) {
+                System.Console.WriteLine($"{A.Name} {e.Message}");
             }
+        }
+
+        internal static bool TestEqualWithWord(IAutomat a1, IAutomat a2, string w) {
+            bool ac1 = a1.AcceptWord(w);
+            bool ac2 = a2.AcceptWord(w);
+            if (ac1 != ac2) {
+                Utils.DebugMessage($"word '{w}' is {ac1}:{a1.Name} != {ac2}:{a2.Name}", a1, eDebugLogLevel.Normal);
+                return false;
+            } else
+                return true;
         }
 
         internal static char NextFreeCapitalLetter(ICollection<char> alphabet, char inputChar) => NextFreeCapitalLetter(alphabet, inputChar, new char[] { });

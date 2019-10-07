@@ -1,7 +1,7 @@
 using System.Linq;
 
 namespace Serpen.Uni.Automat.Turing {
-    public class NTM1659 : TuringMachineBase<TuringKey, TuringVal[]> {
+    public class NTM1659 : TuringMachineBase<TuringKey, TuringVal[]>, ITuringMachine {
 
         public NTM1659(string name, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, NTM1659Transform transform, uint startState, char blankSymbol, uint acceptedState, uint discardState)
             : base(name, stateCount, inputAlphabet, bandAlphabet, startState, blankSymbol, new uint[] { acceptedState }) {
@@ -46,12 +46,12 @@ namespace Serpen.Uni.Automat.Turing {
                     if (tcfg != null)
                         lastQ = tcfg.State;
                     if (runs > MAX_TURING_RUNS)
-                        throw new TuringCycleException($"possible Turing cycle at {runs} with {w} now is: {tcfg.Band.Trim(BlankSymbol)}");
+                        throw new TuringCycleException($"possible Turing cycle at {runs} with {w} now is: {tcfg.Band.Trim(BlankSymbol)}", this);
                     runs++;
                     if (IsAcceptedState(lastQ))
                         return true;
-                    // else if (DiscardState == lastQ) // TM1659 should end when in discard state
-                    //     foundAccepted = false;
+                    else if (DiscardState == lastQ) // TM1659 should end when in discard state
+                        return false;
                 }
                 tcfgs = GoChar(tcfgs);
             }
@@ -70,7 +70,7 @@ namespace Serpen.Uni.Automat.Turing {
                     if (tcfg != null)
                         lastBand = tcfg.Band;
                     if (runs > MAX_TURING_RUNS)
-                        throw new TuringCycleException($"possible Turing cycle at {runs} with {w} now is: {tcfg.Band.Trim(BlankSymbol)}");
+                        throw new TuringCycleException($"possible Turing cycle at {runs} with {w} now is: {tcfg.Band.Trim(BlankSymbol)}", this);
                     runs++;
                 }
                 tcfgs = GoChar(tcfgs);
@@ -89,7 +89,6 @@ namespace Serpen.Uni.Automat.Turing {
 
             char[] inputAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR);
             char[] bandAlphabet = RandomGenerator.RandomAlphabet(1, MAX_CHAR, inputAlphabet.Append(BLANK));
-
 
             int transformsRnd = rnd.Next(0, stateCount * inputAlphabet.Length);
             for (uint k = 0; k < transformsRnd; k++) {

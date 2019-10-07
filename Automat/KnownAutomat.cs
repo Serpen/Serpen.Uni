@@ -34,6 +34,10 @@ namespace Serpen.Uni.Automat {
 
         public static ContextFree.CFGrammer[] GetCFGs() {
             var list = GetTypes<ContextFree.CFGrammer>();
+
+            for (int i = 0; i < 10; i++)
+                list.Add(ContextFree.CFGrammer.GenerateRandom());
+
             return list.ToArray();
         }
 
@@ -52,21 +56,13 @@ namespace Serpen.Uni.Automat {
             return list.ToArray();
         }
 
-        /// <summary>
-        /// Returns a list of all KnowAutomat NEA_ Fields, current not dyn methods
-        /// </summary>
-        /// <returns></returns>
         public static Finite.NFAe[] GetNFAeModels() {
             var list = GetTypes<Finite.NFAe>();
 
             for (int i = 0; i < 10; i++)
                 list.Add(Finite.NFAe.GenerateRandom());
 
-            return list.ToArray();
-        }
 
-        public static ContextFree.CFGrammer[] GetCFGrammer() {
-            var list = GetTypes<ContextFree.CFGrammer>();
             return list.ToArray();
         }
 
@@ -83,6 +79,7 @@ namespace Serpen.Uni.Automat {
             AList.AddRange(GetDFAModels());
             AList.AddRange(GetNFAModels());
             AList.AddRange(GetNFAeModels());
+            AList.AddRange(GetTypes<ContextFree.DPDA>());
             AList.AddRange(GetTypes<ContextFree.PDA>());
             AList.AddRange(GetTypes<ContextFree.StackPDA>());
             AList.AddRange(GetTypes<ContextFree.StatePDA>());
@@ -93,9 +90,10 @@ namespace Serpen.Uni.Automat {
             return AList.ToArray();
         }
 
-        public static ContextFree.PDA[] GetAllContextFreeAutomats() {
-            var AList = new List<ContextFree.PDA>();
+        public static ContextFree.IPDA[] GetAllContextFreeAutomats() {
+            var AList = new List<ContextFree.IPDA>();
             AList.AddRange(GetTypes<ContextFree.PDA>());
+            AList.AddRange(GetTypes<ContextFree.DPDA>());
             AList.AddRange(GetTypes<ContextFree.StackPDA>());
             AList.AddRange(GetTypes<ContextFree.StatePDA>());
             return AList.ToArray();

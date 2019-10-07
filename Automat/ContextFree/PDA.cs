@@ -3,17 +3,24 @@ using System.Collections.Generic;
 
 namespace Serpen.Uni.Automat.ContextFree {
 
+    public interface IPDA : IReverse { 
+        char[] WorkAlphabet {get;}
+        char StartSymbol {get;}
+
+        PDAConfig[] GoChar(PDAConfig[] pcfgs);
+    }
+
     /// <summary>
     /// nondeterministic PDA with Stack Symbol, which must end as empty stack and accepted state
     /// </summary>
-    public abstract class PDA : AutomatBase<PDATransformKey, PDATransformValue[]>, IReverse, IUnion, IConcat {
+    public abstract class PDA : AutomatBase<PDATransformKey, PDATransformValue[]>, IPDA, IReverse, IUnion, IConcat {
 
         protected const int MAX_RUNS_OR_STACK = 10000;
         protected static readonly char[] EXTRASYMBOLS = new char[] { '§', '$', '%', '&' };
         public const char START = '$';
-        public readonly char[] WorkAlphabet;
+        public char[] WorkAlphabet {get;}
         //public readonly PDATransform Transform;
-        public readonly char StartStackSymbol;
+        public char StartSymbol {get;}
 
         /// <summary>
         /// Create a PDA which accepts when ending in Accepted States
@@ -31,7 +38,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             if (!workalphabet.Contains(startstacksymbol))
                 this.WorkAlphabet = this.WorkAlphabet.Append(startstacksymbol).ToArray();
             this.Transforms = transform;
-            this.StartStackSymbol = startstacksymbol;
+            this.StartSymbol = startstacksymbol;
 
             CheckConstraints();
         }
@@ -42,7 +49,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             if (!workalphabet.Contains(startStacksymbol))
                 this.WorkAlphabet = this.WorkAlphabet.Append(startStacksymbol).ToArray();
             this.Transforms = transform;
-            this.StartStackSymbol = startStacksymbol;
+            this.StartSymbol = startStacksymbol;
 
             CheckConstraints();
         }
@@ -76,7 +83,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             var retCfgs = new List<PDAConfig>();
 
             if (pcfgs.Length > MAX_RUNS_OR_STACK) {
-                Utils.DebugMessage($"Stack >= {pcfgs.Length}, abort", this, Utils.eDebugLogLevel.Always);
+                Utils.DebugMessage($"Stack >= {pcfgs.Length} abort", this, Utils.eDebugLogLevel.Always);
                 return new PDAConfig[0];
             }
 
@@ -174,7 +181,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             return tcol.ToArray();
         }
 
-        public override string ToString() => $"{Name} PDA(|{States.Length}|={string.Join(";", States)}), {{{string.Join(',', Alphabet)}}},{{{string.Join(',', WorkAlphabet)}}}, {{{Transforms.ToString()}}}, {StartState}, {StartStackSymbol}, {{{string.Join(',', AcceptedStates)}}})".Trim();
+        public override string ToString() => $"{Name} PDA(|{States.Length}|={string.Join(";", States)}), {{{string.Join(',', Alphabet)}}},{{{string.Join(',', WorkAlphabet)}}}, {{{Transforms.ToString()}}}, {StartState}, {StartSymbol}, {{{string.Join(',', AcceptedStates)}}})".Trim();
 
         #region "Operations"
 
@@ -191,8 +198,8 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             var pdat = new PDATransform();
             //add new start state, with e to both starts
-            pdat.Add(0, null, null, this.StartStackSymbol.ToString(), 1);
-            pdat.AddM(0, null, null, pda.StartStackSymbol.ToString(), offsetD2);
+            pdat.Add(0, null, null, this.StartSymbol.ToString(), 1);
+            pdat.AddM(0, null, null, pda.StartSymbol.ToString(), offsetD2);
 
             //add each D1 transform, +1
             foreach (var item in this.Transforms)

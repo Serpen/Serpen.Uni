@@ -13,6 +13,6 @@ namespace Serpen.Uni {
     sealed class AlgorithmSourceAttribute : Attribute
     {
         public string Source {get;}
-        public AlgorithmSourceAttribute(string landauComplexity) => this.Source = landauComplexity;
+        public AlgorithmSourceAttribute(string source) => this.Source = source;
     }
 }

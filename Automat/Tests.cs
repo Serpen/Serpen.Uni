@@ -7,64 +7,109 @@ using System.Linq;
 namespace Serpen.Uni.Automat {
     public static class Tests {
 
-        public static IAutomat[][] CastToEveryPossibility(IAutomat[] As) {
-            var Automates = new List<IAutomat[]>();
+        public static IAutomat[][] CastToEveryPossibility(IAutomat[] automats) {
+            var retAutomats = new List<IAutomat[]>();
 
-            foreach (IAutomat A in As) {
-                var list = new List<IAutomat>();
-                if (A is DFA D) {
+            foreach (IAutomat automat in automats) {
+                var ret1Automat = new List<IAutomat>();
+                if (automat is DFA D) {
+                    ret1Automat.Add(D);
+
                     NFA NfromD = (NFA)D;
-                    NFAe NEfromD = (NFAe)D;
-                    NFAe NEfromN = (NFAe)NfromD;
-                    StatePDA QPDAfromNe = (StatePDA)NEfromD;
-                    TuringMachineSingleBand TMfromD = (TuringMachineSingleBand)D;
+                    ret1Automat.Add(NfromD);
 
-                    list.Add(D);
-                    list.Add(NfromD);
-                    list.Add(NfromD);
-                    list.Add(NEfromD);
+                    NFAe NEfromD = (NFAe)D;
+                    ret1Automat.Add(NfromD);
+
+                    NFAe NEfromN = (NFAe)NfromD;
+                    ret1Automat.Add(NEfromD);
+
+                    StatePDA QPDAfromNe = (StatePDA)NEfromD;
+                    ret1Automat.Add(QPDAfromNe);
+
+                    StackPDA SPDAFromQPDA = (StackPDA)QPDAfromNe;
+                    // ret1Automat.Add(SPDAFromQPDA);
+
                     try {
                         DPDA DPDAFromD = (DPDA)D;
-                        list.Add(DPDAFromD);
+                        ret1Automat.Add(DPDAFromD);
                     } catch { }
-                    list.Add(QPDAfromNe);
-                    list.Add(TMfromD);
-                } else if (A is NFA N) {
-                    DFA DfromN = Converter.Nea2TeilmengenDea(N);
-                    NFAe NEfromD = (NFAe)DfromN;
-                    NFAe NEfromN = (NFAe)N;
-                    StatePDA QPDAfromNe = (StatePDA)NEfromD;
 
-                    list.Add(N);
-                    list.Add(DfromN);
-                    list.Add(NEfromD);
-                    list.Add(NEfromN);
-                    list.Add(QPDAfromNe);
-                } else if (A is NFAe Ne) {
+                    TuringMachineSingleBand TMfromD = (TuringMachineSingleBand)D;
+                    // ret1Automat.Add(TMfromD);
+
+                } else if (automat is NFA N) {
+                    ret1Automat.Add(N);
+
+                    DFA DfromN = Converter.Nea2TeilmengenDea(N);
+                    ret1Automat.Add(DfromN);
+
+                    NFAe NEfromD = (NFAe)DfromN;
+                    ret1Automat.Add(NEfromD);
+
+                    NFAe NEfromN = (NFAe)N;
+                    ret1Automat.Add(NEfromN);
+
+                    StatePDA QPDAfromNe = (StatePDA)NEfromD;
+                    ret1Automat.Add(QPDAfromNe);
+
+                    StackPDA SPDAFromQPDA = (StackPDA)QPDAfromNe;
+                    // ret1Automat.Add(SPDAFromQPDA);
+
+                    try {
+                        DPDA DPDAFromD = (DPDA)DfromN;
+                        ret1Automat.Add(DPDAFromD);
+                    } catch { }
+
+                    TuringMachineSingleBand TMfromD = (TuringMachineSingleBand)DfromN;
+                    // ret1Automat.Add(TMfromD);
+
+                } else if (automat is NFAe Ne) {
+                    ret1Automat.Add(Ne);
+
                     DFA DfromNe = Converter.Nea2TeilmengenDea(Ne);
+                    ret1Automat.Add(DfromNe);
+
                     // NFA NfromD = (NFAe)DfromNe;
                     StatePDA QPDAfromNe = (StatePDA)Ne;
+                    ret1Automat.Add(QPDAfromNe);
 
-                    list.Add(Ne);
-                    list.Add(DfromNe);
-                    list.Add(QPDAfromNe);
-                } else if (A is StatePDA QPDA) {
-                    list.Add(QPDA);
+                    StackPDA SPDAFromQPDA = (StackPDA)QPDAfromNe;
+                    // ret1Automat.Add(SPDAFromQPDA);
+
+                    try {
+                        DPDA DPDAFromD = (DPDA)DfromNe;
+                        ret1Automat.Add(DPDAFromD);
+                    } catch { }
+
+
+                    TuringMachineSingleBand TMfromD = (TuringMachineSingleBand)DfromNe;
+                    // ret1Automat.Add(TMfromD);
+
+                } else if (automat is StatePDA QPDA) {
+                    ret1Automat.Add(QPDA);
 
                     try {
                         var SPDAfromQPDA = (StackPDA)QPDA;
-                        list.Add(SPDAfromQPDA);
+                        ret1Automat.Add(SPDAfromQPDA);
+
+                        // NTM1659 NTMfromQPDA = (NTM1659)QPDA;
                     } catch { }
-                } else if (A is StackPDA SPDA) {
+                } else if (automat is StackPDA SPDA) {
                     var QPDAfromSPDA = (StackPDA)SPDA;
 
-                    list.Add(SPDA);
-                    list.Add(QPDAfromSPDA);
+                    ret1Automat.Add(SPDA);
+                    ret1Automat.Add(QPDAfromSPDA);
+                } else if (automat is TuringMachineSingleBand tm1) {
+                    ret1Automat.Add(tm1);
+                } else {
+                    ret1Automat.Add(automat);
                 }
-                Automates.Add(list.ToArray());
+
+                retAutomats.Add(ret1Automat.ToArray());
             }
 
-            return Automates.ToArray();
+            return retAutomats.ToArray();
         }
 
         [System.Obsolete()]
@@ -309,7 +354,6 @@ namespace Serpen.Uni.Automat {
 
         #endregion
 
-
         public static bool TestEqualWithWords(IAutomat A1, IAutomat A2, int initialCount) {
             int onceTrue = 0, onceFalse = 0;
             int passLevel = System.Math.Min(initialCount / 10, 5);
@@ -318,26 +362,28 @@ namespace Serpen.Uni.Automat {
             while ((onceTrue < passLevel | onceFalse < passLevel) && count < initialCount * 2) {
                 string[] words = A1.GetRandomWords(initialCount / 2, 0, initialCount / 2);
                 foreach (string w in words) {
-                    var erg1 = A1.AcceptWord(w);
-                    var erg2 = A2.AcceptWord(w);
+                    try {
+                        var erg1 = A1.AcceptWord(w);
+                        var erg2 = A2.AcceptWord(w);
 
-                    if (erg1) onceTrue++;
-                    if (!erg1) onceFalse++;
-                    if (erg1 != erg2) {
-                        Utils.DebugMessage($"{count}. word '{w}' divides Automates", A1, Utils.eDebugLogLevel.Always);
-                        return false;
-                    }
-                    Utils.DebugMessage($"{count}. word '{w}' passes", A1, Utils.eDebugLogLevel.Verbose);
-
+                        if (erg1) onceTrue++;
+                        if (!erg1) onceFalse++;
+                        if (erg1 != erg2) {
+                            Utils.DebugMessage($"{count}. word '{w}' divides Automates", A1, Utils.eDebugLogLevel.Always);
+                            return false;
+                        }
+                        Utils.DebugMessage($"{count}. word '{w}' passes", A1, Utils.eDebugLogLevel.Verbose);
+                    } catch (TuringCycleException) {
+                    } catch (PDAStackException) { }
                     count++;
                 }
             }
             if (onceTrue >= passLevel && onceFalse >= passLevel) {
-                Utils.DebugMessage($"{count} words passed", A1, Utils.eDebugLogLevel.Normal);
+                Utils.DebugMessage($"{count} words passed", A1, Utils.eDebugLogLevel.Verbose);
                 return true;
             } else {
                 if (A1.Equals(A2)) {
-                    Utils.DebugMessage($"{count} words passed, but not both tested, but Equals works", A1, Utils.eDebugLogLevel.Always);
+                    Utils.DebugMessage($"{count} words passed, but not both tested, but Equals works", A1, Utils.eDebugLogLevel.Normal);
                     return true;
                 } else {
                     Utils.DebugMessage($"{count} words passed, but not both tested, Equals not working", A1, Utils.eDebugLogLevel.Always);

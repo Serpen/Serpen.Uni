@@ -3,19 +3,19 @@ using System.Linq;
 
 namespace Serpen.Uni.Automat.ContextFree {
     public struct PDATransformKey : ITransformKey {
-        public uint q {get;}
-        public char? ci {get;}
+        public uint q { get; }
+        public char? ci { get; }
 
         char[] ITransformKey.c {
             get {
                 if (ci.HasValue)
-                    return new char[] {ci.Value};
+                    return new char[] { ci.Value };
                 else
-                    return new char[] {};
+                    return new char[] { };
             }
         }
-        public char? cw {get;}
-        
+        public char? cw { get; }
+
         public PDATransformKey(uint q, char? ci, char? cw) {
             this.q = q;
             this.ci = ci;
@@ -30,8 +30,8 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
         public override int GetHashCode() => this.ToString().GetHashCode();
-    
-        public override string ToString() 
+
+        public override string ToString()
             => $"({q}, {(ci.HasValue ? ci.Value : Utils.EPSILON)}, {(cw.HasValue ? cw.Value : Utils.EPSILON)})";
     }
 
@@ -41,20 +41,20 @@ namespace Serpen.Uni.Automat.ContextFree {
             this.qNext = qnext;
         }
 
-        public string cw2 {get;}
-        public uint qNext {get;}
+        public string cw2 { get; }
+        public uint qNext { get; }
 
         public override string ToString() => $"({(!string.IsNullOrEmpty(cw2) ? cw2 : Utils.EPSILON.ToString())}, {qNext})";
     }
 
     public class DPDATransform : TransformBase<PDATransformKey, PDATransformValue> {
-        public void Add(uint q, char? ci, char? cw, string cw2, uint qNext) 
+        public void Add(uint q, char? ci, char? cw, string cw2, uint qNext)
             => base.Add(new PDATransformKey(q, ci, cw), new PDATransformValue(cw2, qNext));
-    
+
         public bool TryGetValue(ref PDATransformKey initcfg, out PDATransformValue qnext) {
             bool result;
-            var worksuccessor = new PDATransformKey(initcfg.q,initcfg.ci,initcfg.cw);
 
+            var worksuccessor = new PDATransformKey(initcfg.q, initcfg.ci, initcfg.cw);
             result = base.TryGetValue(worksuccessor, out qnext);
             if (result) {
                 initcfg = worksuccessor;
@@ -67,14 +67,14 @@ namespace Serpen.Uni.Automat.ContextFree {
                 initcfg = worksuccessor;
                 return true;
             }
-            
+
             worksuccessor = new PDATransformKey(initcfg.q, null, initcfg.cw);
             result = base.TryGetValue(worksuccessor, out qnext);
             if (result) {
                 initcfg = worksuccessor;
                 return true;
             }
-        
+
             return false;
 
         }
@@ -91,10 +91,10 @@ namespace Serpen.Uni.Automat.ContextFree {
     }
 
     public class PDATransform : TransformBase<PDATransformKey, PDATransformValue[]> {
-        public void Add(uint q, char? ci, char? cw, string cw2, uint qNext) 
-            => Add(new PDATransformKey(q, ci, cw), new PDATransformValue[] {new PDATransformValue(cw2, qNext)});
-    
-    
+        public void Add(uint q, char? ci, char? cw, string cw2, uint qNext)
+            => Add(new PDATransformKey(q, ci, cw), new PDATransformValue[] { new PDATransformValue(cw2, qNext) });
+
+
         /// <summary>
         /// Adds Tuple + Appends if already exists
         /// </summary>
@@ -102,19 +102,18 @@ namespace Serpen.Uni.Automat.ContextFree {
             ContextFree.PDATransformValue[] pvalRef;
             ContextFree.PDATransformValue pval = new PDATransformValue(cw2, qNext);
             var pkey = new ContextFree.PDATransformKey(q, ci, cw);
-            
+
             if (TryGetValue(pkey, out pvalRef))
                 this[pkey] = pvalRef.Append(pval).ToArray();
             else
-                base.Add(pkey, new PDATransformValue[] {pval});
-        } 
+                base.Add(pkey, new PDATransformValue[] { pval });
+        }
         public bool TryGetValue(ref PDATransformKey[] initcfg, out PDATransformValue[] qnext) {
             var retVals = new List<PDATransformValue>();
             var retKeys = new List<PDATransformKey>();
 
-            for (int i = 0; i < initcfg.Length; i++)
-            {
-                var workSuccessor = new PDATransformKey(initcfg[i].q,initcfg[i].ci,initcfg[i].cw);
+            for (int i = 0; i < initcfg.Length; i++) {
+                var workSuccessor = new PDATransformKey(initcfg[i].q, initcfg[i].ci, initcfg[i].cw);
                 if (base.TryGetValue(workSuccessor, out qnext)) {
                     Utils.DebugMessage($"full match {workSuccessor}", null, Utils.eDebugLogLevel.Verbose);
                     retVals.AddRange(qnext);
@@ -131,7 +130,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                         retKeys.Add(workSuccessor);
                     // continue;
                 }
-                
+
                 workSuccessor = new PDATransformKey(initcfg[i].q, null, initcfg[i].cw);
                 if (base.TryGetValue(workSuccessor, out qnext)) {
                     Utils.DebugMessage($"ignore input char {workSuccessor}", null, Utils.eDebugLogLevel.Verbose);
@@ -140,7 +139,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                         retKeys.Add(workSuccessor);
                     // continue;
                 }
-                
+
                 workSuccessor = new PDATransformKey(initcfg[i].q, null, null);
                 if (base.TryGetValue(workSuccessor, out qnext)) {
                     Utils.DebugMessage($"ignore input,work char {workSuccessor}", null, Utils.eDebugLogLevel.Verbose);
@@ -151,7 +150,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                 }
             } //next i
 
-            if (retKeys.Count>0) {
+            if (retKeys.Count > 0) {
                 initcfg = retKeys.ToArray();
                 qnext = retVals.ToArray();
                 return true;
@@ -173,5 +172,4 @@ namespace Serpen.Uni.Automat.ContextFree {
             return sw.ToString();
         }
     }
-
 }

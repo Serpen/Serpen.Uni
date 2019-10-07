@@ -2,7 +2,12 @@ using System.Linq;
 
 namespace Serpen.Uni.Automat.Turing {
 
-    public abstract class TuringMachineBase<TKey, TVal> : AutomatBase<TKey, TVal> where TKey : struct, ITransformKey { //where TConfig : ITuringConfig {
+    interface ITuringMachine
+    {
+        
+    }
+
+    public abstract class TuringMachineBase<TKey, TVal> : AutomatBase<TKey, TVal>, ITuringMachine where TKey : ITransformKey { //where TConfig : ITuringConfig {
 
         public const char BLANK = '_';
         public readonly char[] BandAlphabet;
@@ -22,7 +27,7 @@ namespace Serpen.Uni.Automat.Turing {
         protected override void CheckConstraints() {
             base.CheckConstraints();
             if (base.Alphabet.Intersect(BandAlphabet).Count() != base.Alphabet.Length)
-                throw new Uni.Exception("Inputalphabet not in Bandalphabet");
+                throw new Uni.Automat.AlphabetException("Inputalphabet not in Bandalphabet");
             if (!BandAlphabet.Contains(BlankSymbol))
                 throw new Automat.AlphabetException(BlankSymbol);
         }

@@ -30,7 +30,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             var spdaWorkAlphabet = new System.Collections.Generic.List<char>(pda.WorkAlphabet);
             spdaWorkAlphabet.Add(extra_symbol);
 
-            newt.Add(0, null, null, pda.StartStackSymbol.ToString(), 1);
+            newt.Add(0, null, null, pda.StartSymbol.ToString(), 1);
 
             uint qPump = pda.StatesCount;
 
@@ -42,7 +42,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
                     //accepted state goes to qPump
                     if (pda.IsAcceptedState(t.Key.q)) {
-                        newt.Add(t.Key.q + 1, null, null, null, qPump);
+                        newt.AddM(t.Key.q + 1, null, null, null, qPump);
                     }
                 }
             }
@@ -63,8 +63,8 @@ namespace Serpen.Uni.Automat.ContextFree {
             int runCount = 0;
             //construct start config
             PDAConfig[] pcfgs;
-            if (StartStackSymbol != 0)
-                pcfgs = new PDAConfig[] { new PDAConfig(StartState, w, new char[] { StartStackSymbol }, null) };
+            if (StartSymbol != 0)
+                pcfgs = new PDAConfig[] { new PDAConfig(StartState, w, new char[] { StartSymbol }, null) };
             else
                 pcfgs = new PDAConfig[] { new PDAConfig(StartState, w, new char[] { }, null) };
 
@@ -72,7 +72,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             //while any pcfg exists
             while (pcfgs.Length > 0) { //&& (pcfg.Where((a) => a.Stack.Length>0).Any())
                 foreach (var p in pcfgs) {
-                    if ((p.Stack.Count() == 0 || (p.Stack[p.Stack.Count() - 1] == this.StartStackSymbol && p.Stack.Count() == 1)) && p.word.Length == 0) {
+                    if ((p.Stack.Count() == 0 || (p.Stack[p.Stack.Count() - 1] == this.StartSymbol && p.Stack.Count() == 1)) && p.word.Length == 0) {
                         return true;
                     }
                 }
@@ -131,7 +131,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                         if (translate.Contains(v.qNext))
                             newT.AddM(Utils.ArrayIndex(translate,t2.Key.q), t2.Key.ci, t2.Key.cw, v.cw2, Utils.ArrayIndex(translate,v.qNext));
             
-            return new StackPDA($"{Name}_purged", names, Alphabet, WorkAlphabet, newT, Utils.ArrayIndex(translate,StartState), StartStackSymbol);
+            return new StackPDA($"{Name}_purged", names, Alphabet, WorkAlphabet, newT, Utils.ArrayIndex(translate,StartState), StartSymbol);
         }
 
         [AlgorithmSource("1659_L3.1_P76")]
