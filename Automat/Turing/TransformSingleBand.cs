@@ -1,5 +1,5 @@
 namespace Serpen.Uni.Automat.Turing {
-    public sealed class TuringTransformSingleBand : TransformBase<TuringTransformSingleBand.TuringKey, TuringTransformSingleBand.TuringVal> {
+    public sealed class TuringTransformSingleBand : TransformBase<TuringKey, TuringVal> {
 
         public override string ToString() {
             var sw = new System.Text.StringBuilder();
@@ -12,7 +12,7 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         public void Add(uint q, char c, uint qNext, char c2, TMDirection dir) {
-            Add(new TuringTransformSingleBand.TuringKey(q, c), new TuringTransformSingleBand.TuringVal(qNext, c2, dir));
+            Add(new TuringKey(q, c), new TuringVal(qNext, c2, dir));
         }
 
         public void AddByStateStore(string[] states, string q, char c, string qNext, char c2, TMDirection dir) {
@@ -35,7 +35,9 @@ namespace Serpen.Uni.Automat.Turing {
             }
         }
 
-        public struct TuringKey : ITransformKey {
+    }
+
+    public struct TuringKey : ITransformKey {
             public TuringKey(uint q, char c) {
                 this.q = q;
                 this.c = c;
@@ -78,5 +80,4 @@ namespace Serpen.Uni.Automat.Turing {
 
             public override string ToString() => $"({qNext}, {c2}, {(Direction)})";
         }
-    }
 }

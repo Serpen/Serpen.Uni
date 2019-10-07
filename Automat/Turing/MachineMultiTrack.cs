@@ -69,7 +69,7 @@ namespace Serpen.Uni.Automat.Turing {
                 if (tcfg != null)
                     lastQ = tcfg.State;
                 if (runs > MAX_TURING_RUNS)
-                    throw new TuringCycleException($"possible Turing cycle at {runs} with {w} now is: {tcfg.Band[0].Trim(BlankSymbol)}");
+                    throw new TuringCycleException($"possible Turing cycle at {runs} with {w} now is: {tcfg.Bands[0].Trim(BlankSymbol)}");
                 runs++;
             }
             if (IsAcceptedState(lastQ))
@@ -88,11 +88,11 @@ namespace Serpen.Uni.Automat.Turing {
             var tcfg = new TuringConfigMultiTrack(BlankSymbol, wordTracks, 0) { State = StartState };
 
             int runs = 0;
-            string lastBand = tcfg.Band[0];
+            string lastBand = tcfg.Bands[0];
             while (tcfg != null && !IsAcceptedState(tcfg.State)) {
                 tcfg = GoChar(tcfg);
                 if (tcfg != null)
-                    lastBand = tcfg.Band[0];
+                    lastBand = tcfg.Bands[0];
                 if (runs > MAX_TURING_RUNS)
                     throw new TuringCycleException($"possible Turing cycle at {runs} with {w} now is: {lastBand.Trim(BlankSymbol)}");
                 runs++;

@@ -1,7 +1,7 @@
 using System.Linq;
 
 namespace Serpen.Uni.Automat.Turing {
-    public class TuringMachineSingleBand : TuringMachineBase<TuringTransformSingleBand.TuringKey, TuringTransformSingleBand.TuringVal> {
+    public class TuringMachineSingleBand : TuringMachineBase<TuringKey, TuringVal> {
 
         public TuringMachineSingleBand(string name, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, TuringTransformSingleBand transform, uint startState, char blankSymbol, uint[] acceptedStates)
             : base(name, stateCount, inputAlphabet, bandAlphabet, startState, blankSymbol, acceptedStates) {
@@ -34,8 +34,8 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         TuringConfigSingleBand GoChar(TuringConfigSingleBand tcfg) {
-            TuringTransformSingleBand.TuringVal tva;
-            var tkey = new TuringTransformSingleBand.TuringKey(tcfg.State, tcfg.CurSymbol);
+            TuringVal tva;
+            var tkey = new TuringKey(tcfg.State, tcfg.CurSymbol);
             if (Transforms.TryGetValue(tkey, out tva)) {
                 tcfg.ReplaceChar(tva.c2, tva.Direction);
                 tcfg.State = tva.qNext;
@@ -101,8 +101,8 @@ namespace Serpen.Uni.Automat.Turing {
         public static explicit operator TuringMachineSingleBand(Finite.DFA dfa) {
             var tt = new TuringTransformSingleBand();
             foreach (var dt in dfa.Transforms) {
-                var tkey = new TuringTransformSingleBand.TuringKey(dt.Key.q, dt.Key.c.Value);
-                var tval = new TuringTransformSingleBand.TuringVal(dt.Value[0], BLANK, TMDirection.Right);
+                var tkey = new TuringKey(dt.Key.q, dt.Key.c.Value);
+                var tval = new TuringVal(dt.Value[0], BLANK, TMDirection.Right);
                 tt.Add(tkey, tval);
             }
             var bandAlphabet = new System.Collections.Generic.List<char>(dfa.Alphabet.Length + 1);
@@ -127,8 +127,8 @@ namespace Serpen.Uni.Automat.Turing {
             for (uint i = 0; i < stateCount; i++) {
                 int transformsRnd = rnd.Next(0, inputAlphabet.Length);
                 for (uint j = 0; j < transformsRnd; j++) {
-                    var tk = new TuringTransformSingleBand.TuringKey(i, Utils.GrAE(bandAlphabet));
-                    var tv = new TuringTransformSingleBand.TuringVal(j, Utils.GrAE(bandAlphabet), TMDirection.Right);
+                    var tk = new TuringKey(i, Utils.GrAE(bandAlphabet));
+                    var tv = new TuringVal(j, Utils.GrAE(bandAlphabet), TMDirection.Right);
                     t.TryAdd(tk, tv);
                 }
             }
@@ -145,8 +145,8 @@ namespace Serpen.Uni.Automat.Turing {
             foreach (var t2 in Transforms)
                 if (translate.Contains(t2.Key.q))
                     if (translate.Contains(t2.Value.qNext)) {
-                        var tk = new TuringTransformSingleBand.TuringKey(Utils.ArrayIndex(translate, t2.Key.q), t2.Key.c);
-                        var tv = new TuringTransformSingleBand.TuringVal(Utils.ArrayIndex(translate, t2.Value.qNext), t2.Value.c2, t2.Value.Direction);
+                        var tk = new TuringKey(Utils.ArrayIndex(translate, t2.Key.q), t2.Key.c);
+                        var tv = new TuringVal(Utils.ArrayIndex(translate, t2.Value.qNext), t2.Value.c2, t2.Value.Direction);
                         newT.Add(tk, tv);
                     }
 

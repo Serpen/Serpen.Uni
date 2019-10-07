@@ -16,7 +16,7 @@ namespace Serpen.Uni.Automat {
 
     public enum RuleConstaint { None, Left, Right }
     public interface IConfig {
-        uint[] State {get;}
+        uint State {get;}
     }
 
     [System.AttributeUsage(System.AttributeTargets.Property, Inherited = false, AllowMultiple = false)]

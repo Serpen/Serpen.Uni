@@ -1,7 +1,7 @@
 using System.Linq;
 
 namespace Serpen.Uni.Automat.Turing {
-    public class NTM1659 : TuringMachineBase<TuringTransformSingleBand.TuringKey, TuringTransformSingleBand.TuringVal[]> {
+    public class NTM1659 : TuringMachineBase<TuringKey, TuringVal[]> {
 
         public NTM1659(string name, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, NTM1659Transform transform, uint startState, char blankSymbol, uint acceptedState, uint discardState)
             : base(name, stateCount, inputAlphabet, bandAlphabet, startState, blankSymbol, new uint[] { acceptedState }) {
@@ -19,10 +19,10 @@ namespace Serpen.Uni.Automat.Turing {
         public uint DiscardState { get; }
 
         TuringConfigSingleBand[] GoChar(TuringConfigSingleBand[] tcfgs) {
-            TuringTransformSingleBand.TuringVal[] tvas;
+            TuringVal[] tvas;
             var retTcfgs = new System.Collections.Generic.List<TuringConfigSingleBand>();
             foreach (var tcfg in tcfgs) {
-                if (Transforms.TryGetValue(new TuringTransformSingleBand.TuringKey(tcfg.State, tcfg.CurSymbol), out tvas)) {
+                if (Transforms.TryGetValue(new TuringKey(tcfg.State, tcfg.CurSymbol), out tvas)) {
                     foreach (var tva in tvas) {
                         var ntcfg = new TuringConfigSingleBand(this.BlankSymbol, tcfg.Band, tcfg.Position);
                         ntcfg.ReplaceChar(tva.c2, tva.Direction);
@@ -93,9 +93,9 @@ namespace Serpen.Uni.Automat.Turing {
 
             int transformsRnd = rnd.Next(0, stateCount * inputAlphabet.Length);
             for (uint k = 0; k < transformsRnd; k++) {
-                var tk = new TuringTransformSingleBand.TuringKey((uint)rnd.Next(0, stateCount), Utils.GrAE(bandAlphabet));
-                var tv = new TuringTransformSingleBand.TuringVal((uint)rnd.Next(0, stateCount), Utils.GrAE(bandAlphabet), TMDirection.Right);
-                t.TryAdd(tk, new TuringTransformSingleBand.TuringVal[] { tv });
+                var tk = new TuringKey((uint)rnd.Next(0, stateCount), Utils.GrAE(bandAlphabet));
+                var tv = new TuringVal((uint)rnd.Next(0, stateCount), Utils.GrAE(bandAlphabet), TMDirection.Right);
+                t.TryAdd(tk, new TuringVal[] { tv });
             }
 
             var ret = new NTM1659("NTM1_Random", (uint)stateCount, inputAlphabet, bandAlphabet, t, (uint)rnd.Next(0, stateCount), BLANK, (uint)rnd.Next(0, stateCount), (uint)rnd.Next(0, stateCount));
@@ -109,12 +109,9 @@ namespace Serpen.Uni.Automat.Turing {
             var newT = new NTM1659Transform();
             foreach (var ti in Transforms)
                 if (translate.Contains(ti.Key.q))
-                    foreach (var tv in ti.Value) {
-                        if (translate.Contains(tv.qNext)) {
+                    foreach (var tv in ti.Value)
+                        if (translate.Contains(tv.qNext))
                             newT.AddM(Utils.ArrayIndex(translate, ti.Key.q), ti.Key.c, Utils.ArrayIndex(translate, tv.qNext), tv.c2, tv.Direction);
-
-                        }
-                    }
 
             return new NTM1659($"{Name}_purged", (uint)names.Length, Alphabet, BandAlphabet, newT, Utils.ArrayIndex(translate, StartState), BlankSymbol, Utils.ArrayIndex(translate, AcceptedState), Utils.ArrayIndex(translate, DiscardState));
         }
@@ -136,7 +133,7 @@ namespace Serpen.Uni.Automat.Turing {
 
     }
 
-    public sealed class NTM1659Transform : TransformBase<TuringTransformSingleBand.TuringKey, TuringTransformSingleBand.TuringVal[]> {
+    public sealed class NTM1659Transform : TransformBase<TuringKey, TuringVal[]> {
 
         public override string ToString() {
             var sw = new System.Text.StringBuilder();
@@ -150,17 +147,16 @@ namespace Serpen.Uni.Automat.Turing {
             return sw.ToString();
         }
 
-        public void Add(uint q, char c, uint qNext, char c2, TMDirection dir) {
-            Add(new TuringTransformSingleBand.TuringKey(q, c), new TuringTransformSingleBand.TuringVal[] { new TuringTransformSingleBand.TuringVal(qNext, c2, dir) });
-        }
+        public void Add(uint q, char c, uint qNext, char c2, TMDirection dir) =>
+            Add(new TuringKey(q, c), new TuringVal[] { new TuringVal(qNext, c2, dir) });
 
         internal void AddM(uint q, char c, uint qNext, char c2, TMDirection dir) {
-            TuringTransformSingleBand.TuringVal[] qBefore;
-            var eat = new TuringTransformSingleBand.TuringKey(q, c);
+            TuringVal[] qBefore;
+            var eat = new TuringKey(q, c);
             if (TryGetValue(eat, out qBefore))
-                this[eat] = qBefore.Append(new TuringTransformSingleBand.TuringVal(qNext, c2, dir)).ToArray();
+                this[eat] = qBefore.Append(new TuringVal(qNext, c2, dir)).ToArray();
             else
-                Add(new TuringTransformSingleBand.TuringKey(q, c), new TuringTransformSingleBand.TuringVal[] { new TuringTransformSingleBand.TuringVal(qNext, c2, dir) });
+                Add(new TuringKey(q, c), new TuringVal[] { new TuringVal(qNext, c2, dir) });
         }
 
     }

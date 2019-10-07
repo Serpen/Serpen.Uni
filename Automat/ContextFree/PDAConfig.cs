@@ -1,7 +1,6 @@
 namespace Serpen.Uni.Automat.ContextFree {
     public class PDAConfig : IConfig {
         public uint State { get; }
-        uint[] IConfig.State => new uint[] {State};
         public string word { get; }
         public char[] Stack { get; }
         public PDAConfig Origin { get; }

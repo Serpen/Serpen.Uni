@@ -1,16 +1,14 @@
 namespace Serpen.Uni.Automat.Turing {
-
     internal class TuringConfigMultiTrack : TuringConfigBase<char[]> {
 
-        public TuringConfigMultiTrack(char blankSymbol, string[] band, int bandPos) : base(blankSymbol) {
-            base.band = band;
-            position = new int[] { bandPos };
-            state = new uint[1];
+        public TuringConfigMultiTrack(char blankSymbol, string[] bands, int bandPos) : base(blankSymbol) {
+            base.band = bands;
+            Position = bandPos;
         }
 
-        public string[] Band {
+        public string[] Bands {
             get => band;
-            set => band = value;
+            private set => band = value;
         }
 
         public int Position {
@@ -18,47 +16,17 @@ namespace Serpen.Uni.Automat.Turing {
             private set => position[0] = value;
         }
 
-        public uint State {
-            get => state[0];
-            internal set => state[0] = value;
-        }
-
         public override char[] CurSymbol {
             get {
-                if (Position >= Band[0].Length)
-                    for (int i = 0; i < Band.Length; i++)
-                        Band[i] = Band[i].Insert(Position, BlankSymbol.ToString());
+                if (Position >= Bands[0].Length)
+                    for (int i = 0; i < Bands.Length; i++)
+                        Bands[i] = Bands[i].Insert(Position, BlankSymbol.ToString());
 
-                char[] ret = new char[Band.Length];
-                for (int i = 0; i < Band.Length; i++)
-                    ret[i] = Band[i][Position];
+                char[] ret = new char[Bands.Length];
+                for (int i = 0; i < Bands.Length; i++)
+                    ret[i] = Bands[i][Position];
                 return ret;
             }
-        }
-
-        public override void ReplaceChar(char[] newChar, TMDirection dir) {
-            string[] s = new string[Band.GetLength(0)];
-            for (int i = 0; i < Band.GetLength(0); i++) {
-                s[i] = Band[i].Remove(Position, 1);
-                s[i] = s[i].Insert(Position, newChar[i].ToString());
-            }
-
-            if (dir == TMDirection.Left) {
-                Position--;
-                if (Position == -1) {
-                    for (int i = 0; i < Band.GetLength(0); i++) {
-                        s[i] = s[i].Insert(0, BlankSymbol.ToString());
-                        Position = 0;
-                    }
-                }
-            } else if (dir == TMDirection.Right) {
-                Position++;
-                if (Position > s[0].Length)
-                    for (int i = 0; i < Band.GetLength(0); i++) {
-                        s[i] = s[i].Insert(Position, BlankSymbol.ToString());
-                    }
-            }
-            Band = s;
         }
     }
 }

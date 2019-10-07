@@ -56,7 +56,7 @@ namespace Serpen.Uni.Automat {
             }
         }
 
-        [AcceptedWordSamples("aa")]
+        [AcceptedWordSamples("00")]
         public static TuringMachineSingleBand1659 TM_1659_A414_M1 {
             get {
                 const uint qA = 1;
@@ -203,6 +203,7 @@ namespace Serpen.Uni.Automat {
             }
         }
 
+        [AcceptedWordSamples("00c00")]
         public static TuringMachineMultiTrack TMk_EFAK_B87_wcw {
             get {
                 string[] stateTracks = { "1,0", "1,1", "1,B", "2,0", "2,1", "2,B", "3,0", "3,1", "3,B", "4,0", "4,1", "4,B", "5,0", "5,1", "5,B", "6,0", "6,1", "6,B", "7,0", "7,1", "7,B", "8,0", "8,1", "8,B", "9,0", "9,1", "9,B" };

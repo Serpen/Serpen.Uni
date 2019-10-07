@@ -1,7 +1,7 @@
 using System.Linq;
 
 namespace Serpen.Uni.Automat.Turing {
-    public class TuringMachineSingleBand1659 : TuringMachineBase<TuringTransformSingleBand.TuringKey, TuringTransformSingleBand.TuringVal> {
+    public class TuringMachineSingleBand1659 : TuringMachineBase<TuringKey, TuringVal> {
 
         public TuringMachineSingleBand1659(string name, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, TuringTransformSingleBand transform, uint startState, char blankSymbol, uint acceptedState, uint discardState)
             : base(name, stateCount, inputAlphabet, bandAlphabet, startState, blankSymbol, new uint[] { acceptedState }) {
@@ -19,8 +19,8 @@ namespace Serpen.Uni.Automat.Turing {
         public readonly uint DiscardState;
 
         TuringConfigSingleBand GoChar(TuringConfigSingleBand tcfg) {
-            TuringTransformSingleBand.TuringVal tva;
-            if (Transforms.TryGetValue(new TuringTransformSingleBand.TuringKey(tcfg.State, tcfg.CurSymbol), out tva)) {
+            TuringVal tva;
+            if (Transforms.TryGetValue(new TuringKey(tcfg.State, tcfg.CurSymbol), out tva)) {
                 tcfg.ReplaceChar(tva.c2, tva.Direction);
                 tcfg.State = tva.qNext;
                 return tcfg;
@@ -80,8 +80,8 @@ namespace Serpen.Uni.Automat.Turing {
             for (uint i = 0; i < stateCount; i++) {
                 int transformsRnd = rnd.Next(0, inputAlphabet.Length);
                 for (uint j = 0; j < transformsRnd; j++) {
-                    var tk = new TuringTransformSingleBand.TuringKey(i, Utils.GrAE(bandAlphabet));
-                    var tv = new TuringTransformSingleBand.TuringVal(j, Utils.GrAE(bandAlphabet), TMDirection.Right);
+                    var tk = new TuringKey(i, Utils.GrAE(bandAlphabet));
+                    var tv = new TuringVal(j, Utils.GrAE(bandAlphabet), TMDirection.Right);
                     t.TryAdd(tk, tv);
                 }
             }
@@ -98,8 +98,8 @@ namespace Serpen.Uni.Automat.Turing {
             foreach (var t2 in Transforms)
                 if (translate.Contains(t2.Key.q))
                     if (translate.Contains(t2.Value.qNext)) {
-                        var tk = new TuringTransformSingleBand.TuringKey(Utils.ArrayIndex(translate, t2.Key.q), t2.Key.c);
-                        var tv = new TuringTransformSingleBand.TuringVal(Utils.ArrayIndex(translate, t2.Value.qNext), t2.Value.c2, t2.Value.Direction);
+                        var tk = new TuringKey(Utils.ArrayIndex(translate, t2.Key.q), t2.Key.c);
+                        var tv = new TuringVal(Utils.ArrayIndex(translate, t2.Value.qNext), t2.Value.c2, t2.Value.Direction);
                         newT.Add(tk, tv);
                     }
 
