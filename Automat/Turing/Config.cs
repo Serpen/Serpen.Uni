@@ -5,7 +5,7 @@ namespace Serpen.Uni.Automat.Turing {
             BlankSymbol = blankSymbol;
         }
         protected char BlankSymbol;
-        public uint[] state {get; protected set;}
+        protected uint[] state;
         uint[] IConfig.State => state;
         protected string[] band;
         protected int[] position;
@@ -22,7 +22,14 @@ namespace Serpen.Uni.Automat.Turing {
 
         public override int GetHashCode() => this.ToString().GetHashCode();
 
-        public override string ToString() => $"({state}, {band}, {position})";
-
+        public override string ToString() {
+            var sb = new System.Text.StringBuilder();
+            for (int i = 0; i < band.Length; i++) {
+                string str = band[i];
+                str = str.Insert(position[0], $"<{state[0]}>");
+                sb.Append(str + '|');
+            }
+            return sb.ToString();
+        }
     }
 }

@@ -40,10 +40,10 @@ namespace Serpen.Uni.Automat.Turing {
 
         TuringConfigMultiTrack GoChar(TuringConfigMultiTrack tcfg) {
             TuringTransformMultiTrack.TuringVal tva;
-            var tkey = new TuringTransformMultiTrack.TuringKey(tcfg.q, tcfg.CurSymbol[0..2]);
+            var tkey = new TuringTransformMultiTrack.TuringKey(tcfg.State, tcfg.CurSymbol[0..2]);
             if (Transforms.TryGetValue(tkey, out tva)) {
                 tcfg.ReplaceChar(tva.c2, tva.Direction);
-                tcfg.q = tva.qNext;
+                tcfg.State = tva.qNext;
                 return tcfg;
             } else
                 return null;
@@ -58,16 +58,16 @@ namespace Serpen.Uni.Automat.Turing {
                 wordTracks[i] = new string(BlankSymbol, w.Length);
             Utils.DebugMessage($"w: {w}=>{string.Join(',', wordTracks)}", this, Utils.eDebugLogLevel.Verbose);
 
-            var tcfg = new TuringConfigMultiTrack(BlankSymbol, wordTracks, 0) { q = StartState };
+            var tcfg = new TuringConfigMultiTrack(BlankSymbol, wordTracks, 0) { State = StartState };
 
             int runs = 0;
-            uint lastQ = tcfg.q;
+            uint lastQ = tcfg.State;
 
-            while (tcfg != null && !IsAcceptedState(tcfg.q)) {
+            while (tcfg != null && !IsAcceptedState(tcfg.State)) {
                 Utils.DebugMessage(tcfg.ToString(), this, Utils.eDebugLogLevel.Verbose);
                 tcfg = GoChar(tcfg);
                 if (tcfg != null)
-                    lastQ = tcfg.q;
+                    lastQ = tcfg.State;
                 if (runs > MAX_TURING_RUNS)
                     throw new TuringCycleException($"possible Turing cycle at {runs} with {w} now is: {tcfg.Band[0].Trim(BlankSymbol)}");
                 runs++;
@@ -85,11 +85,11 @@ namespace Serpen.Uni.Automat.Turing {
                 wordTracks[i] = new string(BlankSymbol, w.Length);
             Utils.DebugMessage($"w: {w}=>{string.Join(',', wordTracks)}", this, Utils.eDebugLogLevel.Verbose);
 
-            var tcfg = new TuringConfigMultiTrack(BlankSymbol, wordTracks, 0) { q = StartState };
+            var tcfg = new TuringConfigMultiTrack(BlankSymbol, wordTracks, 0) { State = StartState };
 
             int runs = 0;
             string lastBand = tcfg.Band[0];
-            while (tcfg != null && !IsAcceptedState(tcfg.q)) {
+            while (tcfg != null && !IsAcceptedState(tcfg.State)) {
                 tcfg = GoChar(tcfg);
                 if (tcfg != null)
                     lastBand = tcfg.Band[0];
@@ -103,7 +103,7 @@ namespace Serpen.Uni.Automat.Turing {
         public override IAutomat PurgeStates() {
             (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
 
-            var newT = new TuringTransformMultiTrack(((TuringTransformMultiTrack)(Transforms)).StateTracks);
+            var newT = new TuringTransformMultiTrack(((TuringTransformMultiTrack)Transforms).StateTracks);
             foreach (var t2 in Transforms)
                 if (translate.Contains(t2.Key.q))
                     if (translate.Contains(t2.Value.qNext)) {
@@ -121,8 +121,10 @@ namespace Serpen.Uni.Automat.Turing {
             int stateCount = rnd.Next(1, 20);
             char[] inputAlphabet = RandomGenerator.RandomAlphabet(1, 20);
             char[] bandAlphabet = RandomGenerator.RandomAlphabet(1, 20, inputAlphabet.Append(BLANK));
+
             uint trackCount = (uint)rnd.Next(1, 5);
             string[] TrackTranslate = new string[rnd.Next(1, 10)];
+
             for (int i = 0; i < TrackTranslate.Length; i++) {
                 var curChars = new string[trackCount];
                 for (int j = 0; j < trackCount; j++)

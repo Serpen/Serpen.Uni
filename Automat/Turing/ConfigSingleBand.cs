@@ -9,32 +9,22 @@ namespace Serpen.Uni.Automat.Turing {
 
         public string Band {
             get => band[0];
-            internal set {
-                band[0] = value;
-            }
+            internal set => band[0] = value;
         }
 
         public uint State {
-            get {
-                return base.state[0];
-            }
-            internal set {
-                base.state[0] = value;
-            }
+            get => base.state[0];
+            internal set => base.state[0] = value;
         }
 
         public int Position {
-            get {
-                return position[0];
-            }
-            private set {
-                position[0] = value;
-            }
+            get => position[0];
+            private set => position[0] = value;
         }
 
         public override char CurSymbol {
             get {
-                if (position[0] >= Band.Length)
+                if (Position >= Band.Length)
                     Band = Band.Insert(Position, BlankSymbol.ToString());
                 return Band[Position];
 
@@ -56,12 +46,6 @@ namespace Serpen.Uni.Automat.Turing {
                     s = s.Insert(Position, BlankSymbol.ToString());
             }
             Band = s;
-        }
-
-        public override string ToString() {
-            string str = string.Join('|', Band);
-            str = str.Insert(Position, $"<{State}>");
-            return str;
         }
     }
 }

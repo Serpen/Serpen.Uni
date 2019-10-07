@@ -10,27 +10,17 @@ namespace Serpen.Uni.Automat.Turing {
 
         public string[] Band {
             get => band;
-            set {
-                band = value;
-            }
+            set => band = value;
         }
 
         public int Position {
-            get {
-                return position[0];
-            }
-            private set {
-                position[0] = value;
-            }
+            get => position[0];
+            private set => position[0] = value;
         }
 
-        public uint q {
-            get {
-                return state[0];
-            }
-            internal set {
-                state[0] = value;
-            }
+        public uint State {
+            get => state[0];
+            internal set => state[0] = value;
         }
 
         public override char[] CurSymbol {
@@ -69,12 +59,6 @@ namespace Serpen.Uni.Automat.Turing {
                     }
             }
             Band = s;
-        }
-
-        public override string ToString() {
-            string str = string.Join('|', Band);
-            str = str.Insert(Position, $"<{q}>");
-            return str;
         }
     }
 }
