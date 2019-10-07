@@ -117,7 +117,7 @@ namespace Serpen.Uni.Automat {
 
         internal static Dictionary<T, List<T>> EqualityClasses<T>(T[] array, System.Func<T, T, bool> comparer) {
 
-            var ret = new Dictionary<T, List<T>>();
+            var ret = new Dictionary<T, List<T>>(array.Length);
 
             ret.Add(array[0], new List<T>(new T[] { array[0] }));
 

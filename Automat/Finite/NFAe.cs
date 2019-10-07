@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 
 namespace Serpen.Uni.Automat.Finite {
-    public class NFAe : FABase, INFA, IAlleAbgeschlossenheitseigenschaften {
+    public class NFAe : FABase, INFA {
 
         public static readonly FABase Empty = new NFAe("Empty", 0, new char[] { }, new NFAeTransform(), 0, new uint[] { });
 
@@ -79,8 +79,8 @@ namespace Serpen.Uni.Automat.Finite {
         /// <returns></returns>
         [AlgorithmSource("EAFK-2.5.3")]
         public uint[] EpsilonHuelle(uint[] q) {
-            var toProcess = new Stack<uint>(); //States that should be processed
-            var Processed = new List<uint>(); //States that have beend processed
+            var toProcess = new Stack<uint>((int)StatesCount); //States that should be processed
+            var Processed = new List<uint>((int)StatesCount); //States that have beend processed
 
             //init every q to be processed
             for (int i = 0; i < q.Length; i++)

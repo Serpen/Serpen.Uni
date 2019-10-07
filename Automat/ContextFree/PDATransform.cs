@@ -47,49 +47,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         public override string ToString() => $"({(!string.IsNullOrEmpty(cw2) ? cw2 : Utils.EPSILON.ToString())}, {qNext})";
     }
 
-    public class DPDATransform : TransformBase<PDATransformKey, PDATransformValue> {
-        public void Add(uint q, char? ci, char? cw, string cw2, uint qNext)
-            => base.Add(new PDATransformKey(q, ci, cw), new PDATransformValue(cw2, qNext));
-
-        public bool TryGetValue(ref PDATransformKey initcfg, out PDATransformValue qnext) {
-            bool result;
-
-            var worksuccessor = new PDATransformKey(initcfg.q, initcfg.ci, initcfg.cw);
-            result = base.TryGetValue(worksuccessor, out qnext);
-            if (result) {
-                initcfg = worksuccessor;
-                return true;
-            }
-
-            worksuccessor = new PDATransformKey(initcfg.q, initcfg.ci, null);
-            result = base.TryGetValue(worksuccessor, out qnext);
-            if (result) {
-                initcfg = worksuccessor;
-                return true;
-            }
-
-            worksuccessor = new PDATransformKey(initcfg.q, null, initcfg.cw);
-            result = base.TryGetValue(worksuccessor, out qnext);
-            if (result) {
-                initcfg = worksuccessor;
-                return true;
-            }
-
-            return false;
-
-        }
-
-        public override string ToString() {
-            var sw = new System.Text.StringBuilder();
-            foreach (var item in this) {
-                sw.Append($"({item.Key.ToString()})=>");
-                sw.Append($"({item.Value.ToString()}); ");
-                sw.Append("); ");
-            }
-            return sw.ToString();
-        }
-    }
-
+    
     public class PDATransform : TransformBase<PDATransformKey, PDATransformValue[]> {
         public void Add(uint q, char? ci, char? cw, string cw2, uint qNext)
             => Add(new PDATransformKey(q, ci, cw), new PDATransformValue[] { new PDATransformValue(cw2, qNext) });
@@ -99,12 +57,12 @@ namespace Serpen.Uni.Automat.ContextFree {
         /// Adds Tuple + Appends if already exists
         /// </summary>
         public void AddM(uint q, char? ci, char? cw, string cw2, uint qNext) {
-            ContextFree.PDATransformValue[] pvalRef;
+            ContextFree.PDATransformValue[] pvalout;
             ContextFree.PDATransformValue pval = new PDATransformValue(cw2, qNext);
             var pkey = new ContextFree.PDATransformKey(q, ci, cw);
 
-            if (TryGetValue(pkey, out pvalRef))
-                this[pkey] = pvalRef.Append(pval).ToArray();
+            if (TryGetValue(pkey, out pvalout))
+                this[pkey] = pvalout.Append(pval).ToArray();
             else
                 base.Add(pkey, new PDATransformValue[] { pval });
         }

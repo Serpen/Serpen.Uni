@@ -38,7 +38,9 @@ namespace Serpen.Uni.Automat.Turing {
 
         public override bool Equals(object obj) {
             if (obj is TuringConfigBase<TChar> tcfg) {
-                return tcfg.State.Equals(this.State) && tcfg.band.Equals(this.band) && tcfg.position.Equals(this.position);
+                return tcfg.State.Equals(this.State) 
+                    && tcfg.band.Equals(this.band) 
+                    && tcfg.position.Equals(this.position);
             }
             return false;
         }

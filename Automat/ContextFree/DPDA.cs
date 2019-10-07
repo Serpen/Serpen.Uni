@@ -58,10 +58,10 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
         public const char START = '$';
-        public char[] WorkAlphabet {get;}
-        public char StartSymbol {get;}
+        public char[] WorkAlphabet { get; }
+        public char StartSymbol { get; }
 
-        PDAConfig[] IPDA.GoChar(PDAConfig[] pcfgs) => new PDAConfig[] {GoChar(pcfgs[0])};
+        PDAConfig[] IPDA.GoChar(PDAConfig[] pcfgs) => new PDAConfig[] { GoChar(pcfgs[0]) };
         public PDAConfig GoChar(PDAConfig pcfg) {
             PDATransformKey qStart;
 
@@ -75,7 +75,9 @@ namespace Serpen.Uni.Automat.ContextFree {
             PDATransformValue qNext;
 
             //get all possible (e-)transforms
-            if (((DPDATransform)Transforms).TryGetValue(ref qStart, out qNext)) {
+            if (!((DPDATransform)Transforms).TryGetValue(ref qStart, out qNext))
+                return null;
+            else {
                 var newStack = new Stack<char>(pcfg.Stack); //new stack vor pcfg
 
                 //stack symbol cw2 replaces cw
@@ -105,8 +107,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                 else
                     return new PDAConfig(qNext.qNext, pcfg.word, newStack.Reverse().ToArray(), pcfg);
 
-            } else
-                return null;
+            }
         }
 
         public override bool AcceptWord(string w) {
@@ -123,15 +124,16 @@ namespace Serpen.Uni.Automat.ContextFree {
             //check if a cfg has word cleared and ends in accepted states
             if (pcfg == null || pcfg.word.Length > 0)
                 return false;
-            else
+            else {
                 if (IsAcceptedState(pcfg.State))
-                return true;
-            else
-                return false;
+                    return true;
+                else
+                    return false;
+            }
         }
 
         public override VisualizationTuple[] VisualizationLines() {
-            var tcol = new System.Collections.Generic.List<VisualizationTuple>();
+            var tcol = new System.Collections.Generic.List<VisualizationTuple>(Transforms.Count);
             foreach (var t in Transforms) {
                 string desc = $"{(t.Key.ci.HasValue ? t.Key.ci.Value : Utils.EPSILON)}|{(t.Key.cw.HasValue ? t.Key.cw.Value : Utils.EPSILON)}->{(!string.IsNullOrEmpty(t.Value.cw2) ? t.Value.cw2 : Utils.EPSILON.ToString())}";
                 var vt = new VisualizationTuple(t.Key.q, t.Value.qNext, desc);
@@ -156,11 +158,9 @@ namespace Serpen.Uni.Automat.ContextFree {
             for (uint i = 0; i < stateCount; i++) {
                 int transformsRnd = rnd.Next(0, inputAlphabet.Length);
                 for (int j = 0; j < transformsRnd; j++) {
-                    try {
-                        var tk = new PDATransformKey(i, Utils.GrAE(inputAlphabet), Utils.GrAE(workAlphabet));
-                        var tv = new PDATransformValue(Utils.GrAE(workAlphabet).ToString(), (uint)rnd.Next(0, stateCount));
-                        t.TryAdd(tk, tv);
-                    } catch { }
+                    var tk = new PDATransformKey(i, Utils.GrAE(inputAlphabet), Utils.GrAE(workAlphabet));
+                    var tv = new PDATransformValue(Utils.GrAE(workAlphabet).ToString(), (uint)rnd.Next(0, stateCount));
+                    t.TryAdd(tk, tv);
                 }
             }
 
@@ -196,7 +196,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             //turn and add each transform
             foreach (var dt in this.Transforms.Reverse())
-                    pdat.Add(newstate[dt.Value.qNext], dt.Key.ci, dt.Key.cw, dt.Value.cw2, newstate[dt.Key.q]);
+                pdat.Add(newstate[dt.Value.qNext], dt.Key.ci, dt.Key.cw, dt.Value.cw2, newstate[dt.Key.q]);
 
             //start state is qe, which leads to every old accepted state
             for (int i = 0; i < this.AcceptedStates.Length; i++)
@@ -208,4 +208,48 @@ namespace Serpen.Uni.Automat.ContextFree {
         public override string ToString() => $"{Name} DPDA(|{States.Length}|={string.Join(";", States)}), {{{string.Join(',', Alphabet)}}},{{{string.Join(',', WorkAlphabet)}}}, {{{Transforms.ToString()}}}, {StartState}, {StartSymbol} {{{string.Join(',', AcceptedStates)}}})".Trim();
 
     } //end class
+
+    public class DPDATransform : TransformBase<PDATransformKey, PDATransformValue> {
+        public void Add(uint q, char? ci, char? cw, string cw2, uint qNext)
+            => base.Add(new PDATransformKey(q, ci, cw), new PDATransformValue(cw2, qNext));
+
+        public bool TryGetValue(ref PDATransformKey initcfg, out PDATransformValue qnext) {
+            bool result;
+
+            var worksuccessor = new PDATransformKey(initcfg.q, initcfg.ci, initcfg.cw);
+            result = base.TryGetValue(worksuccessor, out qnext);
+            if (result) {
+                initcfg = worksuccessor;
+                return true;
+            }
+
+            worksuccessor = new PDATransformKey(initcfg.q, initcfg.ci, null);
+            result = base.TryGetValue(worksuccessor, out qnext);
+            if (result) {
+                initcfg = worksuccessor;
+                return true;
+            }
+
+            worksuccessor = new PDATransformKey(initcfg.q, null, initcfg.cw);
+            result = base.TryGetValue(worksuccessor, out qnext);
+            if (result) {
+                initcfg = worksuccessor;
+                return true;
+            }
+
+            return false;
+
+        }
+
+        public override string ToString() {
+            var sw = new System.Text.StringBuilder();
+            foreach (var item in this) {
+                sw.Append($"({item.Key.ToString()})=>");
+                sw.Append($"({item.Value.ToString()}); ");
+                sw.Append("); ");
+            }
+            return sw.ToString();
+        }
+    }
+
 } //end ns

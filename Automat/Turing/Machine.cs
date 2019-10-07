@@ -2,16 +2,17 @@ using System.Linq;
 
 namespace Serpen.Uni.Automat.Turing {
 
-    interface ITuringMachine
+    interface ITuringMachine : IAutomat
     {
-        
+        char[] BandAlphabet {get;}
+        char BlankSymbol {get;}
     }
 
     public abstract class TuringMachineBase<TKey, TVal> : AutomatBase<TKey, TVal>, ITuringMachine where TKey : ITransformKey { //where TConfig : ITuringConfig {
 
         public const char BLANK = '_';
-        public readonly char[] BandAlphabet;
-        public readonly char BlankSymbol;
+        public char[] BandAlphabet {get;}
+        public char BlankSymbol {get;}
 
         public TuringMachineBase(string name, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, uint startState, char blankSymbol, uint[] acceptedStates)
             : base(stateCount, inputAlphabet, startState, name, acceptedStates) {

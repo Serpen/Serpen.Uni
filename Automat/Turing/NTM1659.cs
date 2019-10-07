@@ -20,7 +20,7 @@ namespace Serpen.Uni.Automat.Turing {
 
         TuringConfigSingleBand[] GoChar(TuringConfigSingleBand[] tcfgs) {
             TuringVal[] tvas;
-            var retTcfgs = new System.Collections.Generic.List<TuringConfigSingleBand>();
+            var retTcfgs = new System.Collections.Generic.List<TuringConfigSingleBand>(Transforms.Count*10);
             foreach (var tcfg in tcfgs) {
                 if (Transforms.TryGetValue(new TuringKey(tcfg.State, tcfg.CurSymbol), out tvas)) {
                     foreach (var tva in tvas) {
@@ -116,7 +116,7 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         public override VisualizationTuple[] VisualizationLines() {
-            var tcol = new System.Collections.Generic.List<VisualizationTuple>();
+            var tcol = new System.Collections.Generic.List<VisualizationTuple>(Transforms.Count);
             foreach (var t in Transforms) {
                 foreach (var tv in t.Value) {
                     var vt = new VisualizationTuple(t.Key.q, tv.qNext,

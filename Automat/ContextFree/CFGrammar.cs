@@ -107,14 +107,10 @@ namespace Serpen.Uni.Automat.ContextFree {
             //iterate rules and replace S->S'
             foreach (var r in rs) {
                 char newrKey = r.Key != StartSymbol ? r.Key : newStartSymbol;
-                var valList = new List<string>();
+                var valList = new List<string>(r.Value.Length);
 
-                foreach (string body in r.Value) {
-                    string newBody = body;
-                    newBody = newBody.Replace(StartSymbol, newStartSymbol);
-
-                    valList.Add(newBody);
-                }
+                foreach (string body in r.Value)
+                    valList.Add(body.Replace(StartSymbol, newStartSymbol));
 
                 newRS.Add(newrKey, valList.ToArray());
             }
@@ -162,7 +158,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
                 //iterate rules
                 foreach (var r in workRS) {
-                    var newVals = new List<string>();
+                    var newVals = new List<string>(r.Value.Length);
                     foreach (string body in r.Value) {
                         if (body.Contains(VarEpsilonHead) && !alreadyProcessed.Contains(r.Key)) { //replace Var with e-Power
                             newVals.AddRange(ReplaceStringEpsilonPowerSet(body, VarEpsilonHead));
@@ -214,7 +210,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                 replaceStrings = workRS[var];
 
                 foreach (var r in workRS) {
-                    var newVals = new List<string>();
+                    var newVals = new List<string>(r.Value.Length);
                     foreach (string body in r.Value) {
                         if (body == var.ToString()) {
                             newVals.AddRange(replaceStrings);
@@ -239,7 +235,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             var translate = new Dictionary<string, char>();
 
             foreach (var r in rs) {
-                var newVals = new List<string>();
+                var newVals = new List<string>(r.Value.Length);
                 foreach (string body in r.Value) {
                     string newbody = body;
                     int replaceStartPos = 0;
@@ -278,17 +274,13 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             return newRs;
         }
-        // "{(R=>(RRaRRRR,,RRRoRRRR,RoaR,o,RRRRotRR,oRR,R))}"
-        // "{U}, {d,e}, {(U=>(UUUUd,UUUUee,,UUUddUdU,e,UUeUe))}, U}"
-        // "{Y,N}, {v,d,x,g,l,p,e}, {(N=>(NlYNdYpN,p,dgldvYp,Y,v,dN,YeNYYxegp))(Y=>(NNYg,dpYYxNNN,x,YNYpYYYN,NYplY,,pYNNx,Ye))}, N}"
-        // "{(N=>(AlYAdYpA,lYAdYpA,AlYdYpA,lYdYpA,AlYAdYp,lYAdYp,AlYdYp,lYdYp,AlAdYpA,lAdYpA,AldYpA,ldYpA,AlAdYp,lAdYp,AldYp,ldYp,AlYAdpA,lYAdpA,AlYdpA,lYdpA,AlYAdp,lYAdp,AlYdp,lYdp,AlAdpA,lAdpA,AldpA,ldpA,AlAdp,lAdp,Aldp,ldp,p,dgldvYp,dgldvp,AAYg,AYg,Yg,AAg,Ag,g,dpYYxAAA,dpYYxAA,dpYYxA,dpYYx,dpYxAAA,dpYxAA,dpYxA,dpYx,dpxAAA,dpxAA,dpxA,dpx,x,YAYpYYYA,YYpYYYA,YAYpYYY,YYpYYY,AYpYYYA,YpYYYA,AYpYYY,YpYYY,YApYYYA,YApYYY,ApYYYA,pYYYA,ApYYY,pYYY,YAYpYYA,YYpYYA,YAYpYY,YYpYY,AYpYYA,YpYYA,AYpYY,YpYY,YApYYA,YApYY,ApYYA,pYYA,ApYY,pYY,YAYpYA,YYpYA,YAYpY,YYpY,AYpYA,YpYA,AYpY,YpY,YApYA,YApY,ApYA,pYA,ApY,pY,YAYpA,YYpA,YAYp,YYp,AYpA,YpA,AYp,Yp,YApA,YAp,ApA,pA,Ap,AYplY,YplY,AplY,plY,AYpl,Ypl,Apl,pl,pYAAx,pYAx,pYx,pAAx,pAx,px,Ye,e,v,dA,d,YeAYYxegp,YeYYxegp,eAYYxegp,eYYxegp,YeAYxegp,YeYxegp,eAYxegp,eYxegp,YeAxegp,Yexegp,eAxegp,exegp,))(A=>(AlYAdYpA,lYAdYpA,AlYdYpA,lYdYpA,AlYAdYp,lYAdYp,AlYdYp,lYdYp,AlAdYpA,lAdYpA,AldYpA,ldYpA,AlAdYp,lAdYp,AldYp,ldYp,AlYAdpA,lYAdpA,AlYdpA,lYdpA,AlYAdp,lYAdp,AlYdp,lYdp,AlAdpA,lAdpA,AldpA,ldpA,AlAdp,lAdp,Aldp,ldp,p,dgldvYp,dgldvp,AAYg,AYg,Yg,AAg,Ag,g,dpYYxAAA,dpYYxAA,dpYYxA,dpYYx,dpYxAAA,dpYxAA,dpYxA,dpYx,dpxAAA,dpxAA,dpxA,dpx,x,YAYpYYYA,YYpYYYA,YAYpYYY,YYpYYY,AYpYYYA,YpYYYA,AYpYYY,YpYYY,YApYYYA,YApYYY,ApYYYA,pYYYA,ApYYY,pYYY,YAYpYYA,YYpYYA,YAYpYY,YYpYY,AYpYYA,YpYYA,AYpYY,YpYY,YApYYA,YApYY,ApYYA,pYYA,ApYY,pYY,YAYpYA,YYpYA,YAYpY,YYpY,AYpYA,YpYA,AYpY,YpY,YApYA,YApY,ApYA,pYA,ApY,pY,YAYpA,YYpA,YAYp,YYp,AYpA,YpA,AYp,Yp,YApA,YAp,ApA,pA,Ap,AYplY,YplY,AplY,plY,AYpl,Ypl,Apl,pl,pYAAx,pYAx,pYx,pAAx,pAx,px,Ye,e,v,dA,d,YeAYYxegp,YeYYxegp,eAYYxegp,eYYxegp,YeAYxegp,YeYxegp,eAYxegp,eYxegp,YeAxegp,Yexegp,eAxegp,exegp))(Y=>(AAYg,AYg,Yg,AAg,Ag,g,dpYYxAAA,dpYYxAA,dpYYxA,dpYYx,dpYxAAA,dpYxAA,dpYxA,dpYx,dpxAAA,dpxAA,dpxA,dpx,x,YAYpYYYA,YYpYYYA,YAYpYYY,YYpYYY,AYpYYYA,YpYYYA,AYpYYY,YpYYY,YApYYYA,YApYYY,ApYYYA,pYYYA,ApYYY,pYYY,YAYpYYA,YYpYYA,YAYpYY,YYpYY,AYpYYA,YpYYA,AYpYY,YpYY,YApYYA,YApYY,ApYYA,pYYA,ApYY,pYY,YAYpYA,YYpYA,YAYpY,YYpY,AYpYA,YpYA,AYpY,YpY,YApYA,YApY,ApYA,pYA,ApY,pY,YAYpA,YYpA,YAYp,YYp,AYpA,YpA,AYp,Yp,YApA,YAp,ApA,pA,Ap,p,AYplY,YplY,AplY,plY,AYpl,Ypl,Apl,pl,pYAAx,pYAx,pYx,pAAx,pAx,px,Ye,e))}
 
         RuleSet Chomskey5_Terminals(RuleSet rs, ref List<char> newVars) {
             var newRs = new RuleSet();
             var translate = new Dictionary<char, char>();
 
             foreach (var r in rs) {
-                var newVals = new List<string>();
+                var newVals = new List<string>(r.Value.Length);
                 foreach (string body in r.Value) {
                     string newBody = body;
                     if (body.Length == 2) {
@@ -325,8 +317,8 @@ namespace Serpen.Uni.Automat.ContextFree {
         /// </summary>
         /// <returns></returns>
         static string[] ReplaceStringEpsilonPowerSet(string s, char c) {
-            var cPos = new List<int>();
-            var strs = new List<string>();
+            var cPos = new List<int>(s.Length);
+            var strs = new List<string>(s.Length);
 
             //save all c occurendes in cPos
             for (int i = 0; i < s.Length; i++)
@@ -399,7 +391,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             bothVarAndTerm.Add(newStart);
             finalVars.Add(newStart);
 
-            var translate = new Dictionary<char, char>();
+            var translate = new Dictionary<char, char>(cfg.VarAndTerm.Count);
             foreach (char c in cfg.Variables) {
                 if (!finalVars.Contains(c)) {
                     translate.Add(c, c);
@@ -433,7 +425,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
 
             foreach (var r in cfg.Rules) {
-                var newVals = new List<string>();
+                var newVals = new List<string>(r.Value.Length);
                 foreach (string body in r.Value) {
                     var sw = new System.Text.StringBuilder();
                     foreach (char c in body) {
@@ -467,10 +459,10 @@ namespace Serpen.Uni.Automat.ContextFree {
             var newRules = new RuleSet();
 
             foreach (var r in this.Rules) {
-                var newVals = new List<string>();
-                foreach (string body in r.Value) {
+                var newVals = new List<string>(r.Value.Length);
+                foreach (string body in r.Value)
                     newVals.Add(body.Reverse().ToString());
-                }
+                
                 newRules.Add(r.Key, newVals.ToArray());
             }
             return new CFGrammer("CFG_Reverse({Name})", this.Variables, this.Terminals, newRules, this.StartSymbol);

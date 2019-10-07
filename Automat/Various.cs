@@ -10,7 +10,7 @@ namespace Serpen.Uni.Automat {
     public interface IKleeneStern : IAutomat { IAutomat KleeneStern(); }
     public interface IHomomorphismChar : IAutomat { IAutomat HomomorphismChar(System.Collections.Generic.Dictionary<char, char> Translate); }
 
-    interface IAlleAbgeschlossenheitseigenschaften : IUnion, IIntersect, IComplement, IDiff, IConcat, IJoin, IReverse, IKleeneStern, IHomomorphismChar { }
+    public interface IAlleAbgeschlossenheitseigenschaften : IUnion, IIntersect, IComplement, IDiff, IConcat, IJoin, IReverse, IKleeneStern, IHomomorphismChar { }
 
     public enum SourceMode { K1659, EAFK }
 

@@ -7,11 +7,11 @@ namespace Serpen.Uni.Automat.Finite {
 
         [AlgorithmSource("EAFK-2.3.5, EAFK-2.5.5, 1659-D-2.8")]
         public static Finite.DFA Nea2TeilmengenDea(Finite.INFA N) {
-            var States = new List<uint[]>();
-            var DeaStatesNames2Index = new Dictionary<string, uint>();
-            var States2Check = new Queue<uint[]>();
+            var States = new List<uint[]>((int)N.StatesCount);
+            var DeaStatesNames2Index = new Dictionary<string, uint>((int)N.StatesCount);
+            var States2Check = new Queue<uint[]>((int)N.StatesCount);
             var t = new Finite.FATransform();
-            var accStates = new List<uint>(); //acceptable States
+            var accStates = new List<uint>(N.AcceptedStates.Length); //acceptable States
 
             // Add first state to DFA states, for check and naming
             uint[] qStart;
@@ -128,9 +128,9 @@ namespace Serpen.Uni.Automat.Finite {
                             //R[i,j,k] = RegExText.Replace(R[i,j,k],@"\(ε\+(\w)\)\*","$1*");
 
                         }
-                    }
-                }
-            }
+                    } //next j
+                } //next i
+            } //next k
 
             return R[D.StartState, D.AcceptedStates[0], R.GetLength(2) - 1];
         } //end function

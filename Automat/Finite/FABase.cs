@@ -24,7 +24,7 @@ namespace Serpen.Uni.Automat.Finite {
         protected abstract uint[] GoChar(uint q, char c); //maybe return only uint
 
         public override VisualizationTuple[] VisualizationLines() {
-            var tcol = new List<VisualizationTuple>();
+            var tcol = new List<VisualizationTuple>(Transforms.Count);
             foreach (var t in Transforms) {
                 string desc = t.Key.c.ToString();
                 if (desc == "")
@@ -39,7 +39,7 @@ namespace Serpen.Uni.Automat.Finite {
 
         public IAutomat Complement() {
             var Dc = this.MemberwiseClone() as FABase;
-            var accStates = new List<uint>();
+            var accStates = new List<uint>((int)StatesCount-AcceptedStates.Length);
 
             for (uint i = 0; i < this.States.Length; i++)
                 if (!this.IsAcceptedState(i))
@@ -132,7 +132,7 @@ namespace Serpen.Uni.Automat.Finite {
                 throw new System.NotImplementedException("Different Alphabets are not implemented");
 
             char[] Alphabet = this.Alphabet;
-            var accStates = new List<uint>();
+            var accStates = new List<uint>(this.AcceptedStates.Length+A.AcceptedStates.Length);
             string[] stateNames = new string[len];
 
             var deat = new FATransform();

@@ -76,7 +76,7 @@ namespace Serpen.Uni.Automat.Finite {
             }
 
             //add eqClasses of accepted states 
-            var acc = new List<uint>();
+            var acc = new List<uint>(AcceptedStates.Length);
             for (uint i = 0; i < AcceptedStates.Length; i++)
                 acc.Add(State2eqClass[AcceptedStates[i]]);
 
@@ -91,7 +91,7 @@ namespace Serpen.Uni.Automat.Finite {
         }
 
         // Alle Wörter müssen in der gleichen Partition enden (akzeptiert, nicht akzeptiert)
-        public bool StatesEqual(uint x, uint y) => StatesEqual(x, y, new List<uint>());
+        public bool StatesEqual(uint x, uint y) => StatesEqual(x, y, new List<uint>((int)StatesCount));
 
         bool StatesEqual(uint x, uint y, List<uint> processed) {
             if (!processed.Contains(x)) {
@@ -193,7 +193,7 @@ namespace Serpen.Uni.Automat.Finite {
             if (!D1.SameAlphabet(D2))
                 throw new NotImplementedException("Different Alphabets are not implemented");
 
-            var accStates = new List<uint>();
+            var accStates = new List<uint>(D1.AcceptedStates.Length+D2.AcceptedStates.Length);
 
             string[] stateNames = new string[len];
 
@@ -367,7 +367,7 @@ namespace Serpen.Uni.Automat.Finite {
         internal static uint[][] TableFillingAlgEqClasses(Finite.DFA D) {
             var tf = TableFillingAlg(D);
             bool[] qAlready = new bool[tf.GetLength(0)]; //state already added
-            var eqClasses = new System.Collections.Generic.List<uint[]>();
+            var eqClasses = new System.Collections.Generic.List<uint[]>((int)D.StatesCount);
             var State2eqClass = new uint?[D.States.Length];
 
             //iterate table and process false(/double) values

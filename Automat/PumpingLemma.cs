@@ -69,7 +69,7 @@ namespace Serpen.Uni.Automat {
         }
 
         static string[][] StringParts3(string w) {
-            var words = new System.Collections.Generic.List<string[]>();
+            var words = new System.Collections.Generic.List<string[]>(w.Length*w.Length);
             for (int i = 0; i <= w.Length; i++) {
                 for (int j = i; j <= w.Length; j++) {
                     string[] parts = new string[3];
@@ -83,7 +83,7 @@ namespace Serpen.Uni.Automat {
         }
 
         static string[][] StringParts5(string w) {
-            var words = new System.Collections.Generic.List<string[]>();
+            var words = new System.Collections.Generic.List<string[]>(w.Length*w.Length);
             for (int i = 0; i <= w.Length; i++) {
                 for (int j = i; j <= w.Length; j++) {
                     for (int k = j; k <= w.Length; k++) {

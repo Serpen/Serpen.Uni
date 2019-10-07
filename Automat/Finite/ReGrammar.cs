@@ -21,8 +21,6 @@ namespace Serpen.Uni.Automat {
 
         public RuleSet Rules { get; }
 
-        // char[] IAcceptWord.Alphabet => Terminals;
-
         public char StartSymbol { get; }
 
         char[] IAcceptWord.Alphabet => Terminals;
@@ -43,6 +41,8 @@ namespace Serpen.Uni.Automat {
 
             int i = 0;
 
+            words.Add("");
+
             while (words.Count < count) {
                 string w = "";
                 var wLen = rnd.Next(minLen, maxLen);
@@ -51,21 +51,22 @@ namespace Serpen.Uni.Automat {
 
                 if (!words.Contains(w))
                     words.Add(w);
-                
-                if (i > count*10) {
+
+                if (i > count * 10) {
                     Utils.DebugMessage($"Unable to get enough random words {i} tries>{words.Count}>{count}", null, Utils.eDebugLogLevel.Verbose);
                     break;
                 }
                 i++;
 
             }
+
             var wordArray = new string[words.Count];
             words.CopyTo(wordArray, 0);
             return wordArray;
 
         }
 
-        protected List<char> VarAndTerm;
+        protected readonly List<char> VarAndTerm;
 
         protected virtual void CheckConstraints() {
             if (this.Variables.Intersect(this.Terminals).Any()) {
@@ -84,7 +85,7 @@ namespace Serpen.Uni.Automat {
 
 
         protected char[] GetGeneratingAndReachableSymbols() {
-            var list = new List<char>();
+            var list = new List<char>(Terminals.Length);
             foreach (char t in Terminals)
                 list.Add(t);
 
@@ -130,7 +131,7 @@ namespace Serpen.Uni.Automat {
 
             foreach (var r in Rules) {
                 if (usedSymbols.Contains(r.Key)) {
-                    var newVals = new List<string>();
+                    var newVals = new List<string>(r.Value.Length);
                     foreach (string body in r.Value) {
                         bool dontAdd = false;
                         if (body == r.Key.ToString())
@@ -185,20 +186,23 @@ namespace Serpen.Uni.Automat.Finite {
             var acceptable = new List<uint>();
 
             foreach (var r in grammar.Rules) {
-                uint rKeyIndex = (uint)System.Array.IndexOf(grammar.Variables, r.Key);
+                uint rKeyIndex = Utils.ArrayIndex(grammar.Variables, r.Key);
                 foreach (string body in r.Value) {
                     if (body.Length == 2)
-                        t.Add((uint)rKeyIndex, body[0], (uint)System.Array.IndexOf(grammar.Variables, body[1]));
+                        t.Add((uint)rKeyIndex, body[0], Utils.ArrayIndex(grammar.Variables, body[1]));
                     else if (body == "") {
-                        t.Add(rKeyIndex, null, (uint)System.Array.IndexOf(grammar.Variables, body[1]));
+                        t.Add(rKeyIndex, null, Utils.ArrayIndex(grammar.Variables, body[1]));
                         acceptable.Add(rKeyIndex);
-                    }
-                    else
+                    } else
                         throw new System.ArgumentException();
                 }
             }
 
-            return new NFAe($"{grammar.Name}-Grammar", (from g in grammar.Variables select g.ToString()).ToArray(), grammar.Terminals, t, (uint)System.Array.IndexOf(grammar.Variables, grammar.StartSymbol), acceptable.ToArray());
+            return new NFAe($"{grammar.Name}-Grammar",
+                (from g in grammar.Variables select g.ToString()).ToArray(),
+                grammar.Terminals, t,
+                Utils.ArrayIndex(grammar.Variables, grammar.StartSymbol),
+                acceptable.ToArray());
         }
 
         public static explicit operator ReGrammer(NFAe A) {
@@ -206,14 +210,13 @@ namespace Serpen.Uni.Automat.Finite {
 
             var stateChars = new char[A.States.Length];
             for (int i = 0; i < stateChars.Length; i++)
-                stateChars[i] = (char)(((int)'A')+i);
-            
+                stateChars[i] = (char)(((int)'A') + i);
+
             foreach (var eat in A.Transforms) {
                 char fromChar = stateChars[eat.Key.q];
-                var newVals = new List<string>();
-                for (int i = 0; i < eat.Value.Length; i++)
-                {
-                    char toChar = stateChars[eat.Value[i]];
+                var newVals = new List<string>(eat.Value.Length);
+                foreach (var eatval in eat.Value) {
+                    char toChar = stateChars[eatval];
                     newVals.Add($"{eat.Key.c}{toChar}");
                 }
                 if (A.IsAcceptedState(eat.Key.q))
@@ -232,8 +235,9 @@ namespace Serpen.Uni.Automat.Finite {
                 foreach (string body in r.Value) {
                     if (body.Length > 2)
                         throw new GrammerException($"body {body} longer than 2");
-                    else if (body.Length == 0) { } 
-                    else if (body.Length == 1) {
+                    else if (body.Length == 0) {
+                        // ok
+                    } else if (body.Length == 1) {
                         if (Variables.Contains(body[0]))
                             throw new GrammerException($"only body {body} is Var");
                     } else {

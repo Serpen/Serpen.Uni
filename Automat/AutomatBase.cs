@@ -6,7 +6,6 @@ namespace Serpen.Uni.Automat {
         string Name { get; }
         bool AcceptWord(string w);
 
-        string GetRandomWord();
         string[] GetRandomWords(int count, int minLen, int maxLen);
         char[] Alphabet { get; }
 
@@ -126,7 +125,7 @@ namespace Serpen.Uni.Automat {
             for (int i = 0; i < translate.Length; i++)
                 names[i] = translate[i].ToString();
 
-            var astates = new System.Collections.Generic.List<uint>();
+            var astates = new System.Collections.Generic.List<uint>(AcceptedStates.Length);
             foreach (var accept in AcceptedStates)
                 if (translate.Contains(accept))
                     astates.Add(Utils.ArrayIndex(translate, accept));
@@ -153,16 +152,6 @@ namespace Serpen.Uni.Automat {
         public abstract VisualizationTuple[] VisualizationLines();
 
         public abstract override string ToString();
-
-        public string GetRandomWord() {
-            var rnd = Utils.RND;
-            var wLen = rnd.Next(0, 10);
-            string w = "";
-            for (int k = 0; k < wLen; k++)
-                w = w.Insert(k, Alphabet[rnd.Next(0, Alphabet.Length)].ToString());
-
-            return w;
-        }
 
         public string[] GetRandomWords(int count, int minLen, int maxLen) {
             var words = new System.Collections.Specialized.StringCollection();
@@ -199,7 +188,7 @@ namespace Serpen.Uni.Automat {
 }
 
 namespace Serpen.Uni.Automat.Finite {
-    public interface INFA : IAutomat {
+    public interface INFA : IAutomat, IAlleAbgeschlossenheitseigenschaften {
         uint[] GoChar(uint[] q, char w);
     }
 }

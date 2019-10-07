@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Serpen.Uni.Automat.ContextFree {
 
-    public interface IPDA : IReverse { 
+    public interface IPDA : IAutomat, IReverse { 
         char[] WorkAlphabet {get;}
         char StartSymbol {get;}
 
@@ -80,7 +80,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         //nondeterministic makes it grow exponetially, maybe it is best, to do a BFS instead of DFS, follow one path to its possible end
         public PDAConfig[] GoChar(PDAConfig[] pcfgs) {
-            var retCfgs = new List<PDAConfig>();
+            var retCfgs = new List<PDAConfig>(1000);
 
             if (pcfgs.Length > MAX_RUNS_OR_STACK) {
                 Utils.DebugMessage($"Stack >= {pcfgs.Length} abort", this, Utils.eDebugLogLevel.Always);
@@ -170,7 +170,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         public abstract override bool AcceptWord(string w);
 
         public override VisualizationTuple[] VisualizationLines() {
-            var tcol = new System.Collections.Generic.List<VisualizationTuple>();
+            var tcol = new System.Collections.Generic.List<VisualizationTuple>(Transforms.Count);
             foreach (var t in Transforms) {
                 foreach (var v in t.Value) {
                     string desc = $"{(t.Key.ci.HasValue ? t.Key.ci.Value : Utils.EPSILON)}|{(t.Key.cw.HasValue ? t.Key.cw.Value : Utils.EPSILON)}->{(!string.IsNullOrEmpty(v.cw2) ? v.cw2 : Utils.EPSILON.ToString())}";
@@ -276,7 +276,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         }
 
-        public virtual IAutomat Reverse() {
+        public IAutomat Reverse() {
             var pdat = new PDATransform();
 
             string[] names = new string[this.StatesCount + 1];

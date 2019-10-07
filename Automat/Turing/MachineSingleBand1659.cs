@@ -107,7 +107,7 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         public override VisualizationTuple[] VisualizationLines() {
-            var tcol = new System.Collections.Generic.List<VisualizationTuple>();
+            var tcol = new System.Collections.Generic.List<VisualizationTuple>(Transforms.Count);
             foreach (var t in Transforms) {
                 var vt = new VisualizationTuple(t.Key.q, t.Value.qNext,
                  $"{t.Key.c}|{t.Value.c2} {t.Value.Direction}");

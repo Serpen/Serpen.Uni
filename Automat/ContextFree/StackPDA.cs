@@ -137,7 +137,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         [AlgorithmSource("1659_L3.1_P76")]
         public static explicit operator StackPDA(ContextFree.CFGrammer cfg) {
             var t = new ContextFree.PDATransform();
-            var sn = new System.Collections.Generic.Dictionary<uint, string>();
+            var names = new System.Collections.Generic.Dictionary<uint, string>();
 
             const uint qSim = 1;
             uint q = qSim + 1;
@@ -145,29 +145,29 @@ namespace Serpen.Uni.Automat.ContextFree {
             // t.Add(0,null, null, ContextFree.PDA.START.ToString(), 1);
             // sn.Add(0, "0");
             t.Add(0, null, null, cfg.StartSymbol.ToString(), qSim);
-            sn.Add(0, "start");
+            names.Add(0, "start");
 
             foreach (char c in cfg.Terminals) {
                 t.Add(qSim, c, c, null, qSim);
             }
             t.Add(qSim, null, ContextFree.PDA.START, null, qSim);
-            sn.Add(qSim, "sim");
+            names.Add(qSim, "sim");
 
             foreach (var r in cfg.Rules) {
                 foreach (string body in r.Value) {
                     if (body.Length > 2) {
                         t.AddM(qSim, null, r.Key, body.Substring(body.Length - 1, 1), q);
-                        sn.TryAdd(q, $"{q}; {r.Key}=>{body}");
+                        names.TryAdd(q, $"{q}; {r.Key}=>{body}");
                         for (int i = body.Length - 2; i > 0; i--) {
                             t.AddM(q, null, null, body.Substring(i, 1), ++q);
-                            sn.TryAdd(q, $"{q}; {r.Key}=>{body}");
+                            names.TryAdd(q, $"{q}; {r.Key}=>{body}");
                         }
                         t.AddM(q, null, null, body.Substring(0, 1), qSim);
                         q++;
                     } else if (body.Length == 2) {
                         t.AddM(qSim, null, r.Key, body.Substring(1, 1), q);
                         t.AddM(q, null, null, body.Substring(0, 1), qSim);
-                        sn.TryAdd(q, $"{q}; {r.Key}=>{body}");
+                        names.TryAdd(q, $"{q}; {r.Key}=>{body}");
                         q++;
 
                     } else {
@@ -176,15 +176,9 @@ namespace Serpen.Uni.Automat.ContextFree {
                 }
             }
 
-            var WorkAlphabet = new System.Collections.Generic.List<char>();
-            WorkAlphabet.AddRange(cfg.Terminals);
-            WorkAlphabet.AddRange(cfg.Variables);
-            // WorkAlphabet.Add(ContextFree.PDA.START);
+            char[] WorkAlphabet = cfg.Terminals.Union(cfg.Variables).ToArray(); //.Append(START)
 
-            var spda = new ContextFree.StackPDA($"SPDA_({cfg.Name})", q, cfg.Terminals, WorkAlphabet.ToArray(), t, 0, ContextFree.PDA.START);
-            for (uint i = 0; i < spda.StatesCount; i++) {
-                spda.States[i] = sn[i];
-            }
+            var spda = new ContextFree.StackPDA($"SPDA_({cfg.Name})", names.Values.ToArray(), cfg.Terminals, WorkAlphabet, t, 0, START);
             return spda;
         }
     }

@@ -3,9 +3,7 @@ using System.Collections.Generic;
 
 namespace Serpen.Uni.Automat.Finite {
 
-    public class NFA : FABase, INFA, IAlleAbgeschlossenheitseigenschaften {
-
-        public static readonly NFA Empty = new NFA("Empty", 0, new char[] { }, new NFAeTransform(), 0, new uint[] { });
+    public class NFA : FABase, INFA {
 
         public NFA(string name, uint StateCount, char[] Alphabet, NFAeTransform Transform, uint StartState, params uint[] acceptedStates)
             : base(StateCount, Alphabet, Transform, StartState, acceptedStates, name) {
@@ -106,7 +104,7 @@ namespace Serpen.Uni.Automat.Finite {
 
         public override IAutomat HomomorphismChar(Dictionary<char, char> translate) {
             var neat = new NFAeTransform();
-            var Alp = (char[])this.Alphabet.Clone();
+            char[] Alp = this.Alphabet.Clone() as char[];
 
             foreach (var dt in this.Transforms)
                 if (translate.ContainsKey(dt.Key.c.Value))
