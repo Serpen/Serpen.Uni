@@ -221,7 +221,7 @@ namespace Serpen.Uni.Automat {
                         if (Utils.SameAlphabet(a1, a2))
                             try {
                                 ret.Add(a1.Diff(a2));
-                            } catch (System.NotImplementedException niex) { }
+                            } catch (System.NotImplementedException) { }
 
             return ret.ToArray();
         }
@@ -236,7 +236,7 @@ namespace Serpen.Uni.Automat {
                         if (Utils.SameAlphabet(a1, a2))
                             try {
                                 ret.Add(a1.Union(a2));
-                            } catch (System.NotImplementedException niex) { }
+                            } catch (System.NotImplementedException) { }
 
 
             return ret.ToArray();
@@ -253,7 +253,7 @@ namespace Serpen.Uni.Automat {
                         if (Utils.SameAlphabet(a1, a2))
                             try {
                                 ret.Add(a1.Intersect(a2));
-                            } catch (System.NotImplementedException niex) { }
+                            } catch (System.NotImplementedException) { }
 
             return ret.ToArray();
         }
@@ -288,15 +288,10 @@ namespace Serpen.Uni.Automat {
             return ret.ToArray();
         }
 
-        public static void TestDoubleReversesByWord(IAutomat[] automats) {
+        public static void TestDoubleReversesByWord(IReverse[] automats) {
             foreach (var a in automats) {
-                if (a is FABase fa1) {
-                    var fa2 = ((FABase)fa1.Reverse()).Reverse();
-                    TestEqualWithWords(fa1, fa2, 200);
-                } else if (a is PDA pda) {
-                    var pdaR = ((PDA)(pda.Reverse())).Reverse();
-                    TestEqualWithWords(pda, pdaR, 200);
-                }
+                var a2 = ((IReverse)a.Reverse()).Reverse();
+                TestEqualWithWords(a, a2, 200);
             }
         }
 
@@ -304,9 +299,13 @@ namespace Serpen.Uni.Automat {
             var automats = KnownAutomat.GetTypes<IConcat>();
             var ret = new List<IAutomat>(automats.Count * automats.Count);
 
-            foreach (var fa1 in automats)
-                foreach (var fa2 in automats)
-                    ret.Add(fa1.Concat((IAutomat)fa2));
+            foreach (var a1 in automats)
+                foreach (var a2 in automats)
+                    try {
+                        ret.Add(a1.Concat(a2));
+                    } 
+                    catch (System.NotSupportedException) {}
+                    catch (System.NotImplementedException) {}
             return ret.ToArray();
         }
 

@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Serpen.Uni.Automat.Finite {
 
-    public abstract class FABase : AutomatBase<EATuple, uint[]> {
+    public abstract class FABase : AutomatBase<EATuple, uint[]>, IAlleAbgeschlossenheitseigenschaften {
 
         public FABase(uint stateCount, char[] alphabet, TransformBase<EATuple, uint[]> eat, uint startState, uint[] acceptedStates, string name = "")
         : base(stateCount, alphabet, startState, name, acceptedStates) {
@@ -50,7 +50,7 @@ namespace Serpen.Uni.Automat.Finite {
         }
 
 
-        public IAutomat Concat(IAutomat automat) {
+        public IAutomat Concat(IConcat automat) {
             var A = automat as FABase;
             if (A == null)
                 throw new System.NotSupportedException();
@@ -118,6 +118,10 @@ namespace Serpen.Uni.Automat.Finite {
 
             return new NFAe($"NFAe_Union({Name}+{fa.Name})", this.StatesCount + fa.StatesCount + 1, nAlphabet, neat, 0, accStates);
         }
+
+        public abstract IAutomat Union(IUnion a);
+        public abstract IAutomat Intersect(IIntersect a);
+        public abstract IAutomat Diff(IDiff a);
 
         public FABase ProductEA(FABase A, DFA.eProductDeaMode mode) {
             uint len = (this.StatesCount * A.StatesCount);
@@ -238,7 +242,7 @@ namespace Serpen.Uni.Automat.Finite {
 
         public abstract IAutomat HomomorphismChar(System.Collections.Generic.Dictionary<char, char> Translate);
 
-        public abstract IAutomat Join(IAutomat A);
+        public abstract IAutomat Join(IJoin A);
 
         public abstract override bool Equals(object obj);
         public abstract override string ToString();

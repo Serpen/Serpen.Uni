@@ -178,7 +178,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         #region "Operations"
 
-        public IAutomat Union(IAutomat automat) {
+        public IAutomat Union(IUnion automat) {
 
             var pda = automat as PDA;
             if (pda == null)
@@ -222,7 +222,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                 throw new System.NotImplementedException();
         }
 
-        public IAutomat Concat(IAutomat automat) {
+        public IAutomat Concat(IConcat automat) {
 
             var pda = automat as PDA;
             if (pda == null)

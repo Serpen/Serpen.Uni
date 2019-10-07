@@ -121,7 +121,7 @@ namespace Serpen.Uni.Automat.Finite {
 
             return new NFA($"NFA_HomomorphismChar({Name})", StatesCount, Alp, neat, StartState, AcceptedStates);
         }
-        public override IAutomat Join(IAutomat A) {
+        public override IAutomat Join(IJoin A) {
             var N2 = A as NFA;
 
             if (N2 is null)
@@ -150,9 +150,9 @@ namespace Serpen.Uni.Automat.Finite {
                 return new NFA($"Join({Name}+{N2.Name})", (N2.StatesCount + sc), this.Alphabet, neat, this.StartState, accStates.ToArray());
             }
         }
-        public IAutomat Union(IAutomat A) => throw new System.NotImplementedException();
-        public IAutomat Intersect(IAutomat A) => throw new System.NotImplementedException();
-        public IAutomat Diff(IAutomat A) => throw new System.NotImplementedException();
+        public override IAutomat Union(IUnion A) => throw new System.NotImplementedException();
+        public override IAutomat Intersect(IIntersect A) => throw new System.NotImplementedException();
+        public override IAutomat Diff(IDiff A) => throw new System.NotImplementedException();
 
         #endregion
 

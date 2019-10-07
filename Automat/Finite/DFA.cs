@@ -146,7 +146,7 @@ namespace Serpen.Uni.Automat.Finite {
             return new DFA($"DFA_HomomorphismChar({Name})", this.StatesCount, Alp, deat, this.StartState, this.AcceptedStates);
         }
 
-        public override IAutomat Join(IAutomat A) {
+        public override IAutomat Join(IJoin A) {
             var D2 = A as DFA;
 
             if (D2 != null) {
@@ -175,9 +175,9 @@ namespace Serpen.Uni.Automat.Finite {
                 throw new NotSupportedException();
         }
 
-        public IAutomat Union(IAutomat A) => UnionProduct(this, (DFA)A);
-        public IAutomat Intersect(IAutomat A) => Intersect(this, (DFA)A);
-        public IAutomat Diff(IAutomat A) => Diff(this, (DFA)A);
+        public override IAutomat Union(IUnion A) => UnionProduct(this, (DFA)A);
+        public override IAutomat Intersect(IIntersect A) => Intersect(this, (DFA)A);
+        public override IAutomat Diff(IDiff A) => Diff(this, (DFA)A);
 
         public static DFA UnionProduct(DFA D1, DFA D2)
             => ProductDea(D1, D2, eProductDeaMode.Union);
