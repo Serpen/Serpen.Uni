@@ -189,8 +189,9 @@ namespace Serpen.Uni.Automat {
                 i++;
 
             }
-            var wordArray = new string[words.Count];
-            words.CopyTo(wordArray, 0);
+            var wordArray = new string[words.Count+1];
+            wordArray[0] = "";
+            words.CopyTo(wordArray, 1);
             return wordArray;
 
         }

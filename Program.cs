@@ -132,7 +132,7 @@ namespace Serpen.Uni {
             var eqAutomats = Tests.CastToEveryPossibility(KnownAutomat.GetAllAutomats());
             foreach (var a in eqAutomats) {
                 if (a.Length > 0) {
-                    foreach (string w in a[0].GetRandomWords(20, 0, 20)) {
+                    foreach (string w in a[0].GetRandomWords(20, 1, 20)) {
                         bool result0 = a[0].AcceptWord(w);
                         foreach (var a2 in a) {
                             if (a2.AcceptWord(w) != result0) {

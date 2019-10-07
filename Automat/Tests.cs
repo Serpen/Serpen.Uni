@@ -217,7 +217,7 @@ namespace Serpen.Uni.Automat {
             foreach (IAutomat a in automats) {
                 if (a is NFA nfa) {
                     var nfa_removed = nfa.PurgeStates();
-                    string[] rwords = nfa.GetRandomWords(words, 0, words);
+                    string[] rwords = nfa.GetRandomWords(words, 1, words);
                     for (int i = 0; i < rwords.Length; i++) {
                         if (!nfa.AcceptWord(rwords[i]) == nfa_removed.AcceptWord(rwords[i]))
                             throw new Uni.Exception($"Automats {nfa} not equal {nfa_removed} by word");
@@ -360,7 +360,7 @@ namespace Serpen.Uni.Automat {
 
             int count = 0;
             while ((onceTrue < passLevel | onceFalse < passLevel) && count < initialCount * 2) {
-                string[] words = A1.GetRandomWords(initialCount / 2, 0, initialCount / 2);
+                string[] words = A1.GetRandomWords(initialCount / 2, 1, initialCount / 2);
                 foreach (string w in words) {
                     try {
                         var erg1 = A1.AcceptWord(w);
