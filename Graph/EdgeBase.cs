@@ -7,13 +7,10 @@ namespace Serpen.Uni.Graph {
 
         public int Count => dic.Count;
 
-        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() {
-            return dic.GetEnumerator();
-        }
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() => dic.GetEnumerator();
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
-            return dic.GetEnumerator();
-        }
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => dic.GetEnumerator();
+
         public void Add(TKey key, TValue value) => dic.Add(key, value);
 
         public bool TryAdd(TKey key, TValue value) => dic.TryAdd(key, value);

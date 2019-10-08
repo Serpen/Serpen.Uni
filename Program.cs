@@ -4,9 +4,7 @@
 
 namespace Serpen.Uni {
     static class Program {
-        static void Main(string[] args) {
-
-            System.Console.WriteLine(Tests.CastingEquality());
+        static void Main() {
 
             var cas = Tests.CastToEveryPossibility(KnownAutomat.GetAllAutomats());
             foreach (var ca in cas) {

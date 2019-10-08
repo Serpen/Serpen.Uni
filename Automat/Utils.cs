@@ -39,12 +39,14 @@ namespace Serpen.Uni.Automat {
         public enum eDebugLogLevel { Always, Normal, Verbose }
 
         internal static void DebugMessage(string message, IAcceptWord a, eDebugLogLevel level) {
-            if (DebugLogLevel >= level) {
-                var stack = new System.Diagnostics.StackTrace();
-                System.Diagnostics.Debug.WriteLine("DBG: " +
-                    stack.GetFrame(1).GetMethod().DeclaringType.Name + "." +
-                    stack.GetFrame(1).GetMethod().Name +
-                    ":" + stack.GetFrame(1).GetILOffset() + " " +
+            if (DebugLogLevel >= level && System.Diagnostics.Debugger.IsAttached) {
+                var stack = new System.Diagnostics.StackTrace(true);
+                var sframe = stack.GetFrame(1);
+                var smethod = sframe.GetMethod();
+                System.Diagnostics.Debug.WriteLine(
+                    smethod.DeclaringType.Name + "." +
+                    smethod.Name +
+                    ":" + sframe.GetFileLineNumber() + " " +
                     (a != null ? "[" + a.Name + "] " : " ") +
                     message);
             }

@@ -3,7 +3,9 @@ Release
 bin
 obj
 .vscode
+.vs
 omnisharp.json
+*.csproj.user
 
 # Windows image file caches
 Thumbs.db
