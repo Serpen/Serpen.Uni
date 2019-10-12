@@ -6,7 +6,7 @@ namespace Serpen.Uni.Automat {
     public static partial class KnownAutomat {
         public static DFA DEA_Contains01 {
             get {
-                var deaT = new FATransform();
+                var deaT = new DFATransform();
                 deaT.AddBinTuple(0, 1, 0);
                 deaT.AddBinTuple(1, 1, 2);
                 deaT.AddBinTuple(2, 2, 2);
@@ -16,7 +16,7 @@ namespace Serpen.Uni.Automat {
         }
         public static DFA DEA_StartOrEndsWith01 {
             get {
-                var deaT = new FATransform();
+                var deaT = new DFATransform();
                 deaT.AddBinTuple(0, 1, 3);
                 deaT.AddBinTuple(1, 4, 2);
                 deaT.AddBinTuple(2, 2, 2);
@@ -29,7 +29,7 @@ namespace Serpen.Uni.Automat {
         }
         public static DFA DEA_SameCount0And1 {
             get {
-                var deaT = new FATransform();
+                var deaT = new DFATransform();
                 deaT.AddBinTuple(0, 1, 2);
                 deaT.AddBinTuple(1, 0, 3);
                 deaT.AddBinTuple(2, 3, 0);
@@ -44,7 +44,7 @@ namespace Serpen.Uni.Automat {
         }
         public static DFA DEA_1659_M1_A22_0even {
             get {
-                var deat = new FATransform();
+                var deat = new DFATransform();
                 deat.AddBinTuple(0, 1, 0);
                 deat.AddBinTuple(1, 0, 1);
                 Func<string, bool> SimplyfieldAcceptFunction = s => s.Count(c => c == '0') % 2 == 0;
@@ -54,7 +54,7 @@ namespace Serpen.Uni.Automat {
 
         public static DFA DEA_1659_M2_A24_01 {
             get {
-                var deat = new FATransform();
+                var deat = new DFATransform();
                 deat.AddBinTuple(0, 1, 0);
                 deat.AddBinTuple(1, 1, 2);
                 deat.AddBinTuple(2, 2, 2);
@@ -63,7 +63,7 @@ namespace Serpen.Uni.Automat {
         }
         public static DFA DEA_1659_A223_B29_RegExp {
             get {
-                var deaT = new FATransform();
+                var deaT = new DFATransform();
                 deaT.Add(0, 'b', 0);
                 deaT.Add(0, 'a', 1);
                 deaT.Add(0, 'c', 1);
@@ -75,7 +75,7 @@ namespace Serpen.Uni.Automat {
         }
         public static DFA DEA_1659_T27_A224 {
             get {
-                var deaT = new FATransform();
+                var deaT = new DFATransform();
                 deaT.AddBinTuple(0, 1, 2);
                 deaT.AddBinTuple(1, 2, 1);
                 deaT.AddBinTuple(2, 2, 2);
@@ -84,7 +84,7 @@ namespace Serpen.Uni.Automat {
         }
         public static DFA DEA_1659_M3_A25_c {
             get {
-                var deaT = new FATransform();
+                var deaT = new DFATransform();
                 deaT.Add(0, 'c', 1);
                 deaT.Add(1, 'c', 2);
                 deaT.Add(2, 'c', 3);
@@ -95,7 +95,7 @@ namespace Serpen.Uni.Automat {
         }
         public static DFA DEA_1659_T21_AE {
             get {
-                var deaT = new FATransform();
+                var deaT = new DFATransform();
                 deaT.AddBinTuple(0, 1, 3);
                 deaT.AddBinTuple(1, 1, 2);
                 deaT.AddBinTuple(2, 1, 2);
@@ -106,7 +106,7 @@ namespace Serpen.Uni.Automat {
         }
         public static DFA DEA_1659_A26_Tree {
             get {
-                var deaT = new FATransform();
+                var deaT = new DFATransform();
                 deaT.AddBinTuple(0, 1, 2);
                 deaT.AddBinTuple(1, 3, 4);
                 deaT.AddBinTuple(2, 5, 6);
@@ -120,7 +120,7 @@ namespace Serpen.Uni.Automat {
         }
         public static DFA DEA_1659_A213_M1_a {
             get {
-                var deaT = new FATransform();
+                var deaT = new DFATransform();
                 deaT.Add(0, 'a', 1);
                 deaT.Add(1, 'a', 2);
                 deaT.Add(2, 'a', 3);
@@ -132,7 +132,7 @@ namespace Serpen.Uni.Automat {
         }
         public static DFA DEA_1659_A213_M1_b {
             get {
-                var deaT = new FATransform();
+                var deaT = new DFATransform();
                 deaT.Add(0, 'a', 1);
                 deaT.Add(1, 'a', 2);
                 deaT.Add(2, 'a', 0);
@@ -141,7 +141,7 @@ namespace Serpen.Uni.Automat {
         }
         public static DFA DEA_A21_B25_MN {
             get {
-                var deaT = new FATransform();
+                var deaT = new DFATransform();
                 deaT.AddBinTuple(0,1,0);
                 deaT.AddBinTuple(1,2,0);
                 deaT.AddBinTuple(2,2,0);
@@ -150,7 +150,7 @@ namespace Serpen.Uni.Automat {
         }
         public static DFA DEA_1659_A215_M3_TF {
             get {
-                var deaT = new FATransform();
+                var deaT = new DFATransform();
                 deaT.AddBinTuple(0, 1, 2);
                 deaT.AddBinTuple(1, 3, 2);
                 deaT.AddBinTuple(2, 4, 0);
@@ -161,7 +161,7 @@ namespace Serpen.Uni.Automat {
         }
         public static DFA DEA_1659_A225_M4_pump_bba {
             get {
-                var deaT = new FATransform();
+                var deaT = new DFATransform();
                 deaT.AddBinTuple(0, 0, 1);
                 deaT.AddBinTuple(1, 0, 2);
                 deaT.AddBinTuple(2, 3, 2);
@@ -171,7 +171,7 @@ namespace Serpen.Uni.Automat {
         }
         public static DFA DEA_1659_A227_T21 {
             get {
-                var deaT = new FATransform();
+                var deaT = new DFATransform();
                 deaT.AddBinTuple(0, 1, 3);
                 deaT.AddBinTuple(1, 1, 2);
                 deaT.AddBinTuple(2, 1, 2);
@@ -186,7 +186,7 @@ namespace Serpen.Uni.Automat {
         }
         public static DFA DEA_1659_A228_T22 {
             get {
-                var deaT = new FATransform();
+                var deaT = new DFATransform();
                 deaT.Add(0, '0', 5);
                 deaT.Add(0, '1', 1);
                 deaT.Add(1, '0', 2);
@@ -216,7 +216,7 @@ namespace Serpen.Uni.Automat {
         }
         public static DFA DEA_1659_A217_TF {
             get {
-                var deat = new FATransform();
+                var deat = new DFATransform();
                 deat.AddBinTuple(0, 3, 2);
                 deat.AddBinTuple(1, 0, 2);
                 deat.AddBinTuple(2, 3, 3);
@@ -228,7 +228,7 @@ namespace Serpen.Uni.Automat {
         }
         public static DFA DEA_EAFK_A48_max {
             get {
-                var deat = new FATransform();
+                var deat = new DFATransform();
                 deat.AddBinTuple(0, 1, 5);
                 deat.AddBinTuple(1, 6, 2);
                 deat.AddBinTuple(2, 0, 2);
@@ -242,7 +242,7 @@ namespace Serpen.Uni.Automat {
         }
         public static DFA DEA_EAFK_A410_a {
             get {
-                var deata = new FATransform();
+                var deata = new DFATransform();
                 deata.AddBinTuple(0, 0, 1);
                 deata.AddBinTuple(1, 0, 1);
                 return new DFA(nameof(DEA_EAFK_A410_a), 2, binAlp, deata, 0, 0);
@@ -250,7 +250,7 @@ namespace Serpen.Uni.Automat {
         }
         public static DFA DEA_EAFK_A410_b {
             get {
-                var deatb = new FATransform();
+                var deatb = new DFATransform();
                 deatb.AddBinTuple(0, 1, 2);
                 deatb.AddBinTuple(1, 1, 2);
                 deatb.AddBinTuple(2, 0, 2);
@@ -370,7 +370,7 @@ namespace Serpen.Uni.Automat {
         }
 
         public static DFA DEA_EndsWithNulls(uint count) {
-            var t = new FATransform();
+            var t = new DFATransform();
             for (uint i = 0; i < count + 1; i++) {
                 t.Add(i, '1', 0);
                 if (i < count)
@@ -385,7 +385,7 @@ namespace Serpen.Uni.Automat {
         }
 
         public static DFA DEA_ContainsOnes(uint count) {
-            var t = new FATransform();
+            var t = new DFATransform();
             for (uint i = 0; i < count + 1; i++) {
                 t.Add(i, '0', i);
                 if (i < count)
@@ -403,7 +403,7 @@ namespace Serpen.Uni.Automat {
             if (zeros == 0 | ones == 0)
                 throw new ArgumentOutOfRangeException();
 
-            var t = new FATransform();
+            var t = new DFATransform();
             for (uint i = 0; i < zeros * ones; i++)
                 if (i < (zeros - 1) * ones)
                     t.Add(i, '0', i + ones);

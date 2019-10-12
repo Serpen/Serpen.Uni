@@ -145,9 +145,7 @@ namespace Serpen.Uni.Automat.Finite {
                 }
             }
 
-            var ret = new NFAe("NFAe_Random", (uint)stateCount, alphabet, t, (uint)rnd.Next(0, stateCount), accState) { Name = $"NFAe_Random_q{stateCount}_a{alphabet.Length}_t{t.Count}_a{accState.Length}" };
-            return ret;
-
+            return new NFAe($"NFAe_Random_Q{stateCount}_T{t.Count}", (uint)stateCount, alphabet, t, (uint)rnd.Next(0, stateCount), accState) { Name = $"NFAe_Random_q{stateCount}_a{alphabet.Length}_t{t.Count}_a{accState.Length}" };
         }
 
         public override IAutomat PurgeStates() {
@@ -161,7 +159,6 @@ namespace Serpen.Uni.Automat.Finite {
                             newT.AddM(Utils.ArrayIndex(translate, t2.Key.q), t2.Key.c, Utils.ArrayIndex(translate, v));
 
             return new NFAe($"{Name}_purged", names, Alphabet, newT, Utils.ArrayIndex(translate, StartState), aStates);
-
         }
 
         #region "Operations"
@@ -234,7 +231,6 @@ namespace Serpen.Uni.Automat.Finite {
         }
 
         public override int GetHashCode() => ToString().GetHashCode();
-
 
         public override string ToString()
             => $"{Name} NEAe(|{StatesCount}|={string.Join(";", States)}, {{{String.Join(',', Alphabet)}}}, {{{Transforms.ToString()}}}, {StartState}, {{{string.Join(',', AcceptedStates)}}})".Trim();

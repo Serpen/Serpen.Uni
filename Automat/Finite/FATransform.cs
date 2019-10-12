@@ -1,20 +1,11 @@
 using System.Linq;
 
 namespace Serpen.Uni.Automat.Finite {
-    public class FATransform : TransformBase<EATuple, uint[]> {
+    public class DFATransform : TransformBase<EATuple, uint[]> {
     
         public void Add(uint q1, char w, uint q2)
             => Add(new EATuple(q1, w), new uint[] {q2});
         
-        internal void AddM(uint q1, char c, uint qNext) {
-            uint[] qBefore;
-            var eat = new EATuple(q1, c);
-            if (TryGetValue(eat, out qBefore)) {
-                Utils.DebugMessage("Corrected Append Strategy??", null, Utils.eDebugLogLevel.Always);
-                this[eat] = qBefore.Append(qNext).ToArray();
-            } else
-                this.Add(eat.q, eat.c.Value, qNext);
-        }
         internal void AddBinTuple(uint q, uint q0, uint q1) {
             this.Add(q,'0', q0);
             this.Add(q,'1', q1);

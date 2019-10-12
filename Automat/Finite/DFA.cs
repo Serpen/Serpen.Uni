@@ -6,11 +6,11 @@ namespace Serpen.Uni.Automat.Finite {
 
     public class DFA : FABase, IAlleAbgeschlossenheitseigenschaften { // IAbgeschlossenheitseigenschaften<FABase, NFAe> {
 
-        public DFA(string name, uint stateCount, char[] alphabet, FATransform transform, uint startState, params uint[] acceptedStates)
+        public DFA(string name, uint stateCount, char[] alphabet, DFATransform transform, uint startState, params uint[] acceptedStates)
             : base(stateCount, alphabet, transform, startState, acceptedStates, name) {
         }
 
-        public DFA(string name, string[] states, char[] alphabet, FATransform transform, uint startState, params uint[] acceptedStates)
+        public DFA(string name, string[] states, char[] alphabet, DFATransform transform, uint startState, params uint[] acceptedStates)
             : base(states, alphabet, transform, startState, acceptedStates, name) {
         }
 
@@ -18,7 +18,7 @@ namespace Serpen.Uni.Automat.Finite {
         protected override uint[] GoChar(uint q, char w) {
 
             uint qNext;
-            if (((FATransform)Transforms).TryGetValue(q, w, out qNext))
+            if (((DFATransform)Transforms).TryGetValue(q, w, out qNext))
                 return new uint[] { qNext };
             else
                 throw new NotImplementedException();
@@ -45,7 +45,7 @@ namespace Serpen.Uni.Automat.Finite {
             //check every state, char
             for (uint q = 0; q < StatesCount; q++)
                 foreach (char c in Alphabet)
-                    if (!((FATransform)Transforms).ContainsKey(q, c))
+                    if (!((DFATransform)Transforms).ContainsKey(q, c))
                         throw new Automat.DeterministicException($"q={q}, c={c} is missing");
 
             foreach (var t in Transforms) {
@@ -66,7 +66,7 @@ namespace Serpen.Uni.Automat.Finite {
                     State2eqClass[tfEqClasses[i][j]] = i;
 
             //generate Transform, and modify to eqclasses
-            var deaT = new FATransform();
+            var deaT = new DFATransform();
             foreach (var item in Transforms) {
                 //q,qnext EqClass
                 uint tSrcEqClass = State2eqClass[item.Key.q];
@@ -130,10 +130,10 @@ namespace Serpen.Uni.Automat.Finite {
             ProductDea(D1, D2, eProductDeaMode.Diff);
 
         public override IAutomat HomomorphismChar(Dictionary<char, char> Translate) {
-            var deat = new FATransform();
+            var deat = new DFATransform();
             var Alp = (char[])this.Alphabet.Clone();
 
-            foreach (var dt in (FATransform)Transforms)
+            foreach (var dt in (DFATransform)Transforms)
                 if (Translate.ContainsKey(dt.Key.c.Value))
                     deat.Add(dt.Key.q, Translate[dt.Key.c.Value], dt.Value[0]);
                 else
@@ -149,30 +149,28 @@ namespace Serpen.Uni.Automat.Finite {
         public override IAutomat Join(IJoin A) {
             var D2 = A as DFA;
 
-            if (D2 != null) {
-                var deat = new FATransform();
-
-                if (!this.SameAlphabet(A)) {
-                    throw new NotImplementedException("Different Alphabets are not implemented");
-                }
-
-                var accStates = new List<uint>(this.AcceptedStates.Length + D2.AcceptedStates.Length);
-                uint sc = this.StatesCount;
-
-                foreach (var t in (FATransform)Transforms)
-                    deat.Add(t.Key.q, t.Key.c.Value, t.Value[0]);
-                foreach (var t in (FATransform)D2.Transforms)
-                    deat.Add(t.Key.q + sc, t.Key.c.Value, t.Value[0] + sc);
-
-                accStates.AddRange(this.AcceptedStates);
-                for (int i = 0; i < D2.AcceptedStates.Length; i++)
-                    accStates.Add(D2.AcceptedStates[i] + sc);
-
-                accStates.Sort();
-
-                return new DFA($"DFA_Join({Name}+{A.Name})", (D2.StatesCount + sc), this.Alphabet, deat, this.StartState, accStates.ToArray());
-            } else
+            if (D2 == null)
                 throw new NotSupportedException();
+            if (!this.SameAlphabet(A))
+                throw new NotImplementedException("Different Alphabets are not implemented");
+
+            var deat = new DFATransform();
+
+            var accStates = new List<uint>(this.AcceptedStates.Length + D2.AcceptedStates.Length);
+            uint sc = this.StatesCount;
+
+            foreach (var t in (DFATransform)Transforms)
+                deat.Add(t.Key.q, t.Key.c.Value, t.Value[0]);
+            foreach (var t in (DFATransform)D2.Transforms)
+                deat.Add(t.Key.q + sc, t.Key.c.Value, t.Value[0] + sc);
+
+            accStates.AddRange(this.AcceptedStates);
+            for (int i = 0; i < D2.AcceptedStates.Length; i++)
+                accStates.Add(D2.AcceptedStates[i] + sc);
+
+            accStates.Sort();
+
+            return new DFA($"DFA_Join({Name}+{A.Name})", (D2.StatesCount + sc), this.Alphabet, deat, this.StartState, accStates.ToArray());
         }
 
         public override IAutomat Union(IUnion A) => UnionProduct(this, (DFA)A);
@@ -193,11 +191,11 @@ namespace Serpen.Uni.Automat.Finite {
             if (!D1.SameAlphabet(D2))
                 throw new NotImplementedException("Different Alphabets are not implemented");
 
-            var accStates = new List<uint>(D1.AcceptedStates.Length+D2.AcceptedStates.Length);
+            var accStates = new List<uint>(D1.AcceptedStates.Length + D2.AcceptedStates.Length);
 
             string[] stateNames = new string[len];
 
-            var deat = new FATransform();
+            var deat = new DFATransform();
 
             //iterate Cross D1xD2, chars
             for (uint i = 0; i < D1.StatesCount; i++) {
@@ -212,8 +210,8 @@ namespace Serpen.Uni.Automat.Finite {
                         //tuple for D1,D2
 
                         //Transform exists, out qNext
-                        bool exist1 = ((FATransform)D1.Transforms).TryGetValue(i, c, out qNext1);
-                        bool exist2 = ((FATransform)D2.Transforms).TryGetValue(j, c, out qNext2);
+                        bool exist1 = ((DFATransform)D1.Transforms).TryGetValue(i, c, out qNext1);
+                        bool exist2 = ((DFATransform)D2.Transforms).TryGetValue(j, c, out qNext2);
 
                         //same calc logic for dstIndex in Matrix
                         uint dstIndex;
@@ -266,11 +264,11 @@ namespace Serpen.Uni.Automat.Finite {
             uint[] accState = RandomGenerator.RandomAcceptedStates(1, stateCount / 3, stateCount);
 
 
-            var t = new FATransform();
+            var t = new DFATransform();
             for (uint i = 0; i < stateCount; i++) {
                 char[] rndAlph = Utils.RandomizeArray(alphabet);
                 for (int j = 0; j < rndAlph.Length; j++)
-                    t.AddM(i, alphabet[j], (uint)rnd.Next(0, stateCount));
+                    t.Add(i, alphabet[j], (uint)rnd.Next(0, stateCount));
             }
 
             var ret = new DFA("DFA_Random", (uint)stateCount, alphabet, t, (uint)rnd.Next(0, stateCount), accState);
@@ -282,19 +280,19 @@ namespace Serpen.Uni.Automat.Finite {
 
             (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
 
-            var newT = new FATransform();
+            var newT = new DFATransform();
             foreach (var t2 in Transforms)
                 if (translate.Contains(t2.Key.q))
                     foreach (var v in t2.Value)
                         if (translate.Contains(v))
-                            newT.AddM(Utils.ArrayIndex(translate, t2.Key.q), t2.Key.c.Value, Utils.ArrayIndex(translate, v));
+                            newT.Add(Utils.ArrayIndex(translate, t2.Key.q), t2.Key.c.Value, Utils.ArrayIndex(translate, v));
 
             return new DFA($"{Name}_purged", names, Alphabet, newT, Utils.ArrayIndex(translate, StartState), aStates);
 
         }
 
 
-        public static readonly DFA Empty = new DFA("DFA_Empty", new String[] { }, new char[] { }, new FATransform(), 0, new uint[] { });
+        public static readonly DFA Empty = new DFA("DFA_Empty", new String[] { }, new char[] { }, new DFATransform(), 0, new uint[] { });
 
         public override bool Equals(object obj1) {
             DFA dobj;
@@ -351,7 +349,7 @@ namespace Serpen.Uni.Automat.Finite {
                             //calculate based on previous iterations
                             //if next states for both x,y has been set to different and not already processed
                             //set current pair to be different, and enable loop
-                            if (t[xNext, yNext] & !t[x, y]) 
+                            if (t[xNext, yNext] & !t[x, y])
                                 t[x, y] = found = true;
                         }
                     }

@@ -27,7 +27,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         public static explicit operator DPDA(Finite.DFA D) {
             var t = new DPDATransform();
-            foreach (var t2 in (Finite.FATransform)D.Transforms)
+            foreach (var t2 in (Finite.DFATransform)D.Transforms)
                 t.Add(t2.Key.q, t2.Key.c, null, null, t2.Value[0]);
             for (int i = 0; i < D.AcceptedStates.Length; i++) {
                 t.Add(D.AcceptedStates[i], null, DPDA.START, null, D.StatesCount);

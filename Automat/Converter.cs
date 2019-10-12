@@ -5,12 +5,12 @@ using RegExText = System.Text.RegularExpressions.Regex;
 namespace Serpen.Uni.Automat.Finite {
     public class Converter {
 
-        [AlgorithmSource("EAFK-2.3.5, EAFK-2.5.5, 1659-D-2.8")]
+        [AlgorithmSource("EAFK-2.3.5", "EAFK-2.5.5","1659-D-2.8")]
         public static Finite.DFA Nea2TeilmengenDea(Finite.INFA N) {
             var States = new List<uint[]>((int)N.StatesCount);
             var DeaStatesNames2Index = new Dictionary<string, uint>((int)N.StatesCount);
             var States2Check = new Queue<uint[]>((int)N.StatesCount);
-            var t = new Finite.FATransform();
+            var t = new Finite.DFATransform();
             var accStates = new List<uint>(N.AcceptedStates.Length); //acceptable States
 
             // Add first state to DFA states, for check and naming
@@ -92,7 +92,7 @@ namespace Serpen.Uni.Automat.Finite {
                             //check if any char loops in this state
                             foreach (char c in D.Alphabet) {
                                 uint qNext;
-                                if (((Finite.FATransform)D.Transforms).TryGetValue(i, c, out qNext) & qNext == j)
+                                if (((Finite.DFATransform)D.Transforms).TryGetValue(i, c, out qNext) & qNext == j)
                                     toAdd.Add(c.ToString());
                             }
                             R[i, j, 0] = string.Join('+', toAdd);
