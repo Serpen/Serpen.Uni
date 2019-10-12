@@ -36,6 +36,8 @@ namespace Serpen.Uni.Automat {
         public string Name { get; protected set; }
         public uint[] AcceptedStates { get; protected set; }
 
+        internal System.Func<string, bool> SimplyfiedAcceptFunction { get; set; }
+
         public AutomatBase(uint stateCount, char[] alphabet, uint startState, string name, uint[] acceptedStates) {
 
             var sortAlp = alphabet.ToList();
@@ -160,7 +162,7 @@ namespace Serpen.Uni.Automat {
             int i = 0;
 
             //count shouldn't be higher than words available with maxLen
-            count = System.Math.Min(count, Alphabet.Length * maxLen);
+            count = System.Math.Min(count, Alphabet.Length * maxLen * maxLen);
 
             while (words.Count < count) {
                 string w = "";
@@ -178,12 +180,24 @@ namespace Serpen.Uni.Automat {
                 i++;
 
             }
-            var wordArray = new string[words.Count+1];
+            var wordArray = new string[words.Count + 1];
             wordArray[0] = "";
             words.CopyTo(wordArray, 1);
-            return wordArray;
+            return wordArray.OrderBy(w => w, new StringLengthComparer()).ToArray();
 
         }
+
+        public class StringLengthComparer : System.Collections.Generic.IComparer<string> {
+            public int Compare(string s1, string s2) {
+
+                if (s1.Length < s2.Length) return -1;
+                else if (s1.Length > s2.Length) return 1;
+                else
+                    return s1.CompareTo(s2);
+            }
+        }
+
+
     }
 }
 

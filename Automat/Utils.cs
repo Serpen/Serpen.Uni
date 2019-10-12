@@ -53,7 +53,7 @@ namespace Serpen.Uni.Automat {
         }
         internal static void AcceptWordConsoleLine(IAcceptWord A, string w) {
             try {
-                System.Console.WriteLine($"{A.Name} accepts '{w}': {A.AcceptWord(w)}");
+                System.Console.WriteLine($"{A.Name} accepts |{w.Length}| '{w}': {A.AcceptWord(w)}");
             } catch (Serpen.Uni.Automat.TuringCycleException e) {
                 System.Console.WriteLine($"{A.Name} {e.Message}");
             } catch (Serpen.Uni.Automat.PDAStackException e) {
