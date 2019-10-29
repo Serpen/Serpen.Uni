@@ -6,7 +6,7 @@ namespace Serpen.Uni.Automat
 {
     internal static class RandomGenerator {
 
-        public static System.Random rnd = Utils.RND;
+        public static System.Random rnd = Uni.Utils.RND;
 
         public static char[] RandomAlphabet(int min, int max) => RandomAlphabet(min, max, new char[] {});
         public static char[] RandomAlphabet(int min, int max, IEnumerable<char> addChar) {

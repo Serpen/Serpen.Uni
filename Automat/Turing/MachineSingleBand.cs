@@ -54,7 +54,7 @@ namespace Serpen.Uni.Automat.Turing {
             uint lastQ = tcfg.State;
 
             while (tcfg != null && (!IsAcceptedState(tcfg.State) || wordConsumed) && (!wordConsumed || tcfg.Band.Replace(BlankSymbol.ToString(), "") != "")) {
-                Utils.DebugMessage(tcfg.ToString(), this, Utils.eDebugLogLevel.Verbose);
+                Uni.Utils.DebugMessage(tcfg.ToString(), this, Uni.Utils.eDebugLogLevel.Verbose);
                 tcfg = GoChar(tcfg);
                 if (tcfg != null)
                     lastQ = tcfg.State;
@@ -115,7 +115,7 @@ namespace Serpen.Uni.Automat.Turing {
             const byte MAX_STATES = 20;
             const byte MAX_CHAR = 7;
 
-            var rnd = Utils.RND;
+            var rnd = Uni.Utils.RND;
 
             int stateCount = rnd.Next(1, MAX_STATES);
 
@@ -127,8 +127,8 @@ namespace Serpen.Uni.Automat.Turing {
             for (uint i = 0; i < stateCount; i++) {
                 int transformsRnd = rnd.Next(0, inputAlphabet.Length);
                 for (uint j = 0; j < transformsRnd; j++) {
-                    var tk = new TuringKey(i, Utils.GrAE(bandAlphabet));
-                    var tv = new TuringVal(j, Utils.GrAE(bandAlphabet), TMDirection.Right);
+                    var tk = new TuringKey(i, bandAlphabet.RndElement());
+                    var tv = new TuringVal(j, bandAlphabet.RndElement(), TMDirection.Right);
                     t.TryAdd(tk, tv);
                 }
             }
@@ -145,12 +145,12 @@ namespace Serpen.Uni.Automat.Turing {
             foreach (var t2 in Transforms)
                 if (translate.Contains(t2.Key.q))
                     if (translate.Contains(t2.Value.qNext)) {
-                        var tk = new TuringKey(Utils.ArrayIndex(translate, t2.Key.q), t2.Key.c);
-                        var tv = new TuringVal(Utils.ArrayIndex(translate, t2.Value.qNext), t2.Value.c2, t2.Value.Direction);
+                        var tk = new TuringKey(translate.ArrayIndex(t2.Key.q), t2.Key.c);
+                        var tv = new TuringVal(translate.ArrayIndex(t2.Value.qNext), t2.Value.c2, t2.Value.Direction);
                         newT.Add(tk, tv);
                     }
 
-            return new TuringMachineSingleBand($"{Name}_purged", (uint)names.Length, Alphabet, BandAlphabet, newT, Utils.ArrayIndex(translate, StartState), BlankSymbol, aStates);
+            return new TuringMachineSingleBand($"{Name}_purged", (uint)names.Length, Alphabet, BandAlphabet, newT, translate.ArrayIndex(StartState), BlankSymbol, aStates);
         }
     }
 }

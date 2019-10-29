@@ -16,13 +16,13 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         public void AddByStateStore(string[] states, string q, char c, string qNext, char c2, TMDirection dir) {
-            base.Add(new TuringKey(Utils.ArrayIndex(states, q), c), new TuringVal(Utils.ArrayIndex(states, qNext), c2, dir));
+            base.Add(new TuringKey(states.ArrayIndex(q), c), new TuringVal(states.ArrayIndex(qNext), c2, dir));
         }
 
         public void AddByStateStoreAndBand(string[] states, string[] band, char[] bandTrans, string q, string c, string qNext, string c2, TMDirection dir) {
             base.Add(
-                new TuringKey(Utils.ArrayIndex(states, q), bandTrans[Utils.ArrayIndex(band, c)]),
-                new TuringVal(Utils.ArrayIndex(states, qNext), bandTrans[Utils.ArrayIndex(band, c2)], dir)
+                new TuringKey(states.ArrayIndex(q), bandTrans[band.ArrayIndex(c)]),
+                new TuringVal(states.ArrayIndex(qNext), bandTrans[band.ArrayIndex(c2)], dir)
             );
         }
 

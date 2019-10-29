@@ -21,7 +21,7 @@ namespace Serpen.Uni.Automat {
                     foreach (string[] strParts in StringParts3(w)) {
 
                         if (!(w.Length >= pumpLaenge)) {
-                            Utils.DebugMessage($"word |w={w}|>={pumpLaenge}", Automat, Utils.eDebugLogLevel.Verbose);
+                            Uni.Utils.DebugMessage($"word |w={w}|>={pumpLaenge}", Automat, Uni.Utils.eDebugLogLevel.Verbose);
                             continue; // throw new PumpingException($"|w|={w.Length}<{pumpLaenge}");
                         }
 
@@ -29,24 +29,24 @@ namespace Serpen.Uni.Automat {
                         string y = strParts[1];
                         string z = strParts[2];
 
-                        Utils.DebugMessage($"word {w}=({x}.{y}.{z})", Automat, Utils.eDebugLogLevel.Verbose);
+                        Uni.Utils.DebugMessage($"word {w}=({x}.{y}.{z})", Automat, Uni.Utils.eDebugLogLevel.Verbose);
                         if (!((x + y).Length <= pumpLaenge)) {
-                            Utils.DebugMessage($"word |x+y={x.Length}+{y.Length}|<={pumpLaenge}", Automat, Utils.eDebugLogLevel.Verbose);
+                            Uni.Utils.DebugMessage($"word |x+y={x.Length}+{y.Length}|<={pumpLaenge}", Automat, Uni.Utils.eDebugLogLevel.Verbose);
                             continue; // throw new PumpingException($"|xy|={(x + y).Length}>{pumpLaenge}");
                         }
                         if (y.Length == 0) {
-                            Utils.DebugMessage($"word |y={y}|=0", Automat, Utils.eDebugLogLevel.Verbose);
+                            Uni.Utils.DebugMessage($"word |y={y}|=0", Automat, Uni.Utils.eDebugLogLevel.Verbose);
                             continue; // throw new PumpingException($"|y|=0, y={Utils.EPSILON}");
                         }
 
 
                         for (int k = 0; k < exponentCount; k++) {
-                            int r = Utils.RND.Next(1, exponentMax);
+                            int r = Uni.Utils.RND.Next(1, exponentMax);
                             string wi = x + string.Concat(System.Linq.Enumerable.Repeat(y, r)) + z;
                             foundAccepted = Automat.AcceptWord(wi);
-                            Utils.DebugMessage($"word {wi}: {foundAccepted}", Automat, Utils.eDebugLogLevel.Verbose);
+                            Uni.Utils.DebugMessage($"word {wi}: {foundAccepted}", Automat, Uni.Utils.eDebugLogLevel.Verbose);
                             if (foundAccepted) {
-                                Utils.DebugMessage($"{w} {pumpLaenge}-pumpbar for {x}.{y}.{z}", Automat, Utils.eDebugLogLevel.Verbose);
+                                Uni.Utils.DebugMessage($"{w} {pumpLaenge}-pumpbar for {x}.{y}.{z}", Automat, Uni.Utils.eDebugLogLevel.Verbose);
                                 allAcceptedWordsPass++;
                             }
                         }
@@ -61,10 +61,10 @@ namespace Serpen.Uni.Automat {
                 return PumpResult.NoAcceptedWordFound;
 
             if (allAcceptedWordsPass > 0) {
-                Utils.DebugMessage($"{pumpLaenge}-pumpbar for |{allAcceptedWordsPass}| words", Automat, Utils.eDebugLogLevel.Verbose);
+                Uni.Utils.DebugMessage($"{pumpLaenge}-pumpbar for |{allAcceptedWordsPass}| words", Automat, Uni.Utils.eDebugLogLevel.Verbose);
                 return PumpResult.Pumpable;
             } else
-                Utils.DebugMessage($"not {pumpLaenge}-pumpbar", Automat, Utils.eDebugLogLevel.Verbose);
+                Uni.Utils.DebugMessage($"not {pumpLaenge}-pumpbar", Automat, Uni.Utils.eDebugLogLevel.Verbose);
             return PumpResult.NotPumpable;
         }
 

@@ -26,7 +26,7 @@ namespace Serpen.Uni.Automat {
         char[] IAcceptWord.Alphabet => Terminals;
 
         public string GetRandomWord() {
-            var rnd = Utils.RND;
+            var rnd = Uni.Utils.RND;
             var wLen = rnd.Next(0, 10);
             string w = "";
             for (int k = 0; k < wLen; k++)
@@ -36,8 +36,8 @@ namespace Serpen.Uni.Automat {
         }
 
         public string[] GetRandomWords(int count, int minLen, int maxLen) {
-            var words = new System.Collections.Specialized.StringCollection();
-            var rnd = Utils.RND;
+            var words = new System.Collections.Generic.List<string>();
+            var rnd = Uni.Utils.RND;
 
             int i = 0;
 
@@ -53,16 +53,14 @@ namespace Serpen.Uni.Automat {
                     words.Add(w);
 
                 if (i > count * 10) {
-                    Utils.DebugMessage($"Unable to get enough random words {i} tries>{words.Count}>{count}", null, Utils.eDebugLogLevel.Verbose);
+                    Uni.Utils.DebugMessage($"Unable to get enough random words {i} tries>{words.Count}>{count}", null, Uni.Utils.eDebugLogLevel.Verbose);
                     break;
                 }
                 i++;
 
             }
 
-            var wordArray = new string[words.Count];
-            words.CopyTo(wordArray, 0);
-            return wordArray;
+            return words.ToArray();
 
         }
 
@@ -74,12 +72,10 @@ namespace Serpen.Uni.Automat {
             }
             foreach (var r in Rules) {
                 if (!Variables.Contains(r.Key)) throw new System.ArgumentOutOfRangeException("head", $"{r.Key} not in vars");
-                foreach (string body in r.Value) {
-                    for (int i = 0; i < body.Length; i++) {
+                foreach (string body in r.Value)
+                    for (int i = 0; i < body.Length; i++)
                         if (!VarAndTerm.Contains(body[i]))
                             throw new System.ArgumentOutOfRangeException("body", $"{body[i]}[{i}] not in Var/Term");
-                    }
-                }
             }
         }
 
@@ -96,10 +92,7 @@ namespace Serpen.Uni.Automat {
                 foreach (var r in Rules) {
                     foreach (string body in r.Value) {
                         if (!list.Contains(r.Key)) {
-                            if (body.Length == 1 && list.Contains(body[0])) {
-                                list.Add(r.Key);
-                                foundNew = true;
-                            } else if (body == "") {
+                            if (body.Length == 1 && list.Contains(body[0]) || body == "") {
                                 list.Add(r.Key);
                                 foundNew = true;
                             } else {
@@ -113,7 +106,6 @@ namespace Serpen.Uni.Automat {
                                     list.Add(r.Key);
                                     foundNew = true;
                                 }
-
                             }
                         } //end if
                     } //next body
@@ -186,12 +178,12 @@ namespace Serpen.Uni.Automat.Finite {
             var acceptable = new List<uint>();
 
             foreach (var r in grammar.Rules) {
-                uint rKeyIndex = Utils.ArrayIndex(grammar.Variables, r.Key);
+                uint rKeyIndex = grammar.Variables.ArrayIndex(r.Key);
                 foreach (string body in r.Value) {
                     if (body.Length == 2)
-                        t.Add((uint)rKeyIndex, body[0], Utils.ArrayIndex(grammar.Variables, body[1]));
+                        t.Add((uint)rKeyIndex, body[0], grammar.Variables.ArrayIndex(body[1]));
                     else if (body == "") {
-                        t.Add(rKeyIndex, null, Utils.ArrayIndex(grammar.Variables, body[1]));
+                        t.Add(rKeyIndex, null, grammar.Variables.ArrayIndex(body[1]));
                         acceptable.Add(rKeyIndex);
                     } else
                         throw new System.ArgumentException();
@@ -201,7 +193,7 @@ namespace Serpen.Uni.Automat.Finite {
             return new NFAe($"{grammar.Name}-Grammar",
                 (from g in grammar.Variables select g.ToString()).ToArray(),
                 grammar.Terminals, t,
-                Utils.ArrayIndex(grammar.Variables, grammar.StartSymbol),
+                grammar.Variables.ArrayIndex(grammar.StartSymbol),
                 acceptable.ToArray());
         }
 

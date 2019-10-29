@@ -81,7 +81,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                 runCount++;
 
                 if (pcfgs.Length > MAX_RUNS_OR_STACK || runCount > MAX_RUNS_OR_STACK) {
-                    Utils.DebugMessage($"{runCount}: Stack >= {pcfgs.Length}, abort", this, Utils.eDebugLogLevel.Always);
+                    Uni.Utils.DebugMessage($"{runCount}: Stack >= {pcfgs.Length}, abort", this, Uni.Utils.eDebugLogLevel.Always);
                     return false;
                 }
             }
@@ -93,7 +93,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             const byte MAX_STATES = 20;
             const byte MAX_CHAR = 7;
 
-            var rnd = Utils.RND;
+            var rnd = Uni.Utils.RND;
 
             var t = new PDATransform();
             int stateCount = rnd.Next(1, MAX_STATES);
@@ -112,7 +112,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             for (uint i = 0; i < stateCount; i++) {
                 int transformsRnd = rnd.Next(0, inputAlphabet.Length);
                 for (int j = 0; j < transformsRnd; j++) {
-                    t.AddM(i, Utils.GrAE(inputAlphabet), Utils.GrAE(workAlphabet), Utils.GrAE(workAlphabet).ToString(), (uint)rnd.Next(0, stateCount));
+                    t.AddM(i, inputAlphabet.RndElement(), workAlphabet.RndElement(), workAlphabet.RndElement().ToString(), (uint)rnd.Next(0, stateCount));
                 }
             }
 
@@ -129,9 +129,9 @@ namespace Serpen.Uni.Automat.ContextFree {
                 if (translate.Contains(t2.Key.q))
                     foreach (var v in t2.Value)
                         if (translate.Contains(v.qNext))
-                            newT.AddM(Utils.ArrayIndex(translate,t2.Key.q), t2.Key.ci, t2.Key.cw, v.cw2, Utils.ArrayIndex(translate,v.qNext));
+                            newT.AddM(translate.ArrayIndex(t2.Key.q), t2.Key.ci, t2.Key.cw, v.cw2, translate.ArrayIndex(v.qNext));
             
-            return new StackPDA($"{Name}_purged", names, Alphabet, WorkAlphabet, newT, Utils.ArrayIndex(translate,StartState), StartSymbol);
+            return new StackPDA($"{Name}_purged", names, Alphabet, WorkAlphabet, newT, translate.ArrayIndex(StartState), StartSymbol);
         }
 
         [AlgorithmSource("1659_L3.1_P76")]
@@ -147,9 +147,9 @@ namespace Serpen.Uni.Automat.ContextFree {
             t.Add(0, null, null, cfg.StartSymbol.ToString(), qSim);
             names.Add(0, "start");
 
-            foreach (char c in cfg.Terminals) {
+            foreach (char c in cfg.Terminals)
                 t.Add(qSim, c, c, null, qSim);
-            }
+            
             t.Add(qSim, null, ContextFree.PDA.START, null, qSim);
             names.Add(qSim, "sim");
 
@@ -170,16 +170,15 @@ namespace Serpen.Uni.Automat.ContextFree {
                         names.TryAdd(q, $"{q}; {r.Key}=>{body}");
                         q++;
 
-                    } else {
+                    } else
                         t.AddM(qSim, null, r.Key, body, qSim);
-                    }
+                    
                 }
             }
 
             char[] WorkAlphabet = cfg.Terminals.Union(cfg.Variables).ToArray(); //.Append(START)
 
-            var spda = new ContextFree.StackPDA($"SPDA_({cfg.Name})", names.Values.ToArray(), cfg.Terminals, WorkAlphabet, t, 0, START);
-            return spda;
+            return new ContextFree.StackPDA($"SPDA_({cfg.Name})", names.Values.ToArray(), cfg.Terminals, WorkAlphabet, t, 0, START);
         }
     }
 }

@@ -32,7 +32,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         public override int GetHashCode() => this.ToString().GetHashCode();
 
         public override string ToString()
-            => $"({q}, {(ci.HasValue ? ci.Value : Utils.EPSILON)}, {(cw.HasValue ? cw.Value : Utils.EPSILON)})";
+            => $"({q}, {(ci.HasValue ? ci.Value : Uni.Utils.EPSILON)}, {(cw.HasValue ? cw.Value : Uni.Utils.EPSILON)})";
     }
 
     public struct PDATransformValue : ITransformValue {
@@ -44,7 +44,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         public string cw2 { get; }
         public uint qNext { get; }
 
-        public override string ToString() => $"({(!string.IsNullOrEmpty(cw2) ? cw2 : Utils.EPSILON.ToString())}, {qNext})";
+        public override string ToString() => $"({(!string.IsNullOrEmpty(cw2) ? cw2 : Uni.Utils.EPSILON.ToString())}, {qNext})";
     }
 
     
@@ -73,7 +73,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             for (int i = 0; i < initcfg.Length; i++) {
                 var workSuccessor = new PDATransformKey(initcfg[i].q, initcfg[i].ci, initcfg[i].cw);
                 if (base.TryGetValue(workSuccessor, out qnext)) {
-                    Utils.DebugMessage($"full match {workSuccessor}", null, Utils.eDebugLogLevel.Verbose);
+                    Uni.Utils.DebugMessage($"full match {workSuccessor}", null, Uni.Utils.eDebugLogLevel.Verbose);
                     retVals.AddRange(qnext);
                     for (int j = 0; j < qnext.Length; j++)
                         retKeys.Add(workSuccessor);
@@ -82,7 +82,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
                 workSuccessor = new PDATransformKey(initcfg[i].q, initcfg[i].ci, null);
                 if (base.TryGetValue(workSuccessor, out qnext)) {
-                    Utils.DebugMessage($"ignore work char {workSuccessor}", null, Utils.eDebugLogLevel.Verbose);
+                    Uni.Utils.DebugMessage($"ignore work char {workSuccessor}", null, Uni.Utils.eDebugLogLevel.Verbose);
                     retVals.AddRange(qnext);
                     for (int j = 0; j < qnext.Length; j++)
                         retKeys.Add(workSuccessor);
@@ -91,7 +91,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
                 workSuccessor = new PDATransformKey(initcfg[i].q, null, initcfg[i].cw);
                 if (base.TryGetValue(workSuccessor, out qnext)) {
-                    Utils.DebugMessage($"ignore input char {workSuccessor}", null, Utils.eDebugLogLevel.Verbose);
+                    Uni.Utils.DebugMessage($"ignore input char {workSuccessor}", null, Uni.Utils.eDebugLogLevel.Verbose);
                     retVals.AddRange(qnext);
                     for (int j = 0; j < qnext.Length; j++)
                         retKeys.Add(workSuccessor);
@@ -100,7 +100,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
                 workSuccessor = new PDATransformKey(initcfg[i].q, null, null);
                 if (base.TryGetValue(workSuccessor, out qnext)) {
-                    Utils.DebugMessage($"ignore input,work char {workSuccessor}", null, Utils.eDebugLogLevel.Verbose);
+                    Uni.Utils.DebugMessage($"ignore input,work char {workSuccessor}", null, Uni.Utils.eDebugLogLevel.Verbose);
                     retVals.AddRange(qnext);
                     for (int j = 0; j < qnext.Length; j++)
                         retKeys.Add(workSuccessor);

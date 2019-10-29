@@ -14,7 +14,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         public bool isChomskey { get; internal set; }
 
         public static CFGrammer GenerateRandom() {
-            var rnd = Utils.RND;
+            var rnd = Uni.Utils.RND;
             const byte MAX_CHAR = 10;
             const byte MAX_VAR = 5;
             const byte MAX_RUL = 5;
@@ -44,9 +44,9 @@ namespace Serpen.Uni.Automat.ContextFree {
                         var wLen = rnd.Next(0, MAX_WLEN);
                         for (int k = 0; k < wLen; k++) {
                             if (rnd.NextDouble() > 0.7)
-                                w = w.Insert(k, Utils.GrAE(Terms).ToString());
+                                w = w.Insert(k, Terms.RndElement().ToString());
                             else
-                                w = w.Insert(k, Utils.GrAE(Vars).ToString());
+                                w = w.Insert(k, Vars.RndElement().ToString());
                         }
                         Vals[j] = w;
                     }
@@ -56,7 +56,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             var HeadVars = (from r in rs select r.Key).Distinct().ToArray();
 
-            return new CFGrammer("CFG_Random", Vars, Terms, rs, Utils.GrAE(HeadVars));
+            return new CFGrammer("CFG_Random", Vars, Terms, rs, HeadVars.RndElement());
         }
 
 
@@ -325,7 +325,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                 if (s[i] == c)
                     cPos.Add(i);
 
-            var ps = Utils.GetPowerSet(cPos.Count);
+            var ps = Uni.Utils.GetPowerSet(cPos.Count);
 
             for (int i = 0; i < ps.GetLength(0); i++) {
                 var newString = s;

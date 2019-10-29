@@ -156,7 +156,7 @@ namespace Serpen.Uni.Automat {
                 deaT.AddBinTuple(0,1,0);
                 deaT.AddBinTuple(1,2,0);
                 deaT.AddBinTuple(2,2,0);
-                return new DFA(nameof(DEA_A21_B25_MN), new string[] {$"[{Utils.EPSILON.ToString()}]", "[0]", "[00]"}, binAlp, deaT, 0, 2) {SimplyfiedAcceptFunction = w => w.EndsWith("00")};
+                return new DFA(nameof(DEA_A21_B25_MN), new string[] {$"[{Uni.Utils.EPSILON.ToString()}]", "[0]", "[00]"}, binAlp, deaT, 0, 2) {SimplyfiedAcceptFunction = w => w.EndsWith("00")};
             }
         }
 

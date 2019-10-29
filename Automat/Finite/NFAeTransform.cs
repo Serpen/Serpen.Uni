@@ -3,8 +3,7 @@ namespace Serpen.Uni.Automat.Finite
 {
     public class NFAeTransform : TransformBase<EATuple, uint[]>
     {
-        internal void Add(uint q1, char? w, params uint[] q2)
-            => Add(new EATuple(q1, w), q2);
+        internal void Add(uint q1, char? w, params uint[] q2) => Add(new EATuple(q1, w), q2);
 
         internal void AddM(uint q1, char? c, uint qNext) {
             uint[] qBefore;

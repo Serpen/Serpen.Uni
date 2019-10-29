@@ -17,10 +17,10 @@ namespace Serpen.Uni.Automat.Finite {
             var retQ = new List<uint>();
             var neat = Transforms as NFAeTransform;
 
-            for (int i = 0; i < q.Length; i++) {
+            for (int i = 0; i < q.Length; i++)
                 if (neat.ContainsKey(q[i], w))
                     retQ.AddRange(neat[q[i], w]);
-            }
+            
             retQ.Sort();
             return retQ.Distinct().ToArray();
         }
@@ -69,9 +69,9 @@ namespace Serpen.Uni.Automat.Finite {
                 if (translate.Contains(t2.Key.q))
                     foreach (var v in t2.Value)
                         if (translate.Contains(v))
-                            newT.AddM(Utils.ArrayIndex(translate, t2.Key.q), t2.Key.c.Value, Utils.ArrayIndex(translate, v));
+                            newT.AddM(translate.ArrayIndex(t2.Key.q), t2.Key.c.Value, translate.ArrayIndex(v));
 
-            return new NFA($"{Name}_purged", names, Alphabet, newT, Utils.ArrayIndex(translate, StartState), aStates);
+            return new NFA($"{Name}_purged", names, Alphabet, newT, translate.ArrayIndex(StartState), aStates);
 
         }
 
@@ -79,7 +79,7 @@ namespace Serpen.Uni.Automat.Finite {
             const byte MAX_STATES = 20;
             const byte MAX_CHAR = 7;
 
-            var rnd = Utils.RND;
+            var rnd = Uni.Utils.RND;
 
             var t = new NFAeTransform();
             int stateCount = rnd.Next(1, MAX_STATES);
@@ -90,7 +90,7 @@ namespace Serpen.Uni.Automat.Finite {
             for (uint i = 0; i < stateCount; i++) {
                 int transformsRnd = rnd.Next(0, alphabet.Length);
                 for (int j = 0; j < transformsRnd; j++) {
-                    t.AddM(i, Utils.GrAE(alphabet), (uint)rnd.Next(0, stateCount));
+                    t.AddM(i, alphabet.RndElement(), (uint)rnd.Next(0, stateCount));
                 }
             }
 
@@ -161,7 +161,7 @@ namespace Serpen.Uni.Automat.Finite {
             return new NFA($"NFA_({D.Name})", D.StatesCount, D.Alphabet, neaet, D.StartState, D.AcceptedStates);
         }
 
-        public override string ToString() => $"{Name} NEA(|{States.Length}|={string.Join(";", States)}, {{{string.Join(',', Alphabet)}}}, {{{Transforms.ToString()}}}, {StartState}, {{{string.Join(',', AcceptedStates)}}})".Trim();
+        public override string ToString() => $"{Name} NEA(|{States.Length}|={string.Join(";", States)}, {{{string.Join(',', Alphabet)}}}, {{{Transforms}}}, {StartState}, {{{string.Join(',', AcceptedStates)}}})".Trim();
 
 
     }

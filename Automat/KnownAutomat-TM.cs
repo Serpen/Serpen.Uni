@@ -213,8 +213,8 @@ namespace Serpen.Uni.Automat {
 
                 char[] inpAlph = { '0', '1', 'c' };
 
-                uint[] acceptedStates = { Utils.ArrayIndex(stateTracks, "9,B") };
-                uint startState = Utils.ArrayIndex(stateTracks, "1,B");
+                uint[] acceptedStates = { stateTracks.ArrayIndex("9,B") };
+                uint startState = stateTracks.ArrayIndex("1,B");
 
                 var t = new TuringTransformMultiTrack(stateTracks);
                 t.AddByStateStoreAndTracks("1,B", "B,0", "2,0", "*,0", TMDirection.Right);

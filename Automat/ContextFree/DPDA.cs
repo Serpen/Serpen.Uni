@@ -135,7 +135,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         public override VisualizationTuple[] VisualizationLines() {
             var tcol = new System.Collections.Generic.List<VisualizationTuple>(Transforms.Count);
             foreach (var t in Transforms) {
-                string desc = $"{(t.Key.ci.HasValue ? t.Key.ci.Value : Utils.EPSILON)}|{(t.Key.cw.HasValue ? t.Key.cw.Value : Utils.EPSILON)}->{(!string.IsNullOrEmpty(t.Value.cw2) ? t.Value.cw2 : Utils.EPSILON.ToString())}";
+                string desc = $"{(t.Key.ci.HasValue ? t.Key.ci.Value : Uni.Utils.EPSILON)}|{(t.Key.cw.HasValue ? t.Key.cw.Value : Uni.Utils.EPSILON)}->{(!string.IsNullOrEmpty(t.Value.cw2) ? t.Value.cw2 : Uni.Utils.EPSILON.ToString())}";
                 var vt = new VisualizationTuple(t.Key.q, t.Value.qNext, desc);
                 tcol.Add(vt);
             }
@@ -146,7 +146,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             const byte MAX_STATES = 20;
             const byte MAX_CHAR = 7;
 
-            var rnd = Utils.RND;
+            var rnd = Uni.Utils.RND;
 
             var t = new DPDATransform();
             int stateCount = rnd.Next(1, MAX_STATES);
@@ -158,8 +158,8 @@ namespace Serpen.Uni.Automat.ContextFree {
             for (uint i = 0; i < stateCount; i++) {
                 int transformsRnd = rnd.Next(0, inputAlphabet.Length);
                 for (int j = 0; j < transformsRnd; j++) {
-                    var tk = new PDATransformKey(i, Utils.GrAE(inputAlphabet), Utils.GrAE(workAlphabet));
-                    var tv = new PDATransformValue(Utils.GrAE(workAlphabet).ToString(), (uint)rnd.Next(0, stateCount));
+                    var tk = new PDATransformKey(i, inputAlphabet.RndElement(), workAlphabet.RndElement());
+                    var tv = new PDATransformValue(workAlphabet.RndElement().ToString(), (uint)rnd.Next(0, stateCount));
                     t.TryAdd(tk, tv);
                 }
             }
@@ -176,9 +176,9 @@ namespace Serpen.Uni.Automat.ContextFree {
             foreach (var t2 in Transforms)
                 if (translate.Contains(t2.Key.q))
                     if (translate.Contains(t2.Value.qNext))
-                        newT.Add(Utils.ArrayIndex(translate, t2.Key.q), t2.Key.ci, t2.Key.cw, t2.Value.cw2, Utils.ArrayIndex(translate, t2.Value));
+                        newT.Add(translate.ArrayIndex(t2.Key.q), t2.Key.ci, t2.Key.cw, t2.Value.cw2, translate.ArrayIndex(t2.Value));
 
-            return new DPDA($"{Name}_purged", (uint)names.Length, Alphabet, WorkAlphabet, newT, Utils.ArrayIndex(translate, StartState), StartSymbol, aStates);
+            return new DPDA($"{Name}_purged", (uint)names.Length, Alphabet, WorkAlphabet, newT, translate.ArrayIndex(StartState), StartSymbol, aStates);
         }
 
         public virtual IAutomat Reverse() {

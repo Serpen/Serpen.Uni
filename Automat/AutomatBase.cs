@@ -1,4 +1,5 @@
 using System.Linq;
+using Serpen.Uni;
 
 namespace Serpen.Uni.Automat {
 
@@ -120,7 +121,7 @@ namespace Serpen.Uni.Automat {
                 translate[i] = j;
             }
 
-            if (Utils.ArrayIndex(translate, StartState) > this.StatesCount)
+            if (translate.ArrayIndex(StartState) > this.StatesCount)
                 throw new Uni.Automat.StateException(StartState, "removed with too high start state");
 
             string[] names = new string[translate.Length];
@@ -130,7 +131,7 @@ namespace Serpen.Uni.Automat {
             var astates = new System.Collections.Generic.List<uint>(AcceptedStates.Length);
             foreach (var accept in AcceptedStates)
                 if (translate.Contains(accept))
-                    astates.Add(Utils.ArrayIndex(translate, accept));
+                    astates.Add(translate.ArrayIndex(accept));
 
 
             return (translate, names, astates.ToArray());
@@ -156,8 +157,8 @@ namespace Serpen.Uni.Automat {
         public abstract override string ToString();
 
         public string[] GetRandomWords(int count, int minLen, int maxLen) {
-            var words = new System.Collections.Specialized.StringCollection();
-            var rnd = Utils.RND;
+            var words = new System.Collections.Generic.List<string>();
+            var rnd = Uni.Utils.RND;
 
             int i = 0;
 
@@ -174,20 +175,18 @@ namespace Serpen.Uni.Automat {
                     words.Add(w);
 
                 if (i > count * 10) {
-                    Utils.DebugMessage($"Unable to get enough random words {i} tries>{words.Count}>{count}", this, Utils.eDebugLogLevel.Verbose);
+                    Uni.Utils.DebugMessage($"Unable to get enough random words {i} tries>{words.Count}>{count}", this, Uni.Utils.eDebugLogLevel.Verbose);
                     break;
                 }
                 i++;
 
             }
-            var wordArray = new string[words.Count + 1];
-            wordArray[0] = "";
-            words.CopyTo(wordArray, 1);
-            return wordArray.OrderBy(w => w, new StringLengthComparer()).ToArray();
-
+            
+            words.Sort(new StringLengthComparer());
+            return words.ToArray();
         }
 
-        public class StringLengthComparer : System.Collections.Generic.IComparer<string> {
+        class StringLengthComparer : System.Collections.Generic.IComparer<string> {
             public int Compare(string s1, string s2) {
 
                 if (s1.Length < s2.Length) return -1;

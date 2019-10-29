@@ -115,20 +115,17 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             //while any pcfg exists
             while (pcfgs.Length > 0) { //&& (pcfg.Where((a) => a.Stack.Length>0).Any())
-                Utils.DebugMessage(string.Join(',', (from a in pcfgs select a.ToString())), this, Utils.eDebugLogLevel.Verbose);
-                foreach (var p in pcfgs) {
+                Uni.Utils.DebugMessage(string.Join(',', (from a in pcfgs select a.ToString())), this, Uni.Utils.eDebugLogLevel.Verbose);
+                foreach (var p in pcfgs)
                     if (p.word.Length == 0)
                         if (IsAcceptedState(p.State))
                             return true;
-                } //next p
 
                 pcfgs = GoChar(pcfgs);
 
                 runCount++;
-                if (pcfgs.Length > MAX_RUNS_OR_STACK && runCount > MAX_RUNS_OR_STACK) {
+                if (pcfgs.Length > MAX_RUNS_OR_STACK && runCount > MAX_RUNS_OR_STACK)
                     throw new PDAStackException($"{runCount}: Stack >= {pcfgs.Length}, {runCount}. run abort", this);
-                }
-
             }
 
             return false;
@@ -138,7 +135,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             const byte MAX_STATES = 20;
             const byte MAX_CHAR = 7;
 
-            var rnd = Utils.RND;
+            var rnd = Uni.Utils.RND;
 
             var t = new PDATransform();
             int stateCount = rnd.Next(1, MAX_STATES);
@@ -149,9 +146,8 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             for (uint i = 0; i < stateCount; i++) {
                 int transformsRnd = rnd.Next(0, inputAlphabet.Length);
-                for (int j = 0; j < transformsRnd; j++) {
-                    t.AddM(i, Utils.GrAE(inputAlphabet), Utils.GrAE(workAlphabet), Utils.GrAE(workAlphabet).ToString(), (uint)rnd.Next(0, stateCount));
-                }
+                for (int j = 0; j < transformsRnd; j++)
+                    t.AddM(i, inputAlphabet.RndElement(), workAlphabet.RndElement(), workAlphabet.RndElement().ToString(), (uint)rnd.Next(0, stateCount));
             }
 
             var ret = new StatePDA("QPDA_Random", (uint)stateCount, inputAlphabet, workAlphabet, t, (uint)rnd.Next(0, stateCount), START, accState);
@@ -168,10 +164,9 @@ namespace Serpen.Uni.Automat.ContextFree {
                 if (translate.Contains(t2.Key.q))
                     foreach (var v in t2.Value)
                         if (translate.Contains(v.qNext))
-                            newT.AddM(Utils.ArrayIndex(translate, t2.Key.q), t2.Key.ci, t2.Key.cw, v.cw2, Utils.ArrayIndex(translate, v.qNext));
+                            newT.AddM(translate.ArrayIndex(t2.Key.q), t2.Key.ci, t2.Key.cw, v.cw2, translate.ArrayIndex(v.qNext));
 
-            return new StatePDA($"{Name}_purged", names, Alphabet, WorkAlphabet, newT, Utils.ArrayIndex(translate, StartState), StartSymbol, aStates);
-
+            return new StatePDA($"{Name}_purged", names, Alphabet, WorkAlphabet, newT, translate.ArrayIndex(StartState), StartSymbol, aStates);
         }
     }
 }

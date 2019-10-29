@@ -42,7 +42,7 @@ namespace Serpen.Uni.Automat.Turing {
             uint lastQ = tcfgs[0].State;
             while (tcfgs.Length > 0) {
                 foreach (var tcfg in tcfgs) {
-                    Utils.DebugMessage(tcfg.ToString(), this, Utils.eDebugLogLevel.Verbose);
+                    Uni.Utils.DebugMessage(tcfg.ToString(), this, Uni.Utils.eDebugLogLevel.Verbose);
                     if (tcfg != null)
                         lastQ = tcfg.State;
                     if (runs > MAX_TURING_RUNS)
@@ -66,7 +66,7 @@ namespace Serpen.Uni.Automat.Turing {
 
             while (tcfgs.Length > 0 && !IsAcceptedState(lastQ)) {
                 foreach (var tcfg in tcfgs) {
-                    Utils.DebugMessage(tcfg.ToString(), this, Utils.eDebugLogLevel.Verbose);
+                    Uni.Utils.DebugMessage(tcfg.ToString(), this, Uni.Utils.eDebugLogLevel.Verbose);
                     if (tcfg != null)
                         lastBand = tcfg.Band;
                     if (runs > MAX_TURING_RUNS)
@@ -82,7 +82,7 @@ namespace Serpen.Uni.Automat.Turing {
             const byte MAX_STATES = 20;
             const byte MAX_CHAR = 7;
 
-            var rnd = Utils.RND;
+            var rnd = Uni.Utils.RND;
 
             var t = new NTM1659Transform();
             int stateCount = rnd.Next(1, MAX_STATES);
@@ -92,8 +92,8 @@ namespace Serpen.Uni.Automat.Turing {
 
             int transformsRnd = rnd.Next(0, stateCount * inputAlphabet.Length);
             for (uint k = 0; k < transformsRnd; k++) {
-                var tk = new TuringKey((uint)rnd.Next(0, stateCount), Utils.GrAE(bandAlphabet));
-                var tv = new TuringVal((uint)rnd.Next(0, stateCount), Utils.GrAE(bandAlphabet), TMDirection.Right);
+                var tk = new TuringKey((uint)rnd.Next(0, stateCount), bandAlphabet.RndElement());
+                var tv = new TuringVal((uint)rnd.Next(0, stateCount), bandAlphabet.RndElement(), TMDirection.Right);
                 t.TryAdd(tk, new TuringVal[] { tv });
             }
 
@@ -110,9 +110,9 @@ namespace Serpen.Uni.Automat.Turing {
                 if (translate.Contains(ti.Key.q))
                     foreach (var tv in ti.Value)
                         if (translate.Contains(tv.qNext))
-                            newT.AddM(Utils.ArrayIndex(translate, ti.Key.q), ti.Key.c, Utils.ArrayIndex(translate, tv.qNext), tv.c2, tv.Direction);
+                            newT.AddM(translate.ArrayIndex(ti.Key.q), ti.Key.c, translate.ArrayIndex(tv.qNext), tv.c2, tv.Direction);
 
-            return new NTM1659($"{Name}_purged", (uint)names.Length, Alphabet, BandAlphabet, newT, Utils.ArrayIndex(translate, StartState), BlankSymbol, Utils.ArrayIndex(translate, AcceptedState), Utils.ArrayIndex(translate, DiscardState));
+            return new NTM1659($"{Name}_purged", (uint)names.Length, Alphabet, BandAlphabet, newT, translate.ArrayIndex(StartState), BlankSymbol, translate.ArrayIndex(AcceptedState), translate.ArrayIndex(DiscardState));
         }
 
         public override VisualizationTuple[] VisualizationLines() {

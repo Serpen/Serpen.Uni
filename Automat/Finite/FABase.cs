@@ -28,7 +28,7 @@ namespace Serpen.Uni.Automat.Finite {
             foreach (var t in Transforms) {
                 string desc = t.Key.c.ToString();
                 if (desc == "")
-                    desc = Utils.EPSILON.ToString();
+                    desc = Uni.Utils.EPSILON.ToString();
                 foreach (uint v in t.Value) {
                     var vt = new VisualizationTuple(t.Key.q, v, desc);
                     tcol.Add(vt);
@@ -182,8 +182,6 @@ namespace Serpen.Uni.Automat.Finite {
         public abstract override bool Equals(object obj);
         public abstract override string ToString();
 
-        public override int GetHashCode() {
-            return ToString().GetHashCode();
-        }
+        public override int GetHashCode() => ToString().GetHashCode();
     }
 }

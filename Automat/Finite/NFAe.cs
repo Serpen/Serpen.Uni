@@ -64,13 +64,9 @@ namespace Serpen.Uni.Automat.Finite {
             return EpsilonHuelle(retQ.Distinct().ToArray());
         }
 
-        protected override uint[] GoChar(uint q, char w) {
-            return GoChar(new uint[] { q }, w);
-        }
+        protected override uint[] GoChar(uint q, char w) => GoChar(new uint[] { q }, w);
 
-        public uint[] EpsilonHuelle(uint q) {
-            return EpsilonHuelle(new uint[] { q });
-        }
+        public uint[] EpsilonHuelle(uint q) => EpsilonHuelle(new uint[] { q });
 
         /// <summary>
         /// Epsilon-Huelle for a set of states
@@ -93,11 +89,11 @@ namespace Serpen.Uni.Automat.Finite {
                 var t = new EATuple(curQ, null); //e Transform
                 uint[] eQs;
 
-                if (Transforms.TryGetValue(t, out eQs)) { //Exists e Transform?
+                if (Transforms.TryGetValue(t, out eQs))  //Exists e Transform?
                     foreach (var eQ in eQs) //for every e Transform
                         if (!Processed.Contains(eQ)) //only add if not already processed
                             toProcess.Push(eQ);
-                }
+
                 Processed.Add(curQ);
             }
 
@@ -130,7 +126,7 @@ namespace Serpen.Uni.Automat.Finite {
             const byte MAX_STATES = 20;
             const byte MAX_CHAR = 7;
 
-            var rnd = Utils.RND;
+            var rnd = Uni.Utils.RND;
 
             int stateCount = rnd.Next(1, MAX_STATES);
 
@@ -140,9 +136,8 @@ namespace Serpen.Uni.Automat.Finite {
             var t = new NFAeTransform();
             for (uint i = 0; i < stateCount; i++) {
                 int transformsRnd = rnd.Next(0, alphabet.Length);
-                for (int j = 0; j < transformsRnd; j++) {
-                    t.AddM(i, Utils.GrAE(alphabet), (uint)rnd.Next(0, stateCount));
-                }
+                for (int j = 0; j < transformsRnd; j++)
+                    t.AddM(i, alphabet.RndElement(), (uint)rnd.Next(0, stateCount));
             }
 
             return new NFAe($"NFAe_Random_Q{stateCount}_T{t.Count}", (uint)stateCount, alphabet, t, (uint)rnd.Next(0, stateCount), accState) { Name = $"NFAe_Random_q{stateCount}_a{alphabet.Length}_t{t.Count}_a{accState.Length}" };
@@ -156,9 +151,9 @@ namespace Serpen.Uni.Automat.Finite {
                 if (translate.Contains(t2.Key.q))
                     foreach (var v in t2.Value)
                         if (translate.Contains(v))
-                            newT.AddM(Utils.ArrayIndex(translate, t2.Key.q), t2.Key.c, Utils.ArrayIndex(translate, v));
+                            newT.AddM(translate.ArrayIndex(t2.Key.q), t2.Key.c, translate.ArrayIndex(v));
 
-            return new NFAe($"{Name}_purged", names, Alphabet, newT, Utils.ArrayIndex(translate, StartState), aStates);
+            return new NFAe($"{Name}_purged", names, Alphabet, newT, translate.ArrayIndex(StartState), aStates);
         }
 
         #region "Operations"

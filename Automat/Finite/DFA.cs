@@ -256,7 +256,7 @@ namespace Serpen.Uni.Automat.Finite {
             const byte MAX_STATES = 20;
             const byte MAX_CHAR = 7;
 
-            var rnd = Utils.RND;
+            var rnd = Uni.Utils.RND;
 
             int stateCount = rnd.Next(1, MAX_STATES);
 
@@ -266,7 +266,7 @@ namespace Serpen.Uni.Automat.Finite {
 
             var t = new DFATransform();
             for (uint i = 0; i < stateCount; i++) {
-                char[] rndAlph = Utils.RandomizeArray(alphabet);
+                char[] rndAlph = alphabet.Randomize();
                 for (int j = 0; j < rndAlph.Length; j++)
                     t.Add(i, alphabet[j], (uint)rnd.Next(0, stateCount));
             }
@@ -285,10 +285,9 @@ namespace Serpen.Uni.Automat.Finite {
                 if (translate.Contains(t2.Key.q))
                     foreach (var v in t2.Value)
                         if (translate.Contains(v))
-                            newT.Add(Utils.ArrayIndex(translate, t2.Key.q), t2.Key.c.Value, Utils.ArrayIndex(translate, v));
+                            newT.Add(translate.ArrayIndex(t2.Key.q), t2.Key.c.Value, translate.ArrayIndex(v));
 
-            return new DFA($"{Name}_purged", names, Alphabet, newT, Utils.ArrayIndex(translate, StartState), aStates);
-
+            return new DFA($"{Name}_purged", names, Alphabet, newT, translate.ArrayIndex(StartState), aStates);
         }
 
 

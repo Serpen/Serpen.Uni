@@ -83,7 +83,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             var retCfgs = new List<PDAConfig>(1000);
 
             if (pcfgs.Length > MAX_RUNS_OR_STACK) {
-                Utils.DebugMessage($"Stack >= {pcfgs.Length} abort", this, Utils.eDebugLogLevel.Always);
+                Uni.Utils.DebugMessage($"Stack >= {pcfgs.Length} abort", this, Uni.Utils.eDebugLogLevel.Always);
                 return new PDAConfig[0];
             }
 
@@ -173,7 +173,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             var tcol = new System.Collections.Generic.List<VisualizationTuple>(Transforms.Count);
             foreach (var t in Transforms) {
                 foreach (var v in t.Value) {
-                    string desc = $"{(t.Key.ci.HasValue ? t.Key.ci.Value : Utils.EPSILON)}|{(t.Key.cw.HasValue ? t.Key.cw.Value : Utils.EPSILON)}->{(!string.IsNullOrEmpty(v.cw2) ? v.cw2 : Utils.EPSILON.ToString())}";
+                    string desc = $"{(t.Key.ci.HasValue ? t.Key.ci.Value : Uni.Utils.EPSILON)}|{(t.Key.cw.HasValue ? t.Key.cw.Value : Uni.Utils.EPSILON)}->{(!string.IsNullOrEmpty(v.cw2) ? v.cw2 : Uni.Utils.EPSILON.ToString())}";
                     var vt = new VisualizationTuple(t.Key.q, v.qNext, desc);
                     tcol.Add(vt);
                 }

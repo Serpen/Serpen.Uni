@@ -1,9 +1,8 @@
 namespace Serpen.Uni.Automat.Turing {
     public abstract class TuringConfigBase<TChar> : IConfig {
 
-        protected TuringConfigBase(char blankSymbol) {
-            BlankSymbol = blankSymbol;
-        }
+        protected TuringConfigBase(char blankSymbol) => BlankSymbol = blankSymbol;
+        
         protected char BlankSymbol;
         public uint State {get; set;}
         protected string[] band;

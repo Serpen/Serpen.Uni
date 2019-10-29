@@ -34,8 +34,6 @@ namespace Serpen.Uni.Automat.Turing {
             }
         }
 
-        public void ReplaceChar(char newChar, TMDirection dir) {
-            base.ReplaceChar(new char[] {newChar}, dir);
-        }
+        public void ReplaceChar(char newChar, TMDirection dir) => base.ReplaceChar(new char[] {newChar}, dir);
     }
 }
