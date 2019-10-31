@@ -1,3 +1,5 @@
+// using System.Linq;
+
 namespace Serpen.Uni.CompSys {
 
     public class WerteTabelle {
@@ -22,7 +24,7 @@ namespace Serpen.Uni.CompSys {
                             mt = (a) => mt(a) & a[j];
                         else
                             mt = (a) => mt(a) & !a[j];
-                            mt = delegate (bool[] b) {return mt(b);};
+                        mt = delegate (bool[] b) { return mt(b); };
                     }
                     sf = (a) => sf(a) | mt(a);
                 }
@@ -30,8 +32,26 @@ namespace Serpen.Uni.CompSys {
             return new Schaltfunktion(VarCount, sf);
         }
 
-        public Schaltfunktion McCluskey() {
-            return null;
+        public string[] QuineMcCluskey() {
+            QuineMcCluskeyRow[] minTerms;
+
+            int minTermCount = 0;
+            for (int i = 0; i < Array.GetLength(0); i++)
+                if (Array[i, Array.GetLength(1) - 1]) minTermCount++;
+
+            minTerms = new QuineMcCluskeyRow[minTermCount];
+
+            int j = 0;
+            for (int i = 0; i < minTerms.Length; i++) {
+                while (!Array[j, Array.GetLength(1) - 1])
+                    j++;
+                minTerms[i] = new QuineMcCluskeyRow(Array, j, j.ToString());
+                j++;
+            }
+
+            while (QuineMcCluskeyRow.Step2(ref minTerms));
+
+            return QuineMcCluskeyRow.WesentlichePrimimplikanten(minTerms, minTermCount);
         }
 
         public override string ToString() {
@@ -44,10 +64,29 @@ namespace Serpen.Uni.CompSys {
             for (int x = 0; x < Array.GetLength(0); x++) {
                 for (byte y = 0; y < Array.GetLength(1) - 1; y++)
                     sb.Append($" {(Array[x, y] ? 1 : 0)} |");
-                
+
                 sb.AppendLine($" {(Array[x, Array.GetLength(1) - 1] ? 1 : 0)}");
             }
             return sb.ToString();
         } //end function ToString()
+
+        public static WerteTabelle T25 => new WerteTabelle(new bool[,] {
+                    {false, false, false, false, true},
+                    {false, false, false, true, false},
+                    {false, false, true, false, true},
+                    {false, false, true, true, false},
+                    {false, true, false, false, true},
+                    {false, true, false, true, true},
+                    {false, true, true, false, true},
+                    {false, true, true, true, true},
+                    {true, false, false, false, false},
+                    {true, false, false, true, false},
+                    {true, false, true, false, true},
+                    {true, false, true, true, true},
+                    {true, true, false, false, false},
+                    {true, true, false, true, false},
+                    {true, true, true, false, false},
+                    {true, true, true, true, false},
+                });
     }
 }

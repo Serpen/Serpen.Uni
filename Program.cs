@@ -6,14 +6,14 @@ using Serpen.Uni.CompSys;
 namespace Serpen.Uni {
     static class Program {
         static void Main() {
-            var sf = Schaltfunktion.SF_212 ;
-            System.Console.WriteLine(sf.Invoke(true, false, false));
-            var wt = (WerteTabelle)sf;
+            // var sf = Schaltfunktion.SF_212 ;
+            // System.Console.WriteLine(sf.Invoke(true, false, false));
+            var wt = (WerteTabelle.T25);
             System.Console.WriteLine(wt);
             var kv = new KVDiagramm(wt);
             System.Console.WriteLine(kv);
-            var dnf = wt.toDNF();
-            System.Console.WriteLine((WerteTabelle)dnf);
+            var qmcf = wt.QuineMcCluskey();
+            System.Console.WriteLine(string.Join(';', qmcf));
         }
 
 
