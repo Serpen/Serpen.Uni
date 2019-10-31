@@ -66,6 +66,7 @@ namespace Serpen.Uni.CompSys {
 
         public override string ToString() => $"{Index} {string.Join(',', Row)} {CountOnes} {Processed}";
 
+        [AlgorithmSource("~1608 2.2.3")]
         internal static bool Step2(ref QuineMcCluskeyRow[] qmcRows) {
             var newTerms = new System.Collections.Generic.HashSet<QuineMcCluskeyRow>();
 
@@ -94,6 +95,7 @@ namespace Serpen.Uni.CompSys {
             return foundnew;
         }
 
+        [AlgorithmSource("~1608 2.2.3")]
         internal static string[] WesentlichePrimimplikanten(QuineMcCluskeyRow[] qmcRows, int indiciesCount) {
 
             // var Indicies = new List<int>();
@@ -145,31 +147,80 @@ namespace Serpen.Uni.CompSys {
 
             Utils.DebugMessage($"found Kernimplikanten: {string.Join(',', Kernimplikanten)}", Utils.eDebugLogLevel.Normal);
 
-            for (int c = 0; c < table.GetLength(1); c++) {
+            for (int c = 0; c < table.GetLength(1); c++)
                 if (!processedIndicies.Contains(c))
-                    for (int r = 0; r < table.GetLength(0); r++) {
-                        if (table[r, c]) {
-                            // yield return r;
+                    for (int r = 0; r < table.GetLength(0); r++)
+                        if (table[r, c])
                             Kernimplikanten.Add(r);
-                            // unnessesarry?! : 
-                            IEnumerable<int> inds = (from i in qmcRows[r].Index.Split(',') select System.Convert.ToInt32(i));
-                            foreach (var ind in inds)
-                                processedIndicies.Add(matchTable[ind]);
-                        }
-                    }
-            }
+
+            Dominanz(ref table);
 
             Utils.DebugMessage($"found implikanten: {string.Join(',', Kernimplikanten)}", Utils.eDebugLogLevel.Normal);
-            
+
             var kistr = new string[Kernimplikanten.Count];
             for (int i = 0; i < Kernimplikanten.Count; i++)
                 kistr[i] = qmcRows[i].Index;
-            
+
             return kistr;
             // return Kernimplikanten;
         }
-        
-        
+
+        [AlgorithmSource("wikipedia")]
+        internal static void Dominanz(ref bool[,] table) {
+            Utils.DebugMessage('\n' + Utils.FormatArray(table), Utils.eDebugLogLevel.Normal);
+
+            int removeColumn = -1;
+            int removeRow = -1;
+
+            removeColumn = SpaltenDominanz(table);
+            if (removeColumn == -1)
+                removeRow = ZeilenDominanz(table);
+
+            while (removeColumn != -1 || removeRow != -1) {
+                if (removeColumn != -1) {
+                    table = table.RemoveArrayCol(removeColumn);
+                    Utils.DebugMessage($"remove Col {removeColumn}: \n{Utils.FormatArray(table)}", Utils.eDebugLogLevel.Normal);
+                } else if (removeRow != -1) {
+                    table = table.RemoveArrayRow(removeRow);
+                    Utils.DebugMessage($"remove Row {removeRow}: \n{Utils.FormatArray(table)}", Utils.eDebugLogLevel.Normal);
+                }
+
+                removeColumn = SpaltenDominanz(table);
+                if (removeColumn == -1)
+                    removeRow = ZeilenDominanz(table);
+
+            }
+        }
+
+        static int SpaltenDominanz(bool[,] table) {
+            for (int c = 0; c < table.GetLength(1); c++) {
+                for (int c2 = c + 1; c2 < table.GetLength(1); c2++) {
+                    bool isTeilmenge = true;
+                    for (int r = 0; r < table.GetLength(0); r++) {
+                        if (!table[r, c] && table[r, c2])
+                            isTeilmenge = false;
+                    }
+                    if (isTeilmenge)
+                        return c;
+                }
+            }
+            return -1;
+        }
+
+        static int ZeilenDominanz(bool[,] table) {
+            for (int r1 = 0; r1 < table.GetLength(0); r1++) {
+                for (int r2 = r1 + 1; r2 < table.GetLength(0); r2++) {
+                    bool isTeilmenge = true;
+                    for (int c = 0; c < table.GetLength(1); c++) {
+                        if (!table[r1, c] && table[r2, c])
+                            isTeilmenge = false;
+                    }
+                    if (isTeilmenge)
+                        return r2;
+                }
+            }
+            return -1;
+        }
     }
 
 }

@@ -12,7 +12,6 @@ namespace Serpen.Uni {
         public static int Log2(int z) => (int)System.Math.Log2(z);
         public static bool HasBitSet(this byte i, int b) => (b & (1 << i)) > 0;
 
-        internal static eDebugLogLevel DebugLogLevel = eDebugLogLevel.Always;
 
         /// <summary>
         /// Get Random Array Elemet
@@ -21,20 +20,19 @@ namespace Serpen.Uni {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
 
-        public static bool[,] GetPowerSet(int bitscount) {
-            var ret = new bool[Pow2(bitscount), bitscount];
+        public static bool[,] GetPowerSet(int bitscount, int additionalCols = 0) {
+            var ret = new bool[Pow2(bitscount), bitscount + additionalCols];
 
-            for (int i = 0; i < ret.GetLength(0); i++) {
-                for (byte j = 0; j < ret.GetLength(1); j++) {
+            for (int i = 0; i < ret.GetLength(0); i++)
+                for (byte j = 0; j < bitscount; j++)
                     ret[i, j] = CheckBitSet(i, j);
-                }
-            }
             return ret;
         }
 
         static bool CheckBitSet(this int b, int bitNumber) => (b & (1 << bitNumber)) > 0;
 
         public enum eDebugLogLevel { Always, Normal, Verbose }
+        internal static eDebugLogLevel DebugLogLevel = eDebugLogLevel.Normal;
 
         internal static void DebugMessage(string message, eDebugLogLevel level) {
             if (DebugLogLevel >= level && System.Diagnostics.Debugger.IsAttached) {
@@ -48,7 +46,7 @@ namespace Serpen.Uni {
                     message);
             }
         }
-    
+
         public static T[] Randomize<T>(this T[] array) {
             var rnd = Uni.Utils.RND;
             for (int i = 0; i < array.Length * 2 / 3; i++) {
@@ -92,6 +90,40 @@ namespace Serpen.Uni {
         }
 
         public static T RndElement<T>(this T[] array) => array[Utils.RND.Next(0, array.Length)];
+
+        public static T[,] RemoveArrayCol<T>(this T[,] table, int column) {
+            var newTable = new T[table.GetLength(0), table.GetLength(1) - 1];
+            int indexModifier = 0;
+            for (int c = 0; c < newTable.GetLength(1); c++) {
+                if (c == column)
+                    indexModifier++;
+                for (int r = 0; r < newTable.GetLength(0); r++)
+                    newTable[r, c] = table[r, c + indexModifier];
+            }
+            return newTable;
+        }
+
+        public static T[,] RemoveArrayRow<T>(this T[,] table, int row) {
+            var newTable = new T[table.GetLength(0), table.GetLength(1) - 1];
+            int indexModifier = 0;
+            for (int r = 0; r < newTable.GetLength(0); r++) {
+                if (r == row)
+                    indexModifier++;
+                for (int c = 0; c < newTable.GetLength(1); c++)
+                    newTable[r, c] = table[r + indexModifier, c];
+            }
+            return newTable;
+        }
+
+        public static string FormatArray(bool[,] array) {
+            var sb = new System.Text.StringBuilder();
+            for (int r = 0; r < array.GetLength(0); r++) {
+                for (int c = 0; c < array.GetLength(1); c++)
+                    sb.Append($"{(array[r, c] ? 1 : 0)}, ");
+                sb.AppendLine();
+            }
+            return sb.ToString();
+        }
 
     } //end class Utils 
 }

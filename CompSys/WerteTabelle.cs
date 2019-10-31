@@ -11,6 +11,16 @@ namespace Serpen.Uni.CompSys {
             VarCount = array.GetLength(1) - 1;
         }
 
+        public WerteTabelle(int vars, bool[] array) {
+            if (Utils.Pow2(vars) != array.Length)
+                throw new System.ArgumentOutOfRangeException();
+
+            Array = Utils.GetPowerSet(vars, 1);
+            for (int i = 0; i < Array.GetLength(0); i++)
+                Array[i, Array.GetLength(1)-1] = array[i];
+            VarCount = vars;
+        }
+
         [System.Obsolete()]
         public Schaltfunktion toDNF() {
             Schaltfunktion.Schaltfunction sf = (a) => false;
@@ -32,6 +42,7 @@ namespace Serpen.Uni.CompSys {
             return new Schaltfunktion(VarCount, sf);
         }
 
+        [AlgorithmSource("~1608 2.2.3")]
         public string[] QuineMcCluskey() {
             QuineMcCluskeyRow[] minTerms;
 
@@ -49,7 +60,7 @@ namespace Serpen.Uni.CompSys {
                 j++;
             }
 
-            while (QuineMcCluskeyRow.Step2(ref minTerms));
+            while (QuineMcCluskeyRow.Step2(ref minTerms)) ;
 
             return QuineMcCluskeyRow.WesentlichePrimimplikanten(minTerms, minTermCount);
         }
@@ -70,23 +81,8 @@ namespace Serpen.Uni.CompSys {
             return sb.ToString();
         } //end function ToString()
 
-        public static WerteTabelle T25 => new WerteTabelle(new bool[,] {
-                    {false, false, false, false, true},
-                    {false, false, false, true, false},
-                    {false, false, true, false, true},
-                    {false, false, true, true, false},
-                    {false, true, false, false, true},
-                    {false, true, false, true, true},
-                    {false, true, true, false, true},
-                    {false, true, true, true, true},
-                    {true, false, false, false, false},
-                    {true, false, false, true, false},
-                    {true, false, true, false, true},
-                    {true, false, true, true, true},
-                    {true, true, false, false, false},
-                    {true, true, false, true, false},
-                    {true, true, true, false, false},
-                    {true, true, true, true, false},
-                });
+        public static WerteTabelle T25_2 => new WerteTabelle(4, new bool[] {
+            true, false, true, false, true, true, true, true,
+            false, false, true, true, false, false, false, false});
     }
 }
