@@ -94,12 +94,13 @@ namespace Serpen.Uni.Automat.Finite {
             uint[] accStates = new uint[this.AcceptedStates.Length + fa.AcceptedStates.Length];
             char[] nAlphabet = this.Alphabet.Union(fa.Alphabet).ToArray();
 
-            var neat = new NFAeTransform();
-            //add new start state, with e to both starts
-            neat.Add(0, null, 1, offsetD2);
+			var neat = new NFAeTransform
+			{
+				{ 0, null, 1, offsetD2 }
+			};
 
-            //add each D1 transform, +1
-            foreach (var item in this.Transforms)
+			//add each D1 transform, +1
+			foreach (var item in this.Transforms)
                 foreach (uint val in item.Value)
                     neat.AddM(item.Key.q + 1, item.Key.c, val + 1);
 
@@ -156,13 +157,14 @@ namespace Serpen.Uni.Automat.Finite {
         }
 
         public IAutomat KleeneStern() {
-            var neaET = new NFAeTransform();
+			var neaET = new NFAeTransform
+			{
+				//accepted front state
+				{ 0, null, 1 }
+			};
 
-            //accepted front state
-            neaET.Add(0, null, 1);
-
-            //add transforms, +1
-            foreach (var item in this.Transforms) {
+			//add transforms, +1
+			foreach (var item in this.Transforms) {
                 uint[] qnext = new uint[item.Value.Length];
                 for (int i = 0; i < item.Value.Length; i++)
                     qnext[i] = item.Value[i] + 1;

@@ -6,6 +6,9 @@ obj
 .vs
 omnisharp.json
 *.csproj.user
+StyleCop.Cache
+Settings.StyleCop
+*.sln
 
 # Windows image file caches
 Thumbs.db

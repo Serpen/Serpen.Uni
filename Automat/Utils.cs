@@ -1,16 +1,15 @@
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Serpen.Uni.Automat {
 
     public static class Utils {
 
-        internal static void AcceptWordConsoleLine(IAcceptWord A, string w) {
+        internal static void AcceptWordConsoleLine(this IAcceptWord A, string w) {
             try {
                 System.Console.WriteLine($"{A.Name} accepts |{w.Length}| '{w}': {A.AcceptWord(w)}");
-            } catch (Serpen.Uni.Automat.TuringCycleException e) {
+            } catch (Turing.TuringCycleException e) {
                 System.Console.WriteLine($"{A.Name} {e.Message}");
-            } catch (Serpen.Uni.Automat.PDAStackException e) {
+            } catch (ContextFree.PDAStackException e) {
                 System.Console.WriteLine($"{A.Name} {e.Message}");
             }
         }
@@ -19,7 +18,7 @@ namespace Serpen.Uni.Automat {
             bool ac1 = a1.AcceptWord(w);
             bool ac2 = a2.AcceptWord(w);
             if (ac1 != ac2) {
-                Uni.Utils.DebugMessage($"word '{w}' is {ac1}:{a1.Name} != {ac2}:{a2.Name}", a1, Uni.Utils.eDebugLogLevel.Normal);
+                Utils.DebugMessage($"word '{w}' is {ac1}:{a1.Name} != {ac2}:{a2.Name}", a1, Uni.Utils.eDebugLogLevel.Normal);
                 return false;
             } else
                 return true;
@@ -62,13 +61,9 @@ namespace Serpen.Uni.Automat {
             throw new System.ArgumentOutOfRangeException();
         }
         
-        public static void SaveAutomatImageToTemp(IAutomat automat)
+        public static void SaveAutomatImageToTemp(this IAutomat automat)
             => Visualization.DrawAutomat(automat).Save(System.Environment.ExpandEnvironmentVariables($@"%temp%\automat\{automat.Name}.png"));
 
-
-    } //end class Utils 
-
-    public static class ExtensionMethods {
         public static bool EqualAlphabets(this char[] alphabet, char[] anotherAlphabet) {
             if (alphabet.Length != anotherAlphabet.Length) return false;
             for (int i = 0; i < alphabet.Length; i++)
@@ -76,5 +71,20 @@ namespace Serpen.Uni.Automat {
                     return false;
             return true;
         }
-    }
+
+        internal static void DebugMessage(string message, Automat.IAcceptWord a, Serpen.Uni.Utils.eDebugLogLevel level) {
+            if (Serpen.Uni.Utils.DebugLogLevel >= level && System.Diagnostics.Debugger.IsAttached) {
+                var stack = new System.Diagnostics.StackTrace(true);
+                var sframe = stack.GetFrame(1);
+                var smethod = sframe.GetMethod();
+                System.Diagnostics.Debug.WriteLine(
+                    smethod.DeclaringType.Name + "." +
+                    smethod.Name +
+                    ":" + sframe.GetFileLineNumber() + " " +
+                    (a != null ? "[" + a.Name + "] " : " ") +
+                    message);
+            }
+        }
+
+    } //end class Utils 
 }

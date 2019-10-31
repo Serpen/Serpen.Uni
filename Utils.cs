@@ -12,7 +12,7 @@ namespace Serpen.Uni {
         public static int Log2(int z) => (int)System.Math.Log2(z);
         public static bool HasBitSet(this byte i, int b) => (b & (1 << i)) > 0;
 
-        private static eDebugLogLevel DebugLogLevel = eDebugLogLevel.Always;
+        internal static eDebugLogLevel DebugLogLevel = eDebugLogLevel.Always;
 
         /// <summary>
         /// Get Random Array Elemet
@@ -36,7 +36,7 @@ namespace Serpen.Uni {
 
         public enum eDebugLogLevel { Always, Normal, Verbose }
 
-        internal static void DebugMessage(string message, Automat.IAcceptWord a, eDebugLogLevel level) {
+        internal static void DebugMessage(string message, eDebugLogLevel level) {
             if (DebugLogLevel >= level && System.Diagnostics.Debugger.IsAttached) {
                 var stack = new System.Diagnostics.StackTrace(true);
                 var sframe = stack.GetFrame(1);
@@ -45,7 +45,6 @@ namespace Serpen.Uni {
                     smethod.DeclaringType.Name + "." +
                     smethod.Name +
                     ":" + sframe.GetFileLineNumber() + " " +
-                    (a != null ? "[" + a.Name + "] " : " ") +
                     message);
             }
         }

@@ -170,7 +170,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
         public override IAutomat PurgeStates() {
-            (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
+			(uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
 
             var newT = new DPDATransform();
             foreach (var t2 in Transforms)

@@ -81,7 +81,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                 runCount++;
 
                 if (pcfgs.Length > MAX_RUNS_OR_STACK || runCount > MAX_RUNS_OR_STACK) {
-                    Uni.Utils.DebugMessage($"{runCount}: Stack >= {pcfgs.Length}, abort", this, Uni.Utils.eDebugLogLevel.Always);
+                    Utils.DebugMessage($"{runCount}: Stack >= {pcfgs.Length}, abort", this, Uni.Utils.eDebugLogLevel.Always);
                     return false;
                 }
             }

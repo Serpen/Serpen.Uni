@@ -40,7 +40,6 @@ namespace Serpen.Uni.Automat {
         internal System.Func<string, bool> SimplyfiedAcceptFunction { get; set; }
 
         public AutomatBase(uint stateCount, char[] alphabet, uint startState, string name, uint[] acceptedStates) {
-
             var sortAlp = alphabet.ToList();
             sortAlp.Sort();
             this.Alphabet = sortAlp.ToArray();
@@ -66,7 +65,7 @@ namespace Serpen.Uni.Automat {
             if (StartState >= StatesCount)
                 throw new Automat.StateException(StartState);
             foreach (uint acc in AcceptedStates) {
-                if (acc >= StatesCount)
+                if (acc >= this.StatesCount)
                     throw new Automat.StateException(acc);
             }
         }
@@ -156,47 +155,39 @@ namespace Serpen.Uni.Automat {
 
         public abstract override string ToString();
 
-        public string[] GetRandomWords(int count, int minLen, int maxLen) {
-            var words = new System.Collections.Generic.List<string>();
-            var rnd = Uni.Utils.RND;
+		public string[] GetRandomWords(int count, int minLen, int maxLen) {
+			var words = new System.Collections.Generic.List<string>();
+			var rnd = Uni.Utils.RND;
 
-            int i = 0;
+			int i = 0;
 
-            //count shouldn't be higher than words available with maxLen
-            count = System.Math.Min(count, Alphabet.Length * maxLen * maxLen);
+			// count shouldn't be higher than words available with maxLen
+			count = System.Math.Min(count, Alphabet.Length * maxLen * maxLen);
 
-            while (words.Count < count) {
-                string w = "";
-                var wLen = rnd.Next(minLen, maxLen);
-                for (int k = 0; k < wLen; k++)
-                    w = w.Insert(k, Alphabet[rnd.Next(0, Alphabet.Length)].ToString());
+			while (words.Count < count) {
+				string w = "";
+				var wLen = rnd.Next(minLen, maxLen);
+				for (int k = 0; k < wLen; k++)
+					w = w.Insert(k, Alphabet[rnd.Next(0, Alphabet.Length)].ToString());
 
-                if (!words.Contains(w))
-                    words.Add(w);
+				if (!words.Contains(w))
+					words.Add(w);
 
-                if (i > count * 10) {
-                    Uni.Utils.DebugMessage($"Unable to get enough random words {i} tries>{words.Count}>{count}", this, Uni.Utils.eDebugLogLevel.Verbose);
-                    break;
-                }
-                i++;
+				if (i > count * 10) {
+					Utils.DebugMessage($"Unable to get enough random words {i} tries>{words.Count}>{count}", this, Uni.Utils.eDebugLogLevel.Verbose);
+					break;
+				}
+				i++;
+			}
 
-            }
-            
-            words.Sort(new StringLengthComparer());
+			words.Sort(delegate (string s1, string s2) {
+				if (s1.Length < s2.Length) return -1;
+				else if (s1.Length > s2.Length) return 1;
+				else return s1.CompareTo(s2);
+			});
+
             return words.ToArray();
         }
-
-        class StringLengthComparer : System.Collections.Generic.IComparer<string> {
-            public int Compare(string s1, string s2) {
-
-                if (s1.Length < s2.Length) return -1;
-                else if (s1.Length > s2.Length) return 1;
-                else
-                    return s1.CompareTo(s2);
-            }
-        }
-
-
     }
 }
 

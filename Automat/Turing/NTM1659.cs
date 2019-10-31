@@ -42,7 +42,7 @@ namespace Serpen.Uni.Automat.Turing {
             uint lastQ = tcfgs[0].State;
             while (tcfgs.Length > 0) {
                 foreach (var tcfg in tcfgs) {
-                    Uni.Utils.DebugMessage(tcfg.ToString(), this, Uni.Utils.eDebugLogLevel.Verbose);
+                    Utils.DebugMessage(tcfg.ToString(), this, Uni.Utils.eDebugLogLevel.Verbose);
                     if (tcfg != null)
                         lastQ = tcfg.State;
                     if (runs > MAX_TURING_RUNS)
@@ -66,7 +66,7 @@ namespace Serpen.Uni.Automat.Turing {
 
             while (tcfgs.Length > 0 && !IsAcceptedState(lastQ)) {
                 foreach (var tcfg in tcfgs) {
-                    Uni.Utils.DebugMessage(tcfg.ToString(), this, Uni.Utils.eDebugLogLevel.Verbose);
+                    Utils.DebugMessage(tcfg.ToString(), this, Uni.Utils.eDebugLogLevel.Verbose);
                     if (tcfg != null)
                         lastBand = tcfg.Band;
                     if (runs > MAX_TURING_RUNS)

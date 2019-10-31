@@ -25,10 +25,10 @@ namespace Serpen.Uni.Automat.ContextFree {
             var Vars = new char[rnd.Next(1, MAX_VAR)];
             var Terms = new char[rnd.Next(1, MAX_CHAR)];
             for (int i = 0; i < Vars.Length; i++)
-                Vars[i] = (char)(rnd.Next((Int32)'A', (Int32)'Z'));
+                Vars[i] = (char)(rnd.Next((int)'A', (int)'Z'));
 
             for (int i = 0; i < Terms.Length; i++)
-                Terms[i] = (char)(rnd.Next((Int32)'a', (Int32)'z'));
+                Terms[i] = (char)(rnd.Next((int)'a', (int)'z'));
 
             Vars = Vars.Distinct().ToArray();
             Terms = Terms.Distinct().ToArray();
@@ -54,9 +54,9 @@ namespace Serpen.Uni.Automat.ContextFree {
                 }
             }
 
-            var HeadVars = (from r in rs select r.Key).Distinct().ToArray();
+            var headVars = (from r in rs select r.Key).Distinct().ToArray();
 
-            return new CFGrammer("CFG_Random", Vars, Terms, rs, HeadVars.RndElement());
+            return new CFGrammer("CFG_Random", Vars, Terms, rs, headVars.RndElement());
         }
 
 
@@ -84,7 +84,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             char newStartSymbol = (char)0;
 
-            //check all rules for startbody
+            // check all rules for startbody
             foreach (var r in rs)
                 foreach (string body in r.Value) {
                     if (body.Contains(StartSymbol)) {
@@ -96,15 +96,15 @@ namespace Serpen.Uni.Automat.ContextFree {
                     }
                 }
 
-            //no symbol found, return old and exit
+            // no symbol found, return old and exit
             if (newStartSymbol == (char)0)
                 return rs;
 
-            //first add new startsymbole
+            // first add new startsymbole
             newRS.Add(StartSymbol, new string[] { newStartSymbol.ToString() });
 
 
-            //iterate rules and replace S->S'
+            // iterate rules and replace S->S'
             foreach (var r in rs) {
                 char newrKey = r.Key != StartSymbol ? r.Key : newStartSymbol;
                 var valList = new List<string>(r.Value.Length);
@@ -240,7 +240,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                     string newbody = body;
                     int replaceStartPos = 0;
 
-                    //translate every new word, with all existing translations
+                    // translate every new word, with all existing translations
                     foreach (var t in translate) {
                         var oldbody = newbody;
                         if (newbody.Length > 2)
@@ -257,7 +257,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                         replaceStartPos++;
                         char nL;
 
-                        if (translate.TryGetValue(replacePart, out nL)) { } else {
+                        if (!translate.TryGetValue(replacePart, out nL)) {
                             nL = Utils.NextFreeCapitalLetter(newVars.Union(Terminals).ToArray(), 'X');
                             newVars.Add(nL);
                             translate.Add(replacePart, nL);
@@ -476,7 +476,8 @@ namespace Serpen.Uni.Automat.ContextFree {
         public CFGrammer Complement() => throw new NotSupportedException();
         public CFGrammer Concat(CFGrammer cfg) => Combine(cfg, new string[] { "{0}{1}" }, "concat");
         public CFGrammer Join(CFGrammer cfg) => Combine(cfg, new string[] { "{0}" }, "join");
-        public CFGrammer HomomorphismChar(Dictionary<char, char> translate) => throw new NotImplementedException();
+        
+		public CFGrammer HomomorphismChar(Dictionary<char, char> translate) => throw new NotImplementedException();
 
         #endregion
     } //end class

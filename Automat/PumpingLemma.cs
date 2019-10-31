@@ -21,7 +21,7 @@ namespace Serpen.Uni.Automat {
                     foreach (string[] strParts in StringParts3(w)) {
 
                         if (!(w.Length >= pumpLaenge)) {
-                            Uni.Utils.DebugMessage($"word |w={w}|>={pumpLaenge}", Automat, Uni.Utils.eDebugLogLevel.Verbose);
+                            Utils.DebugMessage($"word |w={w}|>={pumpLaenge}", Automat, Uni.Utils.eDebugLogLevel.Verbose);
                             continue; // throw new PumpingException($"|w|={w.Length}<{pumpLaenge}");
                         }
 
@@ -29,13 +29,13 @@ namespace Serpen.Uni.Automat {
                         string y = strParts[1];
                         string z = strParts[2];
 
-                        Uni.Utils.DebugMessage($"word {w}=({x}.{y}.{z})", Automat, Uni.Utils.eDebugLogLevel.Verbose);
+                        Utils.DebugMessage($"word {w}=({x}.{y}.{z})", Automat, Uni.Utils.eDebugLogLevel.Verbose);
                         if (!((x + y).Length <= pumpLaenge)) {
-                            Uni.Utils.DebugMessage($"word |x+y={x.Length}+{y.Length}|<={pumpLaenge}", Automat, Uni.Utils.eDebugLogLevel.Verbose);
+                            Utils.DebugMessage($"word |x+y={x.Length}+{y.Length}|<={pumpLaenge}", Automat, Uni.Utils.eDebugLogLevel.Verbose);
                             continue; // throw new PumpingException($"|xy|={(x + y).Length}>{pumpLaenge}");
                         }
                         if (y.Length == 0) {
-                            Uni.Utils.DebugMessage($"word |y={y}|=0", Automat, Uni.Utils.eDebugLogLevel.Verbose);
+                            Utils.DebugMessage($"word |y={y}|=0", Automat, Uni.Utils.eDebugLogLevel.Verbose);
                             continue; // throw new PumpingException($"|y|=0, y={Utils.EPSILON}");
                         }
 
@@ -44,9 +44,9 @@ namespace Serpen.Uni.Automat {
                             int r = Uni.Utils.RND.Next(1, exponentMax);
                             string wi = x + string.Concat(System.Linq.Enumerable.Repeat(y, r)) + z;
                             foundAccepted = Automat.AcceptWord(wi);
-                            Uni.Utils.DebugMessage($"word {wi}: {foundAccepted}", Automat, Uni.Utils.eDebugLogLevel.Verbose);
+                            Utils.DebugMessage($"word {wi}: {foundAccepted}", Automat, Uni.Utils.eDebugLogLevel.Verbose);
                             if (foundAccepted) {
-                                Uni.Utils.DebugMessage($"{w} {pumpLaenge}-pumpbar for {x}.{y}.{z}", Automat, Uni.Utils.eDebugLogLevel.Verbose);
+                                Utils.DebugMessage($"{w} {pumpLaenge}-pumpbar for {x}.{y}.{z}", Automat, Uni.Utils.eDebugLogLevel.Verbose);
                                 allAcceptedWordsPass++;
                             }
                         }
@@ -61,15 +61,15 @@ namespace Serpen.Uni.Automat {
                 return PumpResult.NoAcceptedWordFound;
 
             if (allAcceptedWordsPass > 0) {
-                Uni.Utils.DebugMessage($"{pumpLaenge}-pumpbar for |{allAcceptedWordsPass}| words", Automat, Uni.Utils.eDebugLogLevel.Verbose);
+                Utils.DebugMessage($"{pumpLaenge}-pumpbar for |{allAcceptedWordsPass}| words", Automat, Uni.Utils.eDebugLogLevel.Verbose);
                 return PumpResult.Pumpable;
             } else
-                Uni.Utils.DebugMessage($"not {pumpLaenge}-pumpbar", Automat, Uni.Utils.eDebugLogLevel.Verbose);
+                Utils.DebugMessage($"not {pumpLaenge}-pumpbar", Automat, Uni.Utils.eDebugLogLevel.Verbose);
             return PumpResult.NotPumpable;
         }
 
         static string[][] StringParts3(string w) {
-            var words = new System.Collections.Generic.List<string[]>(w.Length*w.Length);
+            var words = new System.Collections.Generic.List<string[]>(w.Length * w.Length);
             for (int i = 0; i <= w.Length; i++) {
                 for (int j = i; j <= w.Length; j++) {
                     string[] parts = new string[3];
@@ -83,7 +83,7 @@ namespace Serpen.Uni.Automat {
         }
 
         static string[][] StringParts5(string w) {
-            var words = new System.Collections.Generic.List<string[]>(w.Length*w.Length);
+            var words = new System.Collections.Generic.List<string[]>(w.Length * w.Length);
             for (int i = 0; i <= w.Length; i++) {
                 for (int j = i; j <= w.Length; j++) {
                     for (int k = j; k <= w.Length; k++) {

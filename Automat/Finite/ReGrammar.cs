@@ -53,7 +53,7 @@ namespace Serpen.Uni.Automat {
                     words.Add(w);
 
                 if (i > count * 10) {
-                    Uni.Utils.DebugMessage($"Unable to get enough random words {i} tries>{words.Count}>{count}", null, Uni.Utils.eDebugLogLevel.Verbose);
+                    Utils.DebugMessage($"Unable to get enough random words {i} tries>{words.Count}>{count}", null, Uni.Utils.eDebugLogLevel.Verbose);
                     break;
                 }
                 i++;

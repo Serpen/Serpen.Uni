@@ -19,9 +19,9 @@ public class TuringTransformMultiTrack : TransformBase<TuringTransformMultiTrack
         
         public void AddByStateStoreAndTracks(string q, string c1, string qNext, string c2, TMDirection dir) {
             Add(new TuringTransformMultiTrack.TuringKey(StateTracks.ArrayIndex(q), 
-                    c1.Replace(",", "").ToCharArray().Reverse().ToArray()),
+                    c1.Replace(",", string.Empty).ToCharArray().Reverse().ToArray()),
                 new TuringTransformMultiTrack.TuringVal(StateTracks.ArrayIndex(qNext), 
-                    c2.Replace(",", "").ToCharArray().Reverse().ToArray(), dir));
+                    c2.Replace(",", string.Empty).ToCharArray().Reverse().ToArray(), dir));
 
         }
         

@@ -108,19 +108,19 @@ namespace Serpen.Uni.Automat.Finite {
 
                             //try some magic to shorten formula
                             if (Rikk == Rkkk | Rikk == $"({Rkkk})" | $"({Rikk}" == Rkkk)
-                                Rikk = "";
+                                Rikk = string.Empty;
                             if (Rkjk == Rkkk | Rkjk == $"({Rkkk})" | $"({Rkjk}" == Rkkk)
-                                Rkjk = "";
+                                Rkjk = string.Empty;
                             if ($"{Rikk}{Rkkk}{Rkjk}" == Rijk)
                                 Rijk = "";
-                            if (Rijk != "") Rijk = $"({Rijk})+";
-                            if (Rikk != "") Rikk = $"({Rikk})";
-                            if (Rkjk != "") Rkjk = $"({Rkjk})";
-                            if (Rkkk != "") Rkkk = $"({Rkkk})*";
+                            if (Rijk != string.Empty) Rijk = $"({Rijk})+";
+                            if (Rikk != string.Empty) Rikk = $"({Rikk})";
+                            if (Rkjk != string.Empty) Rkjk = $"({Rkjk})";
+                            if (Rkkk != string.Empty) Rkkk = $"({Rkkk})*";
 
                             R[i, j, k] = $"{Rijk}{Rikk}{Rkkk}{Rkjk}";
 
-                            if (R[i, j, k] == "()*") R[i, j, k] = "";
+                            if (R[i, j, k] == "()*") R[i, j, k] = string.Empty;
 
                             //try some magic to shorten formula with regex
                             R[i, j, k] = RegExText.Replace(R[i, j, k], @"\((\w)\)", "$1");

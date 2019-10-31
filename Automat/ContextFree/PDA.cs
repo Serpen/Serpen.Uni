@@ -75,7 +75,6 @@ namespace Serpen.Uni.Automat.ContextFree {
             for (int i = 0; i < AcceptedStates.Length; i++)
                 if (AcceptedStates[i] > StatesCount)
                     throw new StateException(AcceptedStates[i]);
-
         }
 
         //nondeterministic makes it grow exponetially, maybe it is best, to do a BFS instead of DFS, follow one path to its possible end
@@ -83,7 +82,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             var retCfgs = new List<PDAConfig>(1000);
 
             if (pcfgs.Length > MAX_RUNS_OR_STACK) {
-                Uni.Utils.DebugMessage($"Stack >= {pcfgs.Length} abort", this, Uni.Utils.eDebugLogLevel.Always);
+                Utils.DebugMessage($"Stack >= {pcfgs.Length} abort", this, Uni.Utils.eDebugLogLevel.Always);
                 return new PDAConfig[0];
             }
 

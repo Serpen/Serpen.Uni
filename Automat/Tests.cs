@@ -369,24 +369,24 @@ namespace Serpen.Uni.Automat {
                         if (erg1) onceTrue++;
                         if (!erg1) onceFalse++;
                         if (erg1 != erg2) {
-                            Uni.Utils.DebugMessage($"{count}. word '{w}' divides Automates", A1, Uni.Utils.eDebugLogLevel.Always);
+                            Utils.DebugMessage($"{count}. word '{w}' divides Automates", A1, Uni.Utils.eDebugLogLevel.Always);
                             return false;
                         }
-                        Uni.Utils.DebugMessage($"{count}. word '{w}' passes", A1, Uni.Utils.eDebugLogLevel.Verbose);
+                        Utils.DebugMessage($"{count}. word '{w}' passes", A1, Uni.Utils.eDebugLogLevel.Verbose);
                     } catch (TuringCycleException) {
                     } catch (PDAStackException) { }
                     count++;
                 }
             }
             if (onceTrue >= passLevel && onceFalse >= passLevel) {
-                Uni.Utils.DebugMessage($"{count} words passed", A1, Uni.Utils.eDebugLogLevel.Verbose);
+                Utils.DebugMessage($"{count} words passed", A1, Uni.Utils.eDebugLogLevel.Verbose);
                 return true;
             } else {
                 if (A1.Equals(A2)) {
-                    Uni.Utils.DebugMessage($"{count} words passed, but not both tested, but Equals works", A1, Uni.Utils.eDebugLogLevel.Normal);
+                    Utils.DebugMessage($"{count} words passed, but not both tested, but Equals works", A1, Uni.Utils.eDebugLogLevel.Normal);
                     return true;
                 } else {
-                    Uni.Utils.DebugMessage($"{count} words passed, but not both tested, Equals not working", A1, Uni.Utils.eDebugLogLevel.Always);
+                    Utils.DebugMessage($"{count} words passed, but not both tested, Equals not working", A1, Uni.Utils.eDebugLogLevel.Always);
                     return true;
                 }
 

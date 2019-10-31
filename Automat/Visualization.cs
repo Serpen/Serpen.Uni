@@ -178,7 +178,7 @@ namespace Serpen.Uni.Automat {
                     thisCurveHeigth = lastCurveHeigth;
                     lastCurveHeigth += CURVE_BONUS;
                     var ps = new Point[] {
-                        new Point(lineX, vCenter+STATE_DIAMETER/2),
+                        new Point(lineX, vCenter+STATE_DIAMETER / 2),
                         new Point(lineM, vCenter+STATE_DIAMETER/2+thisCurveHeigth),
                         new Point(lineX2, vCenter+STATE_DIAMETER/2)};
 

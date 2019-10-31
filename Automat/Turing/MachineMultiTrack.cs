@@ -59,7 +59,7 @@ namespace Serpen.Uni.Automat.Turing {
             wordTracks[0] = w;
             for (int i = 1; i < Tracks; i++)
                 wordTracks[i] = new string(BlankSymbol, w.Length);
-            Uni.Utils.DebugMessage($"w: {w}=>{string.Join(',', wordTracks)}", this, Uni.Utils.eDebugLogLevel.Verbose);
+            Utils.DebugMessage($"w: {w}=>{string.Join(',', wordTracks)}", this, Uni.Utils.eDebugLogLevel.Verbose);
 
             var tcfg = new TuringConfigMultiTrack(BlankSymbol, wordTracks, 0) { State = StartState };
 
@@ -67,7 +67,7 @@ namespace Serpen.Uni.Automat.Turing {
             uint lastQ = tcfg.State;
 
             while (tcfg != null && !IsAcceptedState(tcfg.State)) {
-                Uni.Utils.DebugMessage(tcfg.ToString(), this, Uni.Utils.eDebugLogLevel.Verbose);
+                Utils.DebugMessage(tcfg.ToString(), this, Uni.Utils.eDebugLogLevel.Verbose);
                 tcfg = GoChar(tcfg);
                 if (tcfg != null)
                     lastQ = tcfg.State;
@@ -86,7 +86,7 @@ namespace Serpen.Uni.Automat.Turing {
             for (int i = 1; i < Tracks; i++)
                 wordTracks[i] = new string(BlankSymbol, w.Length);
 
-            Uni.Utils.DebugMessage($"w: {w}=>{string.Join(',', wordTracks)}", this, Uni.Utils.eDebugLogLevel.Verbose);
+            Utils.DebugMessage($"w: {w}=>{string.Join(',', wordTracks)}", this, Uni.Utils.eDebugLogLevel.Verbose);
 
             var tcfg = new TuringConfigMultiTrack(BlankSymbol, wordTracks, 0) { State = StartState };
 
