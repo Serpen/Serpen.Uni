@@ -12,7 +12,7 @@ namespace Serpen.Uni {
             System.Console.WriteLine(wt);
             var kv = new KVDiagramm(wt);
             System.Console.WriteLine(kv);
-            var qmcf = wt.QuineMcCluskey();
+            var qmcf = QuineMcCluskeyRow.QuineMcCluskey(wt);
             System.Console.WriteLine(string.Join(';', qmcf));
         }
 

@@ -104,7 +104,7 @@ namespace Serpen.Uni {
         }
 
         public static T[,] RemoveArrayRow<T>(this T[,] table, int row) {
-            var newTable = new T[table.GetLength(0), table.GetLength(1) - 1];
+            var newTable = new T[table.GetLength(0)-1, table.GetLength(1)];
             int indexModifier = 0;
             for (int r = 0; r < newTable.GetLength(0); r++) {
                 if (r == row)
@@ -115,11 +115,11 @@ namespace Serpen.Uni {
             return newTable;
         }
 
-        public static string FormatArray(bool[,] array) {
+        public static string FormatArray<T>(T[,] array) {
             var sb = new System.Text.StringBuilder();
             for (int r = 0; r < array.GetLength(0); r++) {
                 for (int c = 0; c < array.GetLength(1); c++)
-                    sb.Append($"{(array[r, c] ? 1 : 0)}, ");
+                    sb.Append($"{array[r, c].ToString().PadLeft(2) }, ");
                 sb.AppendLine();
             }
             return sb.ToString();

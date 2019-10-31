@@ -1,4 +1,4 @@
-// using System.Linq;
+using System.Linq;
 
 namespace Serpen.Uni.CompSys {
 
@@ -40,29 +40,6 @@ namespace Serpen.Uni.CompSys {
                 }
 
             return new Schaltfunktion(VarCount, sf);
-        }
-
-        [AlgorithmSource("~1608 2.2.3")]
-        public string[] QuineMcCluskey() {
-            QuineMcCluskeyRow[] minTerms;
-
-            int minTermCount = 0;
-            for (int i = 0; i < Array.GetLength(0); i++)
-                if (Array[i, Array.GetLength(1) - 1]) minTermCount++;
-
-            minTerms = new QuineMcCluskeyRow[minTermCount];
-
-            int j = 0;
-            for (int i = 0; i < minTerms.Length; i++) {
-                while (!Array[j, Array.GetLength(1) - 1])
-                    j++;
-                minTerms[i] = new QuineMcCluskeyRow(Array, j, j.ToString());
-                j++;
-            }
-
-            while (QuineMcCluskeyRow.Step2(ref minTerms)) ;
-
-            return QuineMcCluskeyRow.WesentlichePrimimplikanten(minTerms, minTermCount);
         }
 
         public override string ToString() {
