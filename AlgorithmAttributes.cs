@@ -15,4 +15,7 @@ namespace Serpen.Uni {
         public string[] Source {get;}
         public AlgorithmSourceAttribute(params string[] source) => this.Source = source;
     }
+
+    public enum AlgSourceMode { K1659, K1608, EAFK, Wiki }
+
 }

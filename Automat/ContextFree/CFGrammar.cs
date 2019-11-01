@@ -60,10 +60,10 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
 
-        public CFGrammer toChomskyNF(SourceMode mode = SourceMode.EAFK) {
+        public CFGrammer toChomskyNF(AlgSourceMode mode = AlgSourceMode.EAFK) {
             var newVars = new List<char>(Variables);
             var newRS = Rules;
-            if (mode == SourceMode.EAFK)
+            if (mode == AlgSourceMode.EAFK)
                 newRS = RemoveUnusedSymbols(newRS, ref newVars);
             newRS = Chomskey1_StartSymbol(newRS, ref newVars);
             newRS = Chomskey2_Epsilon(newRS);

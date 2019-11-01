@@ -12,8 +12,6 @@ namespace Serpen.Uni.Automat {
 
     public interface IAlleAbgeschlossenheitseigenschaften : IUnion, IIntersect, IComplement, IDiff, IConcat, IJoin, IReverse, IKleeneStern, IHomomorphismChar { }
 
-    public enum SourceMode { K1659, EAFK, Wiki }
-
     public enum RuleConstaint { None, Left, Right }
     public interface IConfig {
         uint State {get;}
