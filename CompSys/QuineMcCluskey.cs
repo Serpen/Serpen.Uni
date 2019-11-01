@@ -75,7 +75,7 @@ namespace Serpen.Uni.CompSys {
             1 * this.Index.CompareTo(other.Index);
 
         [AlgorithmSource("~1608 2.2.3")]
-        public static string[] QuineMcCluskey(WerteTabelle wt, AlgSourceMode algSourceMode = AlgSourceMode.K1608) {
+        public static string QuineMcCluskey(WerteTabelle wt, AlgSourceMode algSourceMode = AlgSourceMode.K1608) {
             var minTerms = new List<QuineMcCluskeyRow>();
 
             // generate minterm table
@@ -88,7 +88,27 @@ namespace Serpen.Uni.CompSys {
             var minTermArray = minTerms.ToArray();
             while (QuineMcCluskeyRow.Step2(ref minTermArray)) ;
 
-            return QuineMcCluskeyRow.WesentlichePrimimplikanten(minTermArray, algSourceMode);
+            var vpi = QuineMcCluskeyRow.WesentlichePrimimplikanten(minTermArray, algSourceMode);
+
+            var sb = new System.Text.StringBuilder();
+            for (int r1 = 0; r1 < vpi.Length; r1++) {
+                for (int r2 = 0; r2 < minTermArray.Length; r2++) {
+                    if (vpi[r1] == minTermArray[r2].Index) {
+                        int rowLen = minTermArray[r2].Row.Length;
+                        for (int c = 0; c < rowLen; c++) {
+                            if (minTermArray[r2].Row[c] == 1)
+                                sb.Append($"x{rowLen - c} & ");
+                            else if (minTermArray[r2].Row[c] == 0)
+                                sb.Append($"-x{rowLen - c} & ");
+                        } //next k
+                        sb = sb.Remove(sb.Length - 3, 3);
+                        sb.Append(" | ");
+                        break;
+                    } //end if
+                } //next j
+            } //next i
+            sb.Remove(sb.Length - 3, 3);
+            return sb.ToString();
         }
 
         [AlgorithmSource("~1608 2.2.3")]
@@ -182,7 +202,7 @@ namespace Serpen.Uni.CompSys {
                         }
                 } // next c
 
-                Utils.DebugMessage($"found Kernimplikanten: {string.Join(',', Kernimplikanten)}", Utils.eDebugLogLevel.Normal);
+                Utils.DebugMessage($"found Kernimplikanten: {string.Join(',', Kernimplikanten)}", Utils.eDebugLogLevel.Verbose);
 
                 // add remaining unmatched rows
                 for (int c = 1; c < table.GetLength(1); c++)
@@ -191,7 +211,7 @@ namespace Serpen.Uni.CompSys {
                             if (table[r, c] == 1)
                                 Kernimplikanten.Add(r);
 
-                Utils.DebugMessage($"found implikanten: {string.Join(',', Kernimplikanten)}", Utils.eDebugLogLevel.Normal);
+                Utils.DebugMessage($"found implikanten: {string.Join(',', Kernimplikanten)}", Utils.eDebugLogLevel.Verbose);
 
                 // return index names from origin qmc-table
                 var kistr = new string[Kernimplikanten.Count];
