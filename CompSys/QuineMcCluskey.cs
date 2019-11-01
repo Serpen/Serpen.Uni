@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Serpen.Uni.CompSys {
-    struct QuineMcCluskeyRow {
+    struct QuineMcCluskeyRow : System.IComparable<QuineMcCluskeyRow> {
         const int IRRELEVANT = -1;
         sbyte[] Row;
 
@@ -15,41 +15,44 @@ namespace Serpen.Uni.CompSys {
             Index = index;
         }
 
-        public int CountOnes => Row.Count(b => b == 1);
+        public readonly int CountOnes => Row.Count(b => b == 1);
         public bool Processed;
         public string Index;
 
+        /// <summary>
+        /// Checks if other row differs only in one position
+        /// </summary>
+        /// <returns>from both generated combined row</returns>
         public QuineMcCluskeyRow? OneDifferent(ref QuineMcCluskeyRow other) {
-            const int NO_ROW = -1;
-            int differentRow = NO_ROW;
+            const int INVALID_ROW = -1;
 
+            int differentRow = INVALID_ROW; //number of differnt entry or invalid
+
+            // check if only one row is differnt
             for (int i = 0; i < Row.Length; i++)
                 if (Row[i] != other.Row[i]) {
-                    if (differentRow == NO_ROW && Row[i] != IRRELEVANT && other.Row[i] != IRRELEVANT)
+                    if (differentRow == INVALID_ROW && Row[i] != IRRELEVANT && other.Row[i] != IRRELEVANT)
                         differentRow = i;
-                    else {
-                        differentRow = NO_ROW;
-                        break;
+                    else { //more than one different -> reset and exit
+                        differentRow = INVALID_ROW;
+                        break; //or return null;
                     }
                 }
 
-            if (differentRow != NO_ROW) {
-
-                var clone = new QuineMcCluskeyRow();
-
-                clone.Index = $"{this.Index},{other.Index}";
-                clone.Row = new sbyte[this.Row.Length];
-                this.Row.CopyTo(clone.Row, 0);
-                clone.Row[differentRow] = IRRELEVANT;
-                // other.Row[differentRow] = IRRELEVANT;
+            if (differentRow != INVALID_ROW) {
+                Utils.DebugMessage($"only {differentRow}. row different in {this} and {other}", Utils.eDebugLogLevel.Verbose);
+                var newRow = new QuineMcCluskeyRow() {
+                    Index = $"{this.Index},{other.Index}",
+                    Row = new sbyte[this.Row.Length],
+                };
+                this.Row.CopyTo(newRow.Row, 0);
+                newRow.Row[differentRow] = IRRELEVANT;
 
                 Processed = true;
                 other.Processed = true;
 
-                Utils.DebugMessage($"compare ({this}) with ({other}) == true", Utils.eDebugLogLevel.Verbose);
-                return clone;
+                return newRow;
             } else {
-                Utils.DebugMessage($"compare ({this}) with ({other}) == false", Utils.eDebugLogLevel.Verbose);
                 return null;
             }
         }
@@ -58,7 +61,6 @@ namespace Serpen.Uni.CompSys {
             int hc = Row.Length;
             for (int i = 0; i < Row.Length; i++)
                 hc = hc * 128 + Row[i];
-
             return hc;
         }
 
@@ -66,42 +68,40 @@ namespace Serpen.Uni.CompSys {
 
         public override string ToString() => $"{Index.PadLeft(5)} {string.Join(',', Row)} {CountOnes} {Processed}";
 
-        
+        // sort CountOnes, Index.Lenght, Index
+        public int CompareTo(QuineMcCluskeyRow other) =>
+            4 * this.CountOnes.CompareTo(other.CountOnes) +
+            2 * this.Index.Length.CompareTo(other.Index.Length) +
+            1 * this.Index.CompareTo(other.Index);
+
         [AlgorithmSource("~1608 2.2.3")]
-        public static string[] QuineMcCluskey(WerteTabelle wt) {
-            QuineMcCluskeyRow[] minTerms;
+        public static string[] QuineMcCluskey(WerteTabelle wt, AlgSourceMode algSourceMode = AlgSourceMode.K1608) {
+            var minTerms = new List<QuineMcCluskeyRow>();
 
-            int minTermCount = 0;
+            // generate minterm table
             for (int i = 0; i < wt.Array.GetLength(0); i++)
-                if (wt.Array[i, wt.Array.GetLength(1) - 1]) minTermCount++;
+                if (wt.Array[i, wt.Array.GetLength(1) - 1])
+                    minTerms.Add(new QuineMcCluskeyRow(wt.Array, i, i.ToString()));
 
-            minTerms = new QuineMcCluskeyRow[minTermCount];
+            int initialMintermCount = minTerms.Count;
+            minTerms.Sort();
+            var minTermArray = minTerms.ToArray();
+            while (QuineMcCluskeyRow.Step2(ref minTermArray)) ;
 
-            int j = 0;
-            for (int i = 0; i < minTerms.Length; i++) {
-                while (!wt.Array[j, wt.Array.GetLength(1) - 1])
-                    j++;
-                minTerms[i] = new QuineMcCluskeyRow(wt.Array, j, j.ToString());
-                j++;
-            }
-
-            minTerms = minTerms.OrderBy(a => a.CountOnes).ToArray();
-
-            while (QuineMcCluskeyRow.Step2(ref minTerms)) ;
-
-            return QuineMcCluskeyRow.WesentlichePrimimplikanten(minTerms, minTermCount);
+            return QuineMcCluskeyRow.WesentlichePrimimplikanten(minTermArray, algSourceMode);
         }
 
         [AlgorithmSource("~1608 2.2.3")]
         internal static bool Step2(ref QuineMcCluskeyRow[] qmcRows) {
-            var newTerms = new System.Collections.Generic.HashSet<QuineMcCluskeyRow>();
+            var newTerms = new HashSet<QuineMcCluskeyRow>();
 
+            // iterate each row x each follow row
             for (int i = 0; i < qmcRows.Length - 1; i++) {
                 for (int j = i + 1; j < qmcRows.Length; j++) {
                     if (qmcRows[j].CountOnes == qmcRows[i].CountOnes)
-                        continue;
+                        continue; // same count not relevant
                     else if (qmcRows[j].CountOnes > qmcRows[i].CountOnes + 1)
-                        break;
+                        break; // sorted! -> outofbounds
                     else {// # == #+1
                         var newTerm = qmcRows[i].OneDifferent(ref qmcRows[j]);
                         if (newTerm.HasValue)
@@ -112,6 +112,7 @@ namespace Serpen.Uni.CompSys {
 
             bool foundnew = newTerms.Any();
 
+            // add unprocessed rules, to keep them, different from org alg, less performant
             foreach (var item in qmcRows)
                 if (!item.Processed)
                     newTerms.Add(item);
@@ -122,99 +123,116 @@ namespace Serpen.Uni.CompSys {
         }
 
         [AlgorithmSource("~1608 2.2.3", "~wiki:Verfahren_nach_Quine_und_McCluskey")]
-        internal static string[] WesentlichePrimimplikanten(QuineMcCluskeyRow[] qmcRows, int indiciesCount) {
-            
-            var matchTable = new Dictionary<int, int>();
-            int mtIndex = 1;
+        internal static string[] WesentlichePrimimplikanten(QuineMcCluskeyRow[] qmcRows, AlgSourceMode algSourceMode) {
+            //generated index columns sorted
+            var colIndexs = qmcRows
+                .SelectMany(r => r.Index.Split(','))
+                .Distinct()
+                .Select(a => System.Convert.ToInt32(a))
+                .OrderBy(a => a);
 
-            var table = new int[qmcRows.Length+1, indiciesCount+1];
+            var table = new int[qmcRows.Length + 1, colIndexs.Count() + 1]; //data with border desc +1
 
-            //generate Primeimplicanttable
-            for (int r = 0; r < qmcRows.Length; r++) {
-                var inds = (from i in qmcRows[r].Index.Split(',') select System.Convert.ToInt32(i));
-                foreach (var ind in inds) {
-                    int tindex;
-                    if (!matchTable.TryGetValue(ind, out tindex)) {
-                        tindex = mtIndex;
-                        matchTable.Add(ind, mtIndex++);
-                    }
-                    table[r+1, tindex] = 1;
-                }
-            }
+            var matchColumIndex = new Dictionary<int, int>();
+            int mcIndexInc = 1;
+            foreach (var ind in colIndexs)
+                matchColumIndex.Add(ind, mcIndexInc++);
+
+            // generate primeimplicanttable
+            for (int r = 0; r < qmcRows.Length; r++)
+                foreach (var ind in (from i in qmcRows[r].Index.Split(',')
+                                     select System.Convert.ToInt32(i)))
+                    table[r + 1, matchColumIndex[ind]] = 1;
 
             // border description
-            table[0,0]=-1;
-            foreach (var item in matchTable)
+            table[0, 0] = -1;
+            foreach (var item in matchColumIndex)
                 table[0, item.Value] = item.Key;
             for (int i = 1; i < table.GetLength(0); i++)
-                table[i,0] = i-1;
+                table[i, 0] = i - 1;
 
             Utils.DebugMessage("Primimplikanttable:\n" + Utils.FormatArray(table), Utils.eDebugLogLevel.Normal);
 
             var processedIndicies = new List<int>();
 
+            if (algSourceMode == AlgSourceMode.K1608) {
+                const int ROW_NOT_UNIQUE = -1;
+                var Kernimplikanten = new List<int>(); // rows
 
+                // find Kernimplikanten, column has only one unique true row
+                for (int c = 1; c < table.GetLength(1); c++) {
+                    int pindex = ROW_NOT_UNIQUE;
+                    for (int r = 1; r < table.GetLength(0); r++) {
+                        if (table[r, c] == 1 && !processedIndicies.Contains(c))
+                            if (pindex == ROW_NOT_UNIQUE)
+                                pindex = r;
+                            else {
+                                pindex = ROW_NOT_UNIQUE;
+                                break;
+                            }
+                    } // next r
 
-            //find Kernimplikanten
-            var Kernimplikanten = new List<int>();
-            for (int c = 1; c < table.GetLength(1); c++) {
-                int pindex = -1;
-                for (int r = 1; r < table.GetLength(0); r++) {
-                    if (table[r, c] == 1 && !processedIndicies.Contains(c))
-                        if (pindex == -1)
-                            pindex = r;
-                        else {
-                            pindex = -1;
-                            break;
+                    if (pindex != ROW_NOT_UNIQUE)
+                        if (!Kernimplikanten.Contains(pindex)) {
+                            Kernimplikanten.Add(pindex);
+                            foreach (var ind in (from i in qmcRows[pindex - 1].Index.Split(',')
+                                                 select System.Convert.ToInt32(i)))
+                                processedIndicies.Add(matchColumIndex[ind]);
+
                         }
-                }
-                if (pindex != -1)
-                    if (!Kernimplikanten.Contains(pindex)) {
-                        // yield return pindex;
-                        Kernimplikanten.Add(pindex);
-                        IEnumerable<int> inds = (from i in qmcRows[pindex-1].Index.Split(',') select System.Convert.ToInt32(i));
-                        foreach (var ind in inds)
-                            processedIndicies.Add(matchTable[ind]);
+                } // next c
 
-                    }
-            } //next c
+                Utils.DebugMessage($"found Kernimplikanten: {string.Join(',', Kernimplikanten)}", Utils.eDebugLogLevel.Normal);
 
-            Utils.DebugMessage($"found Kernimplikanten: {string.Join(',', Kernimplikanten)}", Utils.eDebugLogLevel.Normal);
+                // add remaining unmatched rows
+                for (int c = 1; c < table.GetLength(1); c++)
+                    if (!processedIndicies.Contains(c))
+                        for (int r = 1; r < table.GetLength(0); r++)
+                            if (table[r, c] == 1)
+                                Kernimplikanten.Add(r);
 
-            for (int c = 1; c < table.GetLength(1); c++)
-                if (!processedIndicies.Contains(c))
-                    for (int r = 1; r < table.GetLength(0); r++)
-                        if (table[r, c]==1)
-                            Kernimplikanten.Add(r);
+                Utils.DebugMessage($"found implikanten: {string.Join(',', Kernimplikanten)}", Utils.eDebugLogLevel.Normal);
 
-            // Dominanz(ref table);
+                // return index names from origin qmc-table
+                var kistr = new string[Kernimplikanten.Count];
+                for (int i = 0; i < kistr.Length; i++)
+                    kistr[i] = qmcRows[Kernimplikanten[i] - 1].Index;
 
-            Utils.DebugMessage($"found implikanten: {string.Join(',', Kernimplikanten)}", Utils.eDebugLogLevel.Normal);
+                return kistr;
+            } else if (algSourceMode == AlgSourceMode.Wiki) {
+                Dominanz(ref table);
 
-            var kistr = new string[Kernimplikanten.Count];
-            for (int i = 0; i < Kernimplikanten.Count; i++)
-                kistr[i] = qmcRows[Kernimplikanten[i]-1].Index;
+                // return index names from origin qmc-table
+                var kistr = new string[table.GetLength(0) - 1];
+                for (int i = 0; i < kistr.Length; i++)
+                    kistr[i] = qmcRows[table[i + 1, 0]].Index;
 
-            return kistr;
-            // return Kernimplikanten;
+                return kistr;
+            } else // invalid alg source
+                throw new System.NotSupportedException();
+
         }
+        const int NO_DOMINANT = -1;
 
+        /// <summary>
+        /// Find Unique implicants by col, row dominance
+        /// </summary>
+        /// <param name="table"></param>
         [AlgorithmSource("wikipedia")]
         internal static void Dominanz(ref int[,] table) {
-            Utils.DebugMessage('\n' + Utils.FormatArray(table), Utils.eDebugLogLevel.Normal);
+            int removeColumn = NO_DOMINANT;
+            int removeRow = NO_DOMINANT;
 
-            int removeColumn = -1;
-            int removeRow = -1;
-
+            // inital first col- then row-dominance
             removeColumn = SpaltenDominanz(table);
-            if (removeColumn == -1)
+            if (removeColumn == NO_DOMINANT)
                 removeRow = ZeilenDominanz(table);
 
-            while (removeColumn != -1 || removeRow != -1) {
-                if (removeColumn != -1) {
+            while (removeColumn != NO_DOMINANT || removeRow != NO_DOMINANT) {
+                if (removeColumn != NO_DOMINANT) {
                     table = table.RemoveArrayCol(removeColumn);
                     Utils.DebugMessage($"remove Col {removeColumn}: \n{Utils.FormatArray(table)}", Utils.eDebugLogLevel.Normal);
-                } else if (removeRow != -1) {
+                } else { // if (removeRow != NO_DOMINANT) {
                     table = table.RemoveArrayRow(removeRow);
                     Utils.DebugMessage($"remove Row {removeRow}: \n{Utils.FormatArray(table)}", Utils.eDebugLogLevel.Normal);
                 }
@@ -222,38 +240,43 @@ namespace Serpen.Uni.CompSys {
                 removeColumn = SpaltenDominanz(table);
                 if (removeColumn == -1)
                     removeRow = ZeilenDominanz(table);
-
             }
         }
 
+        /// <summary>
+        /// Find dominating subset col and return their upset col for removal 
+        /// </summary>
         static int SpaltenDominanz(int[,] table) {
-            for (int c = 1; c < table.GetLength(1); c++) {
-                for (int c2 = c + 1; c2 < table.GetLength(1); c2++) {
-                    bool isTeilmenge = true;
-                    for (int r = 1; r < table.GetLength(0); r++) {
-                        if (table[r, c]!=1 && table[r, c2]==1)
-                            isTeilmenge = false;
-                    }
-                    if (isTeilmenge)
-                        return c;
-                }
-            }
-            return -1;
+            for (int c1 = 1; c1 < table.GetLength(1); c1++) {
+                for (int c2 = c1 + 1; c2 < table.GetLength(1); c2++) {
+                    bool isSubset = true;
+                    for (int r = 1; r < table.GetLength(0); r++)
+                        if (table[r, c1] != 1 && table[r, c2] == 1)
+                            isSubset = false;
+
+                    if (isSubset)
+                        return c1;
+                } // next c2
+            } // next c1
+            return NO_DOMINANT;
         }
 
+        /// <summary>
+        /// Find dominating subset row and return it for removal
+        /// </summary>
         static int ZeilenDominanz(int[,] table) {
             for (int r1 = 1; r1 < table.GetLength(0); r1++) {
                 for (int r2 = r1 + 1; r2 < table.GetLength(0); r2++) {
-                    bool isTeilmenge = true;
-                    for (int c = 1; c < table.GetLength(1); c++) {
-                        if (table[r1, c]!=1 && table[r2, c]==1)
-                            isTeilmenge = false;
-                    }
-                    if (isTeilmenge)
+                    bool isSubset = true;
+                    for (int c = 1; c < table.GetLength(1); c++)
+                        if (table[r1, c] != 1 && table[r2, c] == 1)
+                            isSubset = false;
+
+                    if (isSubset)
                         return r2;
-                }
-            }
-            return -1;
+                } // next r2
+            } // next r1
+            return NO_DOMINANT;
         }
     }
 

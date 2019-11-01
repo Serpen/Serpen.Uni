@@ -62,11 +62,11 @@ namespace Serpen.Uni.CompSys {
             return sb.ToString();
         } //end function
 
-        public static WerteTabelle T25_2 => new WerteTabelle(4, new bool[] {
+        public static WerteTabelle VT_1608_T25 => new WerteTabelle(4, new bool[] {
             true, false, true, false, true, true, true, true,
             false, false, true, true, false, false, false, false});
         
-        public static WerteTabelle wiki_de_qmcc => new WerteTabelle(4,
+        public static WerteTabelle VT_wikide_qmcc => new WerteTabelle(4,
             0, 1, 4, 5, 6, 7, 8, 9, 11, 15
         );
         
