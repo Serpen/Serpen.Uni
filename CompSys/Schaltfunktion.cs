@@ -28,6 +28,7 @@ namespace Serpen.Uni.CompSys {
 
         public bool Invoke(params bool[] b) => SF.Invoke(b);
 
+        public static Schaltfunktion SF_1608_S22 = new Schaltfunktion(3, a => (a[0] & (a[1] | a[2]) | a[1] & a[2]));
         public static Schaltfunktion DNF_T23 = new Schaltfunktion(3, a => (!a[0] & !a[1] & !a[2]) |
                                                                           ( a[0] &  a[1] & !a[2]) | 
                                                                           (!a[0] & !a[1] &  a[2]) | 
