@@ -80,7 +80,7 @@ namespace Serpen.Uni.Graph
             }
         }
 
-        public TreeNode<T>[] BreitenDurchLauf() {
+        public IEnumerable<TreeNode<T>> BreitenDurchLauf() {
             Queue<TreeNode<T>> queue = new Queue<TreeNode<T>>();
             List<TreeNode<T>> list = new List<TreeNode<T>>();
 
@@ -89,6 +89,7 @@ namespace Serpen.Uni.Graph
             while (queue.Any()) {
                 var r = queue.Dequeue();
                 list.Add(r);
+                yield return r;
                 foreach (var c in r._Childs) {
                     if (!list.Contains(c)) {
                         queue.Enqueue(c);   
@@ -97,7 +98,6 @@ namespace Serpen.Uni.Graph
                     
                 }
             }
-            return list.ToArray();
         }
     }
 }
