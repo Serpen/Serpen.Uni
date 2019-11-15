@@ -1,41 +1,41 @@
 namespace Serpen.Uni.CompSys {
-    public enum ePLASet { Unset, PositiveSet, NegativeSet, BothSet }
+    public enum ePROMSet { Unset, PositiveSet, NegativeSet, BothSet }
 
     /// <summary>
     /// Programmable Logic Array
     /// </summary>
-    public class PLA {
+    public class PROM {
 
         /// <param name="andMatrix">which input is set for AND matrix</param>
         /// <param name="orMatrix">which and is set for OR matrix</param>
-        public PLA(ePLASet[,] andMatrix, bool[,] orMatrix) {
+        public PROM(ePROMSet[,] andMatrix, bool[,] orMatrix) {
             if (andMatrix.GetLength(1) != orMatrix.GetLength(1))
                 throw new System.ArgumentOutOfRangeException();
             AndMatrix = andMatrix;
             OrMatrix = orMatrix;
-            Utils.DebugMessage("PLA:\n" + ToString(), Utils.eDebugLogLevel.Normal);
+            Utils.DebugMessage("PROM:\n" + ToString(), Utils.eDebugLogLevel.Normal);
         }
 
-        public static PLA GenerateRandom(int min = 1, int max = 10) {
+        public static PROM GenerateRandom(int min = 1, int max = 10) {
             var rnd = Utils.RND;
 
             int inputs = rnd.Next(min, max);
             int ands = rnd.Next(min, max);
             int orOut = rnd.Next(min, max);
 
-            var andMatrix = new ePLASet[inputs, ands];
+            var andMatrix = new ePROMSet[inputs, ands];
             var orMatrix = new bool[orOut, ands];
 
             for (int a = 0; a < ands; a++) {
                 for (int j = 0; j < inputs; j++)
-                    andMatrix[j, a] = (ePLASet)rnd.Next(0, 3);
+                    andMatrix[j, a] = (ePROMSet)rnd.Next(0, 3);
                 for (int j = 0; j < orOut; j++)
                     orMatrix[j, a] = rnd.Next(0, 2) == 0 ? false : true;
             }
-            return new PLA(andMatrix, orMatrix);
+            return new PROM(andMatrix, orMatrix);
         }
 
-        public ePLASet[,] AndMatrix { get; set; }
+        public ePROMSet[,] AndMatrix { get; set; }
         public bool[,] OrMatrix { get; set; }
 
         public bool[] Invoke(params bool[] inputs) {
@@ -48,11 +48,11 @@ namespace Serpen.Uni.CompSys {
             // calculate AND Elements, iterate through 
             for (int a = 0; a < ands.Length; a++) {
                 for (int i = 0; i < inputs.Length; i++) {
-                    if (AndMatrix[i, a] == ePLASet.BothSet)
+                    if (AndMatrix[i, a] == ePROMSet.BothSet)
                         ands[a] = false; // a&-a = alwaysfalse
-                    else if (AndMatrix[i, a] == ePLASet.PositiveSet)
+                    else if (AndMatrix[i, a] == ePROMSet.PositiveSet)
                         ands[a] = ands[a].HasValue ? ands[a] & inputs[i] : inputs[i];
-                    else if (AndMatrix[i, a] == ePLASet.NegativeSet)
+                    else if (AndMatrix[i, a] == ePROMSet.NegativeSet)
                         ands[a] = ands[a].HasValue ? ands[a] & !inputs[i] : !inputs[i];
                     if (ands[a].HasValue && !ands[a].Value)
                         break; // performance
@@ -81,13 +81,13 @@ namespace Serpen.Uni.CompSys {
             for (int i = 0; i < AndMatrix.GetLength(0); i++) {
                 for (int a = 0; a < AndMatrix.GetLength(1); a++) {
                     switch (AndMatrix[i, a]) {
-                        case ePLASet.PositiveSet:
+                        case ePROMSet.PositiveSet:
                             sb.Append("+ ");
                             break;
-                        case ePLASet.NegativeSet:
+                        case ePROMSet.NegativeSet:
                             sb.Append("- ");
                             break;
-                        case ePLASet.BothSet:
+                        case ePROMSet.BothSet:
                             sb.Append("# ");
                             break;
                         default:
