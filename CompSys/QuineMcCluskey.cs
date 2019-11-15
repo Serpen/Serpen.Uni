@@ -75,7 +75,7 @@ namespace Serpen.Uni.CompSys {
             1 * this.Index.CompareTo(other.Index);
 
         [AlgorithmSource("~1608 2.2.3")]
-        public static string QuineMcCluskey(WerteTabelle wt, AlgSourceMode algSourceMode = AlgSourceMode.K1608) {
+        public static string QuineMcCluskeyAlg(WerteTabelle wt, AlgSourceMode algSourceMode = AlgSourceMode.K1608) {
             var minTerms = new List<QuineMcCluskeyRow>();
 
             // generate minterm table
@@ -88,27 +88,7 @@ namespace Serpen.Uni.CompSys {
             var minTermArray = minTerms.ToArray();
             while (QuineMcCluskeyRow.Step2(ref minTermArray)) ;
 
-            var vpi = QuineMcCluskeyRow.WesentlichePrimimplikanten(minTermArray, algSourceMode);
-
-            var sb = new System.Text.StringBuilder();
-            for (int r1 = 0; r1 < vpi.Length; r1++) {
-                for (int r2 = 0; r2 < minTermArray.Length; r2++) {
-                    if (vpi[r1] == minTermArray[r2].Index) {
-                        int rowLen = minTermArray[r2].Row.Length;
-                        for (int c = 0; c < rowLen; c++) {
-                            if (minTermArray[r2].Row[c] == 1)
-                                sb.Append($"x{rowLen - c} & ");
-                            else if (minTermArray[r2].Row[c] == 0)
-                                sb.Append($"-x{rowLen - c} & ");
-                        } //next k
-                        sb = sb.Remove(sb.Length - 3, 3);
-                        sb.Append(" | ");
-                        break;
-                    } //end if
-                } //next j
-            } //next i
-            sb.Remove(sb.Length - 3, 3);
-            return sb.ToString();
+            return QuineMcCluskeyRow.WesentlichePrimimplikanten(minTermArray, algSourceMode);
         }
 
         [AlgorithmSource("~1608 2.2.3")]
@@ -143,7 +123,7 @@ namespace Serpen.Uni.CompSys {
         }
 
         [AlgorithmSource("~1608 2.2.3", "~wiki:Verfahren_nach_Quine_und_McCluskey")]
-        internal static string[] WesentlichePrimimplikanten(QuineMcCluskeyRow[] qmcRows, AlgSourceMode algSourceMode) {
+        internal static string WesentlichePrimimplikanten(QuineMcCluskeyRow[] qmcRows, AlgSourceMode algSourceMode) {
             //generated index columns sorted
             var colIndexs = qmcRows
                 .SelectMany(r => r.Index.Split(','))
@@ -161,8 +141,8 @@ namespace Serpen.Uni.CompSys {
             // generate primeimplicanttable
             for (int r = 0; r < qmcRows.Length; r++)
                 foreach (var ind in (from i in qmcRows[r].Index.Split(',')
-                                     select System.Convert.ToInt32(i)))
-                    table[r + 1, matchColumIndex[ind]] = 1;
+                                     select matchColumIndex[System.Convert.ToInt32(i)]))
+                    table[r + 1, ind] = 1;
 
             // border description
             table[0, 0] = -1;
@@ -195,10 +175,12 @@ namespace Serpen.Uni.CompSys {
                     if (pindex != ROW_NOT_UNIQUE)
                         if (!Kernimplikanten.Contains(pindex)) {
                             Kernimplikanten.Add(pindex);
-                            foreach (var ind in (from i in qmcRows[pindex - 1].Index.Split(',')
-                                                 select System.Convert.ToInt32(i)))
-                                processedIndicies.Add(matchColumIndex[ind]);
 
+                            processedIndicies.AddRange(
+                                // matching indexes of qmcRows Indexes
+                                from ind in qmcRows[pindex - 1].Index.Split(',')
+                                select matchColumIndex[System.Convert.ToInt32(ind)]
+                            );
                         }
                 } // next c
 
@@ -213,25 +195,45 @@ namespace Serpen.Uni.CompSys {
 
                 Utils.DebugMessage($"found implikanten: {string.Join(',', Kernimplikanten)}", Utils.eDebugLogLevel.Verbose);
 
-                // return index names from origin qmc-table
-                var kistr = new string[Kernimplikanten.Count];
-                for (int i = 0; i < kistr.Length; i++)
-                    kistr[i] = qmcRows[Kernimplikanten[i] - 1].Index;
+                var sb = new System.Text.StringBuilder();
+                int i;
+                for (i = 0; i < Kernimplikanten.Count - 1; i++)
+                    sb.Append(qmcRowToString(qmcRows[Kernimplikanten[i] - 1]) + " | ");
+                sb.Append(qmcRowToString(qmcRows[Kernimplikanten[i] - 1]));
 
-                return kistr;
+                return sb.ToString();
             } else if (algSourceMode == AlgSourceMode.Wiki) {
                 Dominanz(ref table);
 
-                // return index names from origin qmc-table
-                var kistr = new string[table.GetLength(0) - 1];
-                for (int i = 0; i < kistr.Length; i++)
-                    kistr[i] = qmcRows[table[i + 1, 0]].Index;
+                var sb = new System.Text.StringBuilder();
+                int i;
+                for (i = 0; i < table.GetLength(0) - 2; i++)
+                    sb.Append(qmcRowToString(qmcRows[table[i + 1, 0]]) + " | ");
+                sb.Append(qmcRowToString(qmcRows[table[i + 1, 0]]));
 
-                return kistr;
+                return sb.ToString();
             } else // invalid alg source
                 throw new System.NotSupportedException();
-
         }
+
+        private static string qmcRowToString(QuineMcCluskeyRow qmcRow) {
+            var sb = new System.Text.StringBuilder();
+
+            int rowLen = qmcRow.Row.Length;
+
+            for (int c = 0; c < rowLen; c++) {
+                if (sb.Length > 0 && qmcRow.Row[c] != -1)
+                    sb.Append(" & ");
+
+                if (qmcRow.Row[c] == 1)
+                    sb.Append($"x{rowLen - c}");
+                else if (qmcRow.Row[c] == 0)
+                    sb.Append($"-x{rowLen - c}");
+                // else {} // -1 = IRRELEVANT = -
+            } //next c
+            return sb.ToString();
+        }
+
         const int NO_DOMINANT = -1;
 
         /// <summary>
