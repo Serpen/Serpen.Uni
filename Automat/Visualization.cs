@@ -74,7 +74,7 @@ namespace Serpen.Uni.Automat {
                 }
             }
         }
-        public static Bitmap DrawAutomat(IAutomat A) {
+        public static Bitmap DrawAutomat(IAutomat A, uint? highlightState = null) {
 
             var alreadyDrawn = new AlreadyDrawnClass();
 
@@ -111,6 +111,7 @@ namespace Serpen.Uni.Automat {
             }
 
 
+            // draw States
             for (uint iq = 0; iq < A.StatesCount; iq++) {
                 var strSize = g.MeasureString(A.States[iq], FONT);
                 g.DrawString(A.States[iq], FONT, Brushes.Black, qPos(iq) + STATE_DIAMETER / 2 - strSize.Width / 2, vCenter - strSize.Height / 2);
@@ -118,24 +119,24 @@ namespace Serpen.Uni.Automat {
                 var ellipsePen = PEN;
                 if (A.IsAcceptedState(iq))
                     ellipsePen = PEN_DOUBLE;
+                if (iq == highlightState)
+                    ellipsePen = Pens.Red;
+                
                 g.DrawEllipse(ellipsePen, qPos(iq), vCenter - STATE_DIAMETER / 2, STATE_DIAMETER, STATE_DIAMETER);
             }
 
-            //draw Start Arrow
+            // draw Start Arrow
             {
                 int lineX = qPos(A.StartState) - IMAGE_SPACE / 2;
                 int lineX2 = qPos(A.StartState);
                 g.DrawLine(PEN_START_ARROW, lineX, vCenter, lineX2, vCenter);
             }
 
-            //draw Transform Lines, depends which automat, because of inconsistent transform inheritance and nondeterministic transform 
+            // draw Transform Lines, depends which automat, because of inconsistent transform inheritance and nondeterministic transform 
             foreach (var vtl in A.VisualizationLines())
                 DrawTransformLine(ref g, vtl.Item1, vtl.Item2, vtl.Item3, vCenter, ref lastCurveHeigth, ref alreadyDrawn);
 
-            //convert to 8Bit, less is not good
-            System.Drawing.Imaging.BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
-            Bitmap newBitmap = new Bitmap(bmp.Width, bmp.Height, bmpData.Stride, System.Drawing.Imaging.PixelFormat.Format8bppIndexed, bmpData.Scan0);
-            return newBitmap;
+            return bmp;
         }
 
         static void DrawTransformLine(ref Graphics g, int qStart, int qEnd, string desc, int vCenter, ref int lastCurveHeigth, ref AlreadyDrawnClass alreadyDrawn) {
