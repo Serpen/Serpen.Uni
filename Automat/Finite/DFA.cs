@@ -344,16 +344,18 @@ namespace Serpen.Uni.Automat.Finite {
                 // iterate full table, for each char
                 for (uint x = 0; x < t.GetLength(0); x++) {
                     for (uint y = 0; y < t.GetLength(1); y++) { //y=0/1 works, y=x+1 works incorrectly
-                        foreach (char c in D.Alphabet) {
-                            uint xNext = D.GoChar(x, c)[0];
-                            uint yNext = D.GoChar(y, c)[0];
+                        if (!t[x, y]) { // don't work already processed (PERF)
+                            foreach (char c in D.Alphabet) {
+                                uint xNext = D.GoChar(x, c)[0];
+                                uint yNext = D.GoChar(y, c)[0];
 
-                            // calculate based on previous iterations
-                            // if next states for both x,y has been set to different and not already processed
-                            // set current pair to be different, and enable loop
-                            if (t[xNext, yNext] & !t[x, y])
-                                t[x, y] = found = true;
-                        } // next c
+                                // calculate based on previous iterations
+                                // if next states for both x,y has been set to different
+                                // set current pair to be different, and enable loop
+                                if (t[xNext, yNext])
+                                    t[x, y] = found = true;
+                            } // next c
+                        } // end if
                     } // next y
                 } // next x
             } while (found);

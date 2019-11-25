@@ -229,6 +229,40 @@ namespace Serpen.Uni.Automat {
             }
         }
 
+        /// <summary>
+        /// Test if minimized Automats euqal their base
+        /// </summary>
+        public static void MinimizeEquality(Automat.Finite.DFA[] automats, int words = 100) {
+            foreach (IAutomat a in automats) {
+                if (a is DFA dfa) {
+                    var dfa_min = dfa.MinimizeTF();
+                    var dfa_min_min = dfa_min.MinimizeTF();
+
+                    if (dfa_min.StatesCount > dfa_min_min.StatesCount) {
+                        Automat.Utils.SaveAutomatImageToTemp(dfa);
+                        Automat.Utils.SaveAutomatImageToTemp(dfa_min);
+                        throw new Uni.Exception($"minimized Automat, could be minimized further {dfa_min} > {dfa_min_min}");
+                    }
+
+
+                    string[] rwords = dfa.GetRandomWords(words, 1, words);
+
+                    for (int i = 0; i < rwords.Length; i++)
+                        if (!dfa.AcceptWord(rwords[i]) == dfa_min.AcceptWord(rwords[i])) {
+                            Automat.Utils.SaveAutomatImageToTemp(dfa);
+                            Automat.Utils.SaveAutomatImageToTemp(dfa_min);
+                            throw new Uni.Exception($"Automats not equal by word {rwords[i]} {dfa} != {dfa_min}");
+                        }
+
+                    if (!dfa.Equals(dfa_min)) {
+                        Automat.Utils.SaveAutomatImageToTemp(dfa);
+                        Automat.Utils.SaveAutomatImageToTemp(dfa_min);
+                        throw new Uni.Exception($"Automats {dfa} not equal {dfa_min}");
+                    }
+                }
+            }
+        }
+
         public static void ExportAllAutomatBitmaps() => ExportAllAutomatBitmaps(KnownAutomat.GetAllAutomats());
         public static void ExportAllAutomatBitmaps(IAutomat[] As) {
             {
