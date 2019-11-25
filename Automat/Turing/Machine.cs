@@ -30,9 +30,9 @@ namespace Serpen.Uni.Automat.Turing {
         protected override void CheckConstraints() {
             base.CheckConstraints();
             if (base.Alphabet.Intersect(BandAlphabet).Count() != base.Alphabet.Length)
-                throw new Uni.Automat.AlphabetException("Inputalphabet not in Bandalphabet");
+                throw new Uni.Automat.AlphabetException("Inputalphabet not in Bandalphabet", this);
             if (!BandAlphabet.Contains(BlankSymbol))
-                throw new Automat.AlphabetException(BlankSymbol);
+                throw new Automat.AlphabetException(BlankSymbol, this);
         }
 
         

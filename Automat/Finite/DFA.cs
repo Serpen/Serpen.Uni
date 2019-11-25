@@ -40,19 +40,19 @@ namespace Serpen.Uni.Automat.Finite {
             base.CheckConstraints();
             //basic length check
             if (Transforms.Count != StatesCount * Alphabet.Length)
-                throw new Automat.DeterministicException($"Tranformation Count missmatch State*Alphabet");
+                throw new Automat.DeterministicException("Tranformation Count missmatch State*Alphabet", this);
 
             //check every state, char
             for (uint q = 0; q < StatesCount; q++)
                 foreach (char c in Alphabet)
                     if (!((DFATransform)Transforms).ContainsKey(q, c))
-                        throw new Automat.DeterministicException($"q={q}, c={c} is missing");
+                        throw new Automat.DeterministicException($"q={q}, c={c} is missing", this);
 
             foreach (var t in Transforms) {
                 if (t.Key.q > StatesCount | t.Value[0] > StatesCount) //to high state
-                    throw new Automat.StateException(t.Key.q);
+                    throw new Automat.StateException(t.Key.q, this);
                 if (!Alphabet.Contains(t.Key.c.Value)) //char not in alphabet
-                    throw new Automat.AlphabetException(t.Key.c.Value);
+                    throw new Automat.AlphabetException(t.Key.c.Value, this);
             }
         } // end checkTransFormComplete
 

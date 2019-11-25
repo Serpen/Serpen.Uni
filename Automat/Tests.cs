@@ -220,10 +220,10 @@ namespace Serpen.Uni.Automat {
                     string[] rwords = nfa.GetRandomWords(words, 1, words);
                     for (int i = 0; i < rwords.Length; i++) {
                         if (!nfa.AcceptWord(rwords[i]) == nfa_removed.AcceptWord(rwords[i]))
-                            throw new Uni.Exception($"Automats {nfa} not equal {nfa_removed} by word");
+                            throw new Automat.Exception($"Automats not equal by word {rwords[i]}", nfa, nfa_removed);
                     }
                     if (!nfa.Equals(nfa_removed)) {
-                        throw new Uni.Exception($"Automats {nfa} not equal {nfa_removed}");
+                        throw new Automat.Exception("Automats not equal", nfa, nfa_removed);
                     }
                 }
             }
@@ -241,7 +241,7 @@ namespace Serpen.Uni.Automat {
                     if (dfa_min.StatesCount > dfa_min_min.StatesCount) {
                         Automat.Utils.SaveAutomatImageToTemp(dfa);
                         Automat.Utils.SaveAutomatImageToTemp(dfa_min);
-                        throw new Uni.Exception($"minimized Automat, could be minimized further {dfa_min} > {dfa_min_min}");
+                        throw new Automat.Exception($"minimized Automat, could be minimized further", dfa_min, dfa_min_min);
                     }
 
 
@@ -251,13 +251,13 @@ namespace Serpen.Uni.Automat {
                         if (!dfa.AcceptWord(rwords[i]) == dfa_min.AcceptWord(rwords[i])) {
                             Automat.Utils.SaveAutomatImageToTemp(dfa);
                             Automat.Utils.SaveAutomatImageToTemp(dfa_min);
-                            throw new Uni.Exception($"Automats not equal by word {rwords[i]} {dfa} != {dfa_min}");
+                            throw new Automat.Exception($"Automats not equal by word {rwords[i]}", dfa, dfa_min);
                         }
 
                     if (!dfa.Equals(dfa_min)) {
                         Automat.Utils.SaveAutomatImageToTemp(dfa);
                         Automat.Utils.SaveAutomatImageToTemp(dfa_min);
-                        throw new Uni.Exception($"Automats {dfa} not equal {dfa_min}");
+                        throw new Automat.Exception($"Automats not equal", dfa, dfa_min);
                     }
                 }
             }

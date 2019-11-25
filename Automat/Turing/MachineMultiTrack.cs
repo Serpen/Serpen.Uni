@@ -22,20 +22,20 @@ namespace Serpen.Uni.Automat.Turing {
             foreach (var ti in Transforms) {
                 foreach (char c in ti.Key.c)
                     if (!BandAlphabet.Contains(c))
-                        throw new Automat.AlphabetException(c);
+                        throw new Automat.AlphabetException(c, this);
 
                 foreach (char c in ti.Value.c2)
                     if (!BandAlphabet.Contains(c))
-                        throw new Automat.AlphabetException(c);
+                        throw new Automat.AlphabetException(c, this);
 
                 if (Alphabet.Contains(BlankSymbol))
-                    throw new Automat.AlphabetException(BlankSymbol);
+                    throw new Automat.AlphabetException(BlankSymbol, this);
 
                 if (ti.Key.q >= StatesCount)
-                    throw new Automat.StateException(ti.Key.q);
+                    throw new Automat.StateException(ti.Key.q, this);
 
                 if (ti.Value.qNext >= StatesCount)
-                    throw new Automat.StateException(ti.Value.qNext);
+                    throw new Automat.StateException(ti.Value.qNext, this);
 
             }
         }

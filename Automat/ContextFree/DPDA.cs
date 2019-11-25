@@ -41,20 +41,20 @@ namespace Serpen.Uni.Automat.ContextFree {
             base.CheckConstraints();
             foreach (var t in Transforms) {
                 if (t.Key.q > StatesCount | t.Value.qNext > StatesCount) //transform states within states
-                    throw new StateException(t.Key.q);
+                    throw new StateException(t.Key.q, this);
                 else if (t.Key.ci.HasValue && !Alphabet.Contains(t.Key.ci.Value)) //input alphabet of transform key
-                    throw new AlphabetException(t.Key.ci.Value);
+                    throw new AlphabetException(t.Key.ci.Value, this);
                 else if (t.Key.cw.HasValue && !WorkAlphabet.Contains(t.Key.cw.Value)) //work alphabet of transform key
-                    throw new AlphabetException(t.Key.cw.Value);
+                    throw new AlphabetException(t.Key.cw.Value, this);
                 //BUG: contains string
                 else if (t.Value.cw2 != null && !WorkAlphabet.Contains(t.Value.cw2[0])) //work alphabet of transform value
-                    throw new AlphabetException(t.Value.cw2[0]);
+                    throw new AlphabetException(t.Value.cw2[0], this);
             }
 
             //accepted States in States
             for (int i = 0; i < AcceptedStates.Length; i++)
                 if (AcceptedStates[i] > StatesCount)
-                    throw new StateException(AcceptedStates[i]);
+                    throw new StateException(AcceptedStates[i], this);
         }
 
         public const char START = '$';

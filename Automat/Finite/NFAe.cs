@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Serpen.Uni.Automat.Finite {
     public class NFAe : FABase, INFA {
 
-        public static readonly FABase Empty = new NFAe("Empty", 0, new char[] { }, new NFAeTransform(), 0, new uint[] { });
+        public static readonly FABase Empty = new NFAe("Empty", 1, new char[] { }, new NFAeTransform(), 0, new uint[] { });
 
         public NFAe(string name, uint stateCount, char[] Alphabet, NFAeTransform transform, uint startState, params uint[] acceptedStates)
             : base(stateCount, Alphabet, transform, startState, acceptedStates, name) {

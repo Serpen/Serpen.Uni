@@ -60,21 +60,21 @@ namespace Serpen.Uni.Automat.ContextFree {
             foreach (var t in Transforms) {
                 for (int i = 0; i < t.Value.Length; i++) {
                     if (t.Key.q > StatesCount)
-                        throw new StateException(t.Key.q);
+                        throw new StateException(t.Key.q, this);
                     else if (t.Value[i].qNext > StatesCount)
-                        throw new StateException(t.Value[i].qNext);
+                        throw new StateException(t.Value[i].qNext, this);
                     else if (t.Key.ci.HasValue && !Alphabet.Contains(t.Key.ci.Value))
-                        throw new AlphabetException(t.Key.ci.Value);
+                        throw new AlphabetException(t.Key.ci.Value, this);
                     else if (t.Key.cw.HasValue && !WorkAlphabet.Contains(t.Key.cw.Value))
-                        throw new AlphabetException(t.Key.cw.Value);
+                        throw new AlphabetException(t.Key.cw.Value, this);
                     else if (t.Value[i].cw2 != null && t.Value[i].cw2 != "" && !WorkAlphabet.Contains(t.Value[i].cw2[0]))
-                        throw new AlphabetException(t.Value[i].cw2[0]);
+                        throw new AlphabetException(t.Value[i].cw2[0], this);
 
                 }
             }
             for (int i = 0; i < AcceptedStates.Length; i++)
                 if (AcceptedStates[i] > StatesCount)
-                    throw new StateException(AcceptedStates[i]);
+                    throw new StateException(AcceptedStates[i], this);
         }
 
         //nondeterministic makes it grow exponetially, maybe it is best, to do a BFS instead of DFS, follow one path to its possible end

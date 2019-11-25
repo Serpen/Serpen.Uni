@@ -20,15 +20,15 @@ namespace Serpen.Uni.Automat.Turing {
             base.CheckConstraints();
             foreach (var ti in Transforms) {
                 if (!BandAlphabet.Contains(ti.Key.c))
-                    throw new Automat.AlphabetException(ti.Key.c);
+                    throw new Automat.AlphabetException(ti.Key.c, this);
                 if (Alphabet.Contains(BlankSymbol))
-                    throw new Automat.AlphabetException(BlankSymbol);
+                    throw new Automat.AlphabetException(BlankSymbol, this);
                 if (!BandAlphabet.Contains(ti.Value.c2))
-                    throw new Automat.AlphabetException(ti.Value.c2);
+                    throw new Automat.AlphabetException(ti.Value.c2, this);
                 if (ti.Key.q >= StatesCount)
-                    throw new Automat.StateException(ti.Key.q);
+                    throw new Automat.StateException(ti.Key.q, this);
                 if (ti.Value.qNext >= StatesCount)
-                    throw new Automat.StateException(ti.Value.qNext);
+                    throw new Automat.StateException(ti.Value.qNext, this);
 
             }
         }

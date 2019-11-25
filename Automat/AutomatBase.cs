@@ -61,12 +61,12 @@ namespace Serpen.Uni.Automat {
         }
         protected virtual void CheckConstraints() {
             if (StatesCount == 0)
-                throw new Automat.StateException(StatesCount, "automat must have at least a startstate");
+                throw new Automat.StateException(StatesCount, "automat must have at least a startstate", this);
             if (StartState >= StatesCount)
-                throw new Automat.StateException(StartState);
+                throw new Automat.StateException(StartState, this);
             foreach (uint acc in AcceptedStates) {
                 if (acc >= this.StatesCount)
-                    throw new Automat.StateException(acc);
+                    throw new Automat.StateException(acc, this);
             }
         }
 
@@ -142,7 +142,7 @@ namespace Serpen.Uni.Automat {
         protected void CheckWordInAlphabet(string w) {
             for (int i = 0; i < w.Length; i++)
                 if (!Alphabet.Contains(w[i]))
-                    throw new AlphabetException(w[i]);
+                    throw new AlphabetException(w[i], this);
         }
 
         public bool IsAcceptedState(uint q) {
