@@ -87,10 +87,12 @@ namespace Serpen.Uni.Automat.Finite {
             for (uint i = 0; i < tfEqClasses.Length; i++)
                 names[i] = string.Join(',', tfEqClasses[i]);
 
-            return new DFA($"DFA_Minimized({Name})", names, this.Alphabet, deaT, 0, acc.Distinct().ToArray());
+            return new DFA($"DFA_Minimized({Name})", names, this.Alphabet, deaT, State2eqClass[this.StartState], acc.Distinct().ToArray());
         }
 
+
         // Alle Wörter müssen in der gleichen Partition enden (akzeptiert, nicht akzeptiert)
+        [AlgorithmSource("1659_D29")]
         public bool StatesEqual(uint x, uint y) => StatesEqual(x, y, new List<uint>((int)StatesCount));
 
         bool StatesEqual(uint x, uint y, List<uint> processed) {
@@ -322,10 +324,11 @@ namespace Serpen.Uni.Automat.Finite {
             => $"{Name} DEA(|{StatesCount}|={string.Join(";", States)}, {{{String.Join(',', Alphabet)}}}, {{{Transforms.ToString()}}}, {StartState}, {{{string.Join(',', AcceptedStates)}}})".Trim();
 
         /// <summary>
-        /// Table Filling Algorithm for minimize a DEA
+        /// Table Filling Algorithm to minimize a DEA
         /// </summary>
         /// <returns>complete bool Table showing eq pairs</returns>
-        internal static bool[,] TableFillingAlg(Finite.DFA D) {
+        [AlgorithmSource("1659_S27_Algo1")]
+        public static bool[,] TableFillingAlg(Finite.DFA D) {
             bool[,] t = new bool[D.States.Length, D.States.Length];
 
             //first, mark all states which differ between accepted and not
@@ -334,25 +337,25 @@ namespace Serpen.Uni.Automat.Finite {
                     if (D.IsAcceptedState(x) != D.IsAcceptedState(y))
                         t[x, y] = true;
 
-            bool found; //loop while found something new
+            bool found; // loop while found something new
             do {
                 found = false;
 
-                //iterate full table, for each char
+                // iterate full table, for each char
                 for (uint x = 0; x < t.GetLength(0); x++) {
                     for (uint y = 0; y < t.GetLength(1); y++) { //y=0/1 works, y=x+1 works incorrectly
                         foreach (char c in D.Alphabet) {
                             uint xNext = D.GoChar(x, c)[0];
                             uint yNext = D.GoChar(y, c)[0];
 
-                            //calculate based on previous iterations
-                            //if next states for both x,y has been set to different and not already processed
-                            //set current pair to be different, and enable loop
+                            // calculate based on previous iterations
+                            // if next states for both x,y has been set to different and not already processed
+                            // set current pair to be different, and enable loop
                             if (t[xNext, yNext] & !t[x, y])
                                 t[x, y] = found = true;
-                        }
-                    }
-                }
+                        } // next c
+                    } // next y
+                } // next x
             } while (found);
             return t;
         } //end function TableFillingAlg
@@ -361,7 +364,7 @@ namespace Serpen.Uni.Automat.Finite {
         /// Table Filling Algorithm EQ Classes
         /// </summary>
         /// <returns>Returns all TF EQ Classes</returns>
-        internal static uint[][] TableFillingAlgEqClasses(Finite.DFA D) {
+        public static uint[][] TableFillingAlgEqClasses(Finite.DFA D) {
             var tf = TableFillingAlg(D);
             bool[] qAlready = new bool[tf.GetLength(0)]; //state already added
             var eqClasses = new System.Collections.Generic.List<uint[]>((int)D.StatesCount);
