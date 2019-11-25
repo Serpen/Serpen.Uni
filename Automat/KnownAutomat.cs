@@ -20,22 +20,22 @@ namespace Serpen.Uni.Automat {
         /// Returns a list of all KnowAutomat DEA_ Fields, current not dyn methods
         /// </summary>
         /// <returns></returns>
-        public static Finite.DFA[] GetDFAModels() {
+        public static Finite.DFA[] GetDFAModels(int randomCount = 10) {
             var list = GetTypes<Finite.DFA>();
 
             list.Add(KnownAutomat.DEA_BinFreq(3, 5));
             list.Add(KnownAutomat.DEA_ContainsOnes(6));
             list.Add(KnownAutomat.DEA_EndsWithNulls(4));
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < randomCount; i++)
                 list.Add(Finite.DFA.GenerateRandom());
             return list.ToArray();
         }
 
-        public static ContextFree.CFGrammer[] GetCFGs() {
+        public static ContextFree.CFGrammer[] GetCFGs(int randomCount = 10) {
             var list = GetTypes<ContextFree.CFGrammer>();
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < randomCount; i++)
                 list.Add(ContextFree.CFGrammer.GenerateRandom());
 
             return list.ToArray();
@@ -45,21 +45,21 @@ namespace Serpen.Uni.Automat {
         /// Returns a list of all KnowAutomat NEA_ Fields, current not dyn methods
         /// </summary>
         /// <returns></returns>
-        public static Finite.NFA[] GetNFAModels() {
+        public static Finite.NFA[] GetNFAModels(int randomCount = 10) {
             var list = GetTypes<Finite.NFA>();
 
             list.Add(KnownAutomat.NEA_XlastIsOne(5));
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < randomCount; i++)
                 list.Add(Finite.NFA.GenerateRandom());
 
             return list.ToArray();
         }
 
-        public static Finite.NFAe[] GetNFAeModels() {
+        public static Finite.NFAe[] GetNFAeModels(int randomCount = 10) {
             var list = GetTypes<Finite.NFAe>();
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < randomCount; i++)
                 list.Add(Finite.NFAe.GenerateRandom());
 
 
