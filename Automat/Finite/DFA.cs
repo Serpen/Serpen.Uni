@@ -331,7 +331,7 @@ namespace Serpen.Uni.Automat.Finite {
         public static bool[,] TableFillingAlg(Finite.DFA D) {
             bool[,] t = new bool[D.StatesCount, D.StatesCount];
 
-            //first, mark all states which differ between accepted and not
+            // first, mark all states which differ between accepted and not
             for (uint x = 0; x < t.GetLength(0); x++)
                 for (uint y = 0; y < t.GetLength(0); y++)
                     if (D.IsAcceptedState(x) != D.IsAcceptedState(y))
@@ -368,42 +368,28 @@ namespace Serpen.Uni.Automat.Finite {
         /// <returns>Returns all TF EQ Classes</returns>
         public static uint[][] TableFillingAlgEqClasses(Finite.DFA D) {
             var tf = TableFillingAlg(D);
-            bool[] qAlready = new bool[D.StatesCount]; // state already added
-            var eqClasses = new System.Collections.Generic.List<uint[]>((int)D.StatesCount);
+            var eqClasses = new List<uint[]>((int)D.StatesCount);
             int?[] State2eqClass = new int?[D.StatesCount];
 
             // iterate table and process false(/double) values
             for (uint x = 0; x < tf.GetLength(0); x++) {
                 for (uint y = x + 1; y < tf.GetLength(1); y++) {
                     if (!tf[x, y]) {
-                        // add class and mark as processed
-
-                        int? xEqClass = State2eqClass[x];
-                        int? yEqClass = State2eqClass[y];
-
-                        // TODO: bug buggy
-                        if (qAlready[x] & xEqClass.HasValue & !yEqClass.HasValue) {
-                            eqClasses[xEqClass.Value] = eqClasses[xEqClass.Value].Append(y).ToArray();
-                            qAlready[y] = true;
-                            State2eqClass[y] = xEqClass;
-                        } else if (qAlready[y] & yEqClass.HasValue & !yEqClass.HasValue) {
-                            eqClasses[yEqClass.Value] = eqClasses[yEqClass.Value].Append(x).ToArray();
-                            qAlready[x] = true;
-                            State2eqClass[x] = yEqClass;
-                        } else if (!qAlready[x] & !qAlready[y]) {
+                        if (State2eqClass[x].HasValue) {
+                            eqClasses[State2eqClass[x].Value] = eqClasses[State2eqClass[x].Value].Append(y).ToArray();
+                            State2eqClass[y] = State2eqClass[x];
+                        } else {
                             eqClasses.Add(new uint[] { x, y });
-                            qAlready[x] = qAlready[y] = true;
                             State2eqClass[x] = eqClasses.Count - 1;
                             State2eqClass[y] = eqClasses.Count - 1;
                         }
-
-                    } //end if
-                } //next y
+                    } // end if
+                } // next y
             } // next x
 
-            //add all none processed states
-            for (uint i = 0; i < qAlready.Length; i++)
-                if (!qAlready[i])
+            // add all none processed states
+            for (uint i = 0; i < D.StatesCount; i++)
+                if (!State2eqClass[i].HasValue)
                     eqClasses.Add(new uint[] { i });
 
             eqClasses.Sort((first, second) => first[0].CompareTo(second[0]));
