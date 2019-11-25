@@ -343,7 +343,7 @@ namespace Serpen.Uni.Automat.Finite {
 
                 // iterate full table, for each char
                 for (uint x = 0; x < t.GetLength(0); x++) {
-                    for (uint y = 0; y < t.GetLength(1); y++) { //y=0/1 works, y=x+1 works incorrectly
+                    for (uint y = x + 1; y < t.GetLength(1); y++) {
                         if (!t[x, y]) { // don't work already processed (PERF)
                             foreach (char c in D.Alphabet) {
                                 uint xNext = D.GoChar(x, c)[0];
@@ -353,12 +353,14 @@ namespace Serpen.Uni.Automat.Finite {
                                 // if next states for both x,y has been set to different
                                 // set current pair to be different, and enable loop
                                 if (t[xNext, yNext])
-                                    t[x, y] = found = true;
+                                    t[x, y] = t[y, x] = found = true;
                             } // next c
                         } // end if
                     } // next y
                 } // next x
+
             } while (found);
+
             return t;
         } //end function TableFillingAlg
 
