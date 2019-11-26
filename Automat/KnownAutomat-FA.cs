@@ -475,4 +475,3 @@ namespace Serpen.Uni.Automat {
         }
     }
 }
-}
