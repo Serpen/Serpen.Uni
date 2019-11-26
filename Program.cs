@@ -1,24 +1,18 @@
 ﻿using Serpen.Uni.Automat;
 using Serpen.Uni.CompSys;
+using Serpen.Uni.Automat.Finite;
 
 #pragma warning disable CS0162
 
 namespace Serpen.Uni {
     static class Program {
         static void Main() {
-            var sf = Schaltfunktion.SF_1608_S22 ;
-            var wt = (WerteTabelle)sf;
-            System.Console.WriteLine("Wertetabelle: \n" + wt);
-            System.Console.WriteLine("KDFN: " + wt.toKDNF());
-            System.Console.WriteLine("KKFN: " + wt.toKKNF());
-            var kv = new KVDiagramm(wt);
-            System.Console.WriteLine("KV: \n" + kv);
-            var qmcf = QuineMcCluskeyRow.QuineMcCluskey(wt, AlgSourceMode.Wiki);
-            System.Console.WriteLine("QMC-KNF-Wiki: " + qmcf);
-            qmcf = QuineMcCluskeyRow.QuineMcCluskey(wt, AlgSourceMode.K1608);
-            System.Console.WriteLine("QMC-KNF-K1608: " + qmcf);
-        }
+            Automat.Tests.CastToEveryPossibility();
+            KnownAutomat.DEA_1659_A213_M1_a.MinimizeTF();
 
+            // var es = new NFAe("Empty2", 1, new char[] { }, new NFAeTransform(), 0, new uint[] { });
+
+        }
 
     }
 }
