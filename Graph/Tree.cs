@@ -63,8 +63,9 @@ namespace Serpen.Uni.Graph
         public TreeNode<T> StartNode {get;}
 
         public TreeNode<T>[] TiefenDurchLauf() {
-            List<TreeNode<T>> list = new List<TreeNode<T>>();
-            list.Add(StartNode);
+            List<TreeNode<T>> list = new List<TreeNode<T>> {
+                StartNode
+            };
 
             TiefenDurchLauf(ref list);
             return list.ToArray();

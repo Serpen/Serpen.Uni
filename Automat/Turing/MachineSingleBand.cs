@@ -34,9 +34,8 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         TuringConfigSingleBand GoChar(TuringConfigSingleBand tcfg) {
-            TuringVal tva;
             var tkey = new TuringKey(tcfg.State, tcfg.CurSymbol);
-            if (Transforms.TryGetValue(tkey, out tva)) {
+            if (Transforms.TryGetValue(tkey, out TuringVal tva)) {
                 tcfg.ReplaceChar(tva.c2, tva.Direction);
                 tcfg.State = tva.qNext;
                 return tcfg;
@@ -139,7 +138,7 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         public override IAutomat PurgeStates() {
-            (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
+            (uint[] translate, string[] names, uint[] aStates) = base.RemovedStateTranslateTables();
 
             var newT = new TuringTransformSingleBand();
             foreach (var t2 in Transforms)

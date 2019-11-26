@@ -55,9 +55,8 @@ namespace Serpen.Uni.Automat {
 
         class AlreadyDrawnClass : System.Collections.Generic.Dictionary<System.Tuple<int, int>, float> {
             public void AddOrInc(int q1, int q2, float Height) {
-                float val;
                 var t = new System.Tuple<int, int>(q1, q2);
-                if (base.TryGetValue(t, out val)) {
+                if (base.TryGetValue(t, out _)) {
                     base[t] += Height;
                 } else {
                     base.Add(t, Height);
@@ -66,8 +65,7 @@ namespace Serpen.Uni.Automat {
 
             public float this[int q1, int q2] {
                 get {
-                    float val;
-                    if (base.TryGetValue(new System.Tuple<int, int>(q1, q2), out val))
+                    if (base.TryGetValue(new System.Tuple<int, int>(q1, q2), out float val))
                         return val;
                     else
                         return 0;

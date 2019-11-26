@@ -4,14 +4,13 @@ using System.Linq;
 namespace Serpen.Uni.Automat {
 
     public class RuleSet : Dictionary<char, string[]> {
-        RuleConstaint _ruleConstaint;
+        readonly RuleConstaint _ruleConstaint;
 
         public RuleSet() : this(RuleConstaint.None) { }
         public RuleSet(RuleConstaint ruleConstaint) => this._ruleConstaint = ruleConstaint;
 
         public void AddM(char c, string[] s) {
-            string[] vals;
-            if (TryGetValue(c, out vals))
+            if (TryGetValue(c, out string[] vals))
                 this[c] = vals.Union(s).Distinct().ToArray();
             else
                 Add(c, s);

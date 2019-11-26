@@ -8,14 +8,15 @@ namespace Serpen.Uni.Automat {
         [AcceptedWordSamples("aba")]
         public static TuringMachineSingleBand TM_1659_A44_M1 {
             get {
-                var t = new TuringTransformSingleBand();
-                t.Add(0, 'a', 0, 'b', TMDirection.Right);
-                t.Add(0, 'b', 0, 'a', TMDirection.Right);
-                t.Add(0, BLK, 1, 'b', TMDirection.Left);
-                t.Add(1, 'b', 3, 'b', TMDirection.Right);
-                t.Add(1, 'a', 2, 'a', TMDirection.Left);
-                t.Add(2, 'b', 0, 'b', TMDirection.Left);
-                t.Add(2, 'a', 4, 'a', TMDirection.Right);
+                var t = new TuringTransformSingleBand {
+                    { 0, 'a', 0, 'b', TMDirection.Right },
+                    { 0, 'b', 0, 'a', TMDirection.Right },
+                    { 0, BLK, 1, 'b', TMDirection.Left },
+                    { 1, 'b', 3, 'b', TMDirection.Right },
+                    { 1, 'a', 2, 'a', TMDirection.Left },
+                    { 2, 'b', 0, 'b', TMDirection.Left },
+                    { 2, 'a', 4, 'a', TMDirection.Right }
+                };
 
                 char[] inputAlphabet = new char[] { 'a', 'b' };
                 char[] bandAlphabet = new char[] { 'a', 'b', BLK };
@@ -29,25 +30,26 @@ namespace Serpen.Uni.Automat {
                 const uint qA = 6;
                 const uint qD = 5;
 
-                var t = new TuringTransformSingleBand();
-                t.Add(0, 'a', 1, 's', TMDirection.Right);
-                t.Add(0, BLK, qD, BLK, TMDirection.Right);
+                var t = new TuringTransformSingleBand {
+                    { 0, 'a', 1, 's', TMDirection.Right },
+                    { 0, BLK, qD, BLK, TMDirection.Right },
 
-                t.Add(1, 'x', 1, 'x', TMDirection.Right);
-                t.Add(1, 'a', 2, 'x', TMDirection.Right);
-                t.Add(1, BLK, qA, BLK, TMDirection.Right);
+                    { 1, 'x', 1, 'x', TMDirection.Right },
+                    { 1, 'a', 2, 'x', TMDirection.Right },
+                    { 1, BLK, qA, BLK, TMDirection.Right },
 
-                t.Add(2, 'x', 2, 'x', TMDirection.Right);
-                t.Add(2, 'a', 3, 'a', TMDirection.Right);
-                t.Add(2, BLK, 4, BLK, TMDirection.Left);
+                    { 2, 'x', 2, 'x', TMDirection.Right },
+                    { 2, 'a', 3, 'a', TMDirection.Right },
+                    { 2, BLK, 4, BLK, TMDirection.Left },
 
-                t.Add(3, 'x', 3, 'x', TMDirection.Right);
-                t.Add(3, 'a', 2, 'x', TMDirection.Right);
-                t.Add(3, BLK, qD, BLK, TMDirection.Right);
+                    { 3, 'x', 3, 'x', TMDirection.Right },
+                    { 3, 'a', 2, 'x', TMDirection.Right },
+                    { 3, BLK, qD, BLK, TMDirection.Right },
 
-                t.Add(4, 'a', 4, 'a', TMDirection.Left);
-                t.Add(4, 'x', 4, 'x', TMDirection.Left);
-                t.Add(4, 's', 1, 's', TMDirection.Right);
+                    { 4, 'a', 4, 'a', TMDirection.Left },
+                    { 4, 'x', 4, 'x', TMDirection.Left },
+                    { 4, 's', 1, 's', TMDirection.Right }
+                };
 
                 char[] inputAlphabet = new char[] { 'a', 'x', 's' };
                 char[] bandAlphabet = new char[] { 'a', 'x', 's', BLK };
@@ -62,10 +64,11 @@ namespace Serpen.Uni.Automat {
                 const uint qA = 1;
                 const uint qD = 2;
 
-                var t = new TuringTransformSingleBand();
-                t.Add(0, '0', 0, '0', TMDirection.Right);
-                t.Add(0, '1', qD, BLK, TMDirection.Left);
-                t.Add(0, BLK, qA, '0', TMDirection.Left);
+                var t = new TuringTransformSingleBand {
+                    { 0, '0', 0, '0', TMDirection.Right },
+                    { 0, '1', qD, BLK, TMDirection.Left },
+                    { 0, BLK, qA, '0', TMDirection.Left }
+                };
 
                 char[] bandAlphabet = new char[] { '0', '1', BLK };
 
@@ -79,19 +82,20 @@ namespace Serpen.Uni.Automat {
                 const uint qA = 4;
                 const uint qD = 3;
 
-                var t = new NTM1659Transform();
-                t.Add(0, 'a', 0, 'a', TMDirection.Right);
+                var t = new NTM1659Transform {
+                    { 0, 'a', 0, 'a', TMDirection.Right },
+                    { 0, 'b', 0, 'b', TMDirection.Right },
+                    { 0, BLK, qD, BLK, TMDirection.Right },
+
+                    { 1, 'a', 2, 'a', TMDirection.Right },
+                    { 1, 'b', qD, 'b', TMDirection.Right },
+                    { 1, BLK, qD, BLK, TMDirection.Right },
+
+                    { 2, 'b', qA, 'b', TMDirection.Right },
+                    { 2, 'a', qD, 'a', TMDirection.Right },
+                    { 2, BLK, qD, BLK, TMDirection.Right }
+                };
                 t.AddM(0, 'a', 1, 'a', TMDirection.Right);
-                t.Add(0, 'b', 0, 'b', TMDirection.Right);
-                t.Add(0, BLK, qD, BLK, TMDirection.Right);
-
-                t.Add(1, 'a', 2, 'a', TMDirection.Right);
-                t.Add(1, 'b', qD, 'b', TMDirection.Right);
-                t.Add(1, BLK, qD, BLK, TMDirection.Right);
-
-                t.Add(2, 'b', qA, 'b', TMDirection.Right);
-                t.Add(2, 'a', qD, 'a', TMDirection.Right);
-                t.Add(2, BLK, qD, BLK, TMDirection.Right);
 
                 char[] alphabet = new char[] { 'a', 'b', BLK };
 
@@ -102,43 +106,45 @@ namespace Serpen.Uni.Automat {
         [AcceptedWordSamples("0011")]
         public static TuringMachineSingleBand TM_EFAK_A89_B82_T81_0n1n {
             get {
-                var t = new TuringTransformSingleBand();
-                t.Add(0, '0', 1, 'X', TMDirection.Right);
-                t.Add(1, 'Y', 1, 'Y', TMDirection.Right);
-                t.Add(1, '0', 1, '0', TMDirection.Right);
-                t.Add(1, '1', 2, 'Y', TMDirection.Left);
-                t.Add(2, 'Y', 2, 'Y', TMDirection.Left);
-                t.Add(2, '0', 2, '0', TMDirection.Left);
-                t.Add(2, 'X', 0, 'X', TMDirection.Right);
-                t.Add(0, 'Y', 3, 'Y', TMDirection.Right);
-                t.Add(3, 'Y', 3, 'Y', TMDirection.Right);
-                t.Add(3, BLK, 4, BLK, TMDirection.Right);
+                var t = new TuringTransformSingleBand {
+                    { 0, '0', 1, 'X', TMDirection.Right },
+                    { 1, 'Y', 1, 'Y', TMDirection.Right },
+                    { 1, '0', 1, '0', TMDirection.Right },
+                    { 1, '1', 2, 'Y', TMDirection.Left },
+                    { 2, 'Y', 2, 'Y', TMDirection.Left },
+                    { 2, '0', 2, '0', TMDirection.Left },
+                    { 2, 'X', 0, 'X', TMDirection.Right },
+                    { 0, 'Y', 3, 'Y', TMDirection.Right },
+                    { 3, 'Y', 3, 'Y', TMDirection.Right },
+                    { 3, BLK, 4, BLK, TMDirection.Right }
+                };
 
-                char[] inputAlphabet = new char[] { '0', '1', 'X', 'Y'};
-                char[] blankAlphabet = new char[] { '0', '1', 'X', 'Y', BLK};
+                char[] inputAlphabet = new char[] { '0', '1', 'X', 'Y' };
+                char[] blankAlphabet = new char[] { '0', '1', 'X', 'Y', BLK };
                 return new TuringMachineSingleBand(nameof(TM_EFAK_A89_B82_T81_0n1n), 5, inputAlphabet, blankAlphabet, t, 0, BLK, new uint[] { 4 });
             }
         }
 
         public static TuringMachineSingleBand TM_EFAK_A810_B84_Monus {
             get {
-                var t = new TuringTransformSingleBand();
-                t.Add(0, '0', 1, BLK, TMDirection.Right);
-                t.Add(0, '1', 5, BLK, TMDirection.Right);
-                t.Add(1, '0', 1, '0', TMDirection.Right);
-                t.Add(1, '1', 2, '1', TMDirection.Right);
-                t.Add(2, '0', 3, '1', TMDirection.Left);
-                t.Add(2, '1', 2, '1', TMDirection.Right);
-                t.Add(2, BLK, 4, BLK, TMDirection.Left);
-                t.Add(3, '0', 3, '0', TMDirection.Left);
-                t.Add(3, '1', 3, '1', TMDirection.Left);
-                t.Add(3, BLK, 0, BLK, TMDirection.Right);
-                t.Add(4, '0', 4, '0', TMDirection.Left);
-                t.Add(4, '1', 4, BLK, TMDirection.Left);
-                t.Add(4, BLK, 6, '0', TMDirection.Right);
-                t.Add(5, '0', 5, BLK, TMDirection.Right);
-                t.Add(5, '1', 5, BLK, TMDirection.Right);
-                t.Add(5, BLK, 6, BLK, TMDirection.Right);
+                var t = new TuringTransformSingleBand {
+                    { 0, '0', 1, BLK, TMDirection.Right },
+                    { 0, '1', 5, BLK, TMDirection.Right },
+                    { 1, '0', 1, '0', TMDirection.Right },
+                    { 1, '1', 2, '1', TMDirection.Right },
+                    { 2, '0', 3, '1', TMDirection.Left },
+                    { 2, '1', 2, '1', TMDirection.Right },
+                    { 2, BLK, 4, BLK, TMDirection.Left },
+                    { 3, '0', 3, '0', TMDirection.Left },
+                    { 3, '1', 3, '1', TMDirection.Left },
+                    { 3, BLK, 0, BLK, TMDirection.Right },
+                    { 4, '0', 4, '0', TMDirection.Left },
+                    { 4, '1', 4, BLK, TMDirection.Left },
+                    { 4, BLK, 6, '0', TMDirection.Right },
+                    { 5, '0', 5, BLK, TMDirection.Right },
+                    { 5, '1', 5, BLK, TMDirection.Right },
+                    { 5, BLK, 6, BLK, TMDirection.Right }
+                };
                 return new TuringMachineSingleBand(nameof(TM_EFAK_A810_B84_Monus), 7, binAlp, new char[] { '0', '1', BLK }, t, 0, BLK, new uint[] { });
             }
         }
@@ -147,11 +153,12 @@ namespace Serpen.Uni.Automat {
             get {
                 const char BLK = TuringMachineSingleBand1659.BLANK;
 
-                var t = new TuringTransformSingleBand();
-                t.Add(0,'0',1,'1',TMDirection.Right);
-                t.Add(1,'1',0,'0',TMDirection.Right);
-                t.Add(1,BLK,3,BLK,TMDirection.Right);
-                
+                var t = new TuringTransformSingleBand {
+                    { 0, '0', 1, '1', TMDirection.Right },
+                    { 1, '1', 0, '0', TMDirection.Right },
+                    { 1, BLK, 3, BLK, TMDirection.Right }
+                };
+
                 return new TuringMachineSingleBand(nameof(TM_EFAK_U825a), 4, binAlp, new char[] { '0', '1', BLK }, t, 0, BLK, new uint[] { 3 });
             }
         }
@@ -160,14 +167,13 @@ namespace Serpen.Uni.Automat {
             get {
                 const char BLK = TuringMachineSingleBand1659.BLANK;
 
-                var t = new TuringTransformSingleBand();
+                var t = new TuringTransformSingleBand {
+                    { 0, '0', 0, BLK, TMDirection.Right },
+                    { 0, '1', 1, BLK, TMDirection.Right },
+                    { 1, '1', 1, BLK, TMDirection.Right },
+                    { 1, BLK, 3, BLK, TMDirection.Right }
+                };
 
-                t.Add(0,'0',0,BLK,TMDirection.Right);
-                t.Add(0,'1',1,BLK,TMDirection.Right);
-                t.Add(1,'1',1,BLK,TMDirection.Right);
-                t.Add(1,BLK,3,BLK,TMDirection.Right);
-
-                
                 return new TuringMachineSingleBand(nameof(TM_EFAK_U825b), 4, binAlp, new char[] { '0', '1', BLK }, t, 0, BLK, new uint[] { 3 });
             }
         }
@@ -176,13 +182,13 @@ namespace Serpen.Uni.Automat {
             get {
                 const char BLK = TuringMachineSingleBand1659.BLANK;
 
-                var t = new TuringTransformSingleBand();
+                var t = new TuringTransformSingleBand {
+                    { 0, '0', 1, '1', TMDirection.Right },
+                    { 1, '1', 2, '0', TMDirection.Left },
+                    { 2, '1', 0, '1', TMDirection.Right },
+                    { 1, BLK, 3, BLK, TMDirection.Right }
+                };
 
-                t.Add(0,'0',1,'1',TMDirection.Right);
-                t.Add(1,'1',2,'0',TMDirection.Left);
-                t.Add(2,'1',0,'1',TMDirection.Right);
-                t.Add(1,BLK,3,BLK,TMDirection.Right);
-                
                 return new TuringMachineSingleBand(nameof(TM_EFAK_U825c), 4, binAlp, new char[] { '0', '1', BLK }, t, 0, BLK, new uint[] { 3 });
             }
         }
@@ -278,30 +284,31 @@ namespace Serpen.Uni.Automat {
             }
         }
 
-        
+
         public static TuringMachineSingleBand TM_EFAK_A812_copy {
             get {
-                var t = new TuringTransformSingleBand();
-                t.Add(0, '0', 1, 'X', TMDirection.Right);
-                t.Add(0, '1', 3, '1', TMDirection.Left);
-                t.Add(1, '0', 1, '0', TMDirection.Right);
-                t.Add(1, '1', 1, '1', TMDirection.Right);
-                t.Add(1, BLK, 2, '0', TMDirection.Left);
-                t.Add(2, '0', 2, '0', TMDirection.Left);
-                t.Add(2, '1', 2, '1', TMDirection.Left);
-                t.Add(2, 'X', 0, 'X', TMDirection.Right);
-                t.Add(3, 'X', 3, '0', TMDirection.Left);
-                t.Add(3, '1', 4, '1', TMDirection.Right);
+                var t = new TuringTransformSingleBand {
+                    { 0, '0', 1, 'X', TMDirection.Right },
+                    { 0, '1', 3, '1', TMDirection.Left },
+                    { 1, '0', 1, '0', TMDirection.Right },
+                    { 1, '1', 1, '1', TMDirection.Right },
+                    { 1, BLK, 2, '0', TMDirection.Left },
+                    { 2, '0', 2, '0', TMDirection.Left },
+                    { 2, '1', 2, '1', TMDirection.Left },
+                    { 2, 'X', 0, 'X', TMDirection.Right },
+                    { 3, 'X', 3, '0', TMDirection.Left },
+                    { 3, '1', 4, '1', TMDirection.Right }
+                };
 
-                char[] bandAlphabet = new char[] {'0','1','X',BLK};
+                char[] bandAlphabet = new char[] { '0', '1', 'X', BLK };
 
                 return new TuringMachineSingleBand(nameof(TM_EFAK_A812_copy), 5, binAlp, bandAlphabet, t, 0, BLK, new uint[] { 4 });
             }
         }
-        
+
         public static TuringMachineSingleBand TM_EFAK_A813 {
             get {
-                uint[] q = new uint[] {0,9,6,1,5,7,8,10,11,12};
+                uint[] q = new uint[] { 0, 9, 6, 1, 5, 7, 8, 10, 11, 12 };
 
                 var t = new TuringTransformSingleBand();
                 t.Add(q[1], BLK, q[0], BLK, TMDirection.Right);
@@ -309,7 +316,7 @@ namespace Serpen.Uni.Automat {
                 t.Add(q[1], '0', q[1], '0', TMDirection.Left);
                 t.Add(q[2], '0', q[2], '0', TMDirection.Right);
                 t.Add(q[2], '1', q[3], '1', TMDirection.Right);
-                t.Insert((TuringTransformSingleBand)TM_EFAK_A812_copy.Transforms,1);
+                t.Insert((TuringTransformSingleBand)TM_EFAK_A812_copy.Transforms, 1);
                 t.Add(q[4], '0', q[5], '0', TMDirection.Left);
                 t.Add(q[5], '1', q[6], '1', TMDirection.Left);
                 t.Add(q[6], BLK, q[7], BLK, TMDirection.Right);
@@ -318,7 +325,7 @@ namespace Serpen.Uni.Automat {
                 t.Add(q[8], '0', q[8], BLK, TMDirection.Right);
                 t.Add(q[8], '1', q[9], BLK, TMDirection.Right);
 
-                char[] bandAlphabet = new char[] {'0','1','X',BLK};
+                char[] bandAlphabet = new char[] { '0', '1', 'X', BLK };
 
                 return new TuringMachineSingleBand(nameof(TM_EFAK_A813), 13, binAlp, bandAlphabet, t, 0, BLK, new uint[] { 12 });
             }

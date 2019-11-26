@@ -32,7 +32,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         public override int GetHashCode() => this.ToString().GetHashCode();
 
         public override string ToString()
-            => $"({q}, {(ci.HasValue ? ci.Value : Uni.Utils.EPSILON)}, {(cw.HasValue ? cw.Value : Uni.Utils.EPSILON)})";
+            => $"({q}, {(ci ?? Uni.Utils.EPSILON)}, {(cw ?? Uni.Utils.EPSILON)})";
     }
 
     public struct PDATransformValue : ITransformValue {
@@ -56,11 +56,10 @@ namespace Serpen.Uni.Automat.ContextFree {
         /// Adds Tuple + Appends if already exists
         /// </summary>
         public void AddM(uint q, char? ci, char? cw, string cw2, uint qNext) {
-            ContextFree.PDATransformValue[] pvalout;
             ContextFree.PDATransformValue pval = new PDATransformValue(cw2, qNext);
             var pkey = new ContextFree.PDATransformKey(q, ci, cw);
 
-            if (TryGetValue(pkey, out pvalout))
+            if (TryGetValue(pkey, out PDATransformValue[] pvalout))
                 this[pkey] = pvalout.Append(pval).ToArray();
             else
                 base.Add(pkey, new PDATransformValue[] { pval });

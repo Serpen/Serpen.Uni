@@ -19,10 +19,9 @@ namespace Serpen.Uni.Automat.Turing {
         public uint DiscardState { get; }
 
         TuringConfigSingleBand[] GoChar(TuringConfigSingleBand[] tcfgs) {
-            TuringVal[] tvas;
-            var retTcfgs = new System.Collections.Generic.List<TuringConfigSingleBand>(Transforms.Count*10);
+            var retTcfgs = new System.Collections.Generic.List<TuringConfigSingleBand>(Transforms.Count * 10);
             foreach (var tcfg in tcfgs) {
-                if (Transforms.TryGetValue(new TuringKey(tcfg.State, tcfg.CurSymbol), out tvas)) {
+                if (Transforms.TryGetValue(new TuringKey(tcfg.State, tcfg.CurSymbol), out TuringVal[] tvas)) {
                     foreach (var tva in tvas) {
                         var ntcfg = new TuringConfigSingleBand(this.BlankSymbol, tcfg.Band, tcfg.Position);
                         ntcfg.ReplaceChar(tva.c2, tva.Direction);
@@ -103,7 +102,7 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         public override IAutomat PurgeStates() {
-            (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
+            (uint[] translate, string[] names, _) = base.RemovedStateTranslateTables();
 
             var newT = new NTM1659Transform();
             foreach (var ti in Transforms)
@@ -150,9 +149,8 @@ namespace Serpen.Uni.Automat.Turing {
             Add(new TuringKey(q, c), new TuringVal[] { new TuringVal(qNext, c2, dir) });
 
         internal void AddM(uint q, char c, uint qNext, char c2, TMDirection dir) {
-            TuringVal[] qBefore;
             var eat = new TuringKey(q, c);
-            if (TryGetValue(eat, out qBefore))
+            if (TryGetValue(eat, out TuringVal[] qBefore))
                 this[eat] = qBefore.Append(new TuringVal(qNext, c2, dir)).ToArray();
             else
                 Add(new TuringKey(q, c), new TuringVal[] { new TuringVal(qNext, c2, dir) });

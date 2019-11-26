@@ -24,14 +24,12 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         [AlgorithmSource("1659_L33")]
         public static explicit operator StackPDA(StatePDA pda) {
-            var newt = new PDATransform();
+            var newt = new PDATransform {
+                { 0, null, null, pda.StartSymbol.ToString(), 1 }
+            };
 
             char extra_symbol = Utils.NextFreeCapitalLetter(pda.Alphabet.Concat(pda.WorkAlphabet).ToArray(), EXTRASYMBOLS[0], EXTRASYMBOLS);
-            var spdaWorkAlphabet = new System.Collections.Generic.List<char>(pda.WorkAlphabet);
-            spdaWorkAlphabet.Add(extra_symbol);
-
-            newt.Add(0, null, null, pda.StartSymbol.ToString(), 1);
-
+            
             uint qPump = pda.StatesCount;
 
             for (int i = 0; i < pda.Transforms.Count; i++) {
@@ -47,6 +45,10 @@ namespace Serpen.Uni.Automat.ContextFree {
                 }
             }
 
+            var spdaWorkAlphabet = new System.Collections.Generic.List<char>(pda.WorkAlphabet) {
+                extra_symbol
+            };
+            
             foreach (char c in pda.Alphabet) {
                 if (!spdaWorkAlphabet.Contains(c))
                     spdaWorkAlphabet.Add(c);
@@ -122,7 +124,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
         public override IAutomat PurgeStates() {
-            (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
+            (uint[] translate, string[] names, _) = base.RemovedStateTranslateTables();
                 
             var newT = new PDATransform();
             foreach (var t2 in Transforms)

@@ -11,7 +11,7 @@ namespace Serpen.Uni.Automat.Finite {
             var DeaStatesNames2Index = new Dictionary<string, uint>((int)N.StatesCount);
             var States2Check = new Queue<uint[]>((int)N.StatesCount);
             var t = new Finite.DFATransform();
-            var accStates = new List<uint>(N.AcceptedStates.Length); //acceptable States
+            var accStates = new List<uint>(N.AcceptedStates.Length);
 
             // Add first state to DFA states, for check and naming
             uint[] qStart;
@@ -24,16 +24,15 @@ namespace Serpen.Uni.Automat.Finite {
             States2Check.Enqueue(qStart);
             DeaStatesNames2Index.Add(string.Join(',', qStart), 0);
 
-            //if start State is also acceptable
+            // if start State is also acceptable
             if (qStart.Intersect(N.AcceptedStates).Any())
                 accStates.Add(0);
 
-
-            //
+            // ?find all states for checking
             while (States2Check.Any()) {
                 var q = States2Check.Dequeue();
 
-                foreach (var w in N.Alphabet) { //every existing transform for char
+                foreach (var w in N.Alphabet) { // every existing transform for char
                     var qNext = N.GoChar(q, w);
                     var qStr = string.Join(",", qNext);
                     if (!DeaStatesNames2Index.ContainsKey(qStr)) {
@@ -48,9 +47,9 @@ namespace Serpen.Uni.Automat.Finite {
                 }
             }
 
-            //calc transform
-            for (uint i = 0; i < States.Count; i++) { //iterate every state
-                foreach (var w in N.Alphabet) { //iterate alphabet
+            // calc transform
+            for (uint i = 0; i < States.Count; i++) { // iterate every state
+                foreach (var w in N.Alphabet) { // iterate alphabet
                     var x = N.GoChar(States[(int)i], w);
                     var XStr = string.Join(',', x);
                     var xPos = DeaStatesNames2Index[XStr];
@@ -60,7 +59,7 @@ namespace Serpen.Uni.Automat.Finite {
                 }
             }
 
-            //Naming the DFA states, with the NFA state set
+            // Naming the DFA states, with the NFA state set
             string[] names = new string[States.Count];
             for (int i = 0; i < names.Length; i++)
                 names[i] = string.Join(",", States[i]);
@@ -91,8 +90,7 @@ namespace Serpen.Uni.Automat.Finite {
 
                             //check if any char loops in this state
                             foreach (char c in D.Alphabet) {
-                                uint qNext;
-                                if (((Finite.DFATransform)D.Transforms).TryGetValue(i, c, out qNext) & qNext == j)
+                                if (((Finite.DFATransform)D.Transforms).TryGetValue(i, c, out uint qNext) & qNext == j)
                                     toAdd.Add(c.ToString());
                             }
                             R[i, j, 0] = string.Join('+', toAdd);

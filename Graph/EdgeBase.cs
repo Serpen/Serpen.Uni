@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace Serpen.Uni.Graph {
     public class EdgeBase<TKey, TValue>
         : IEnumerable<KeyValuePair<TKey, TValue>>, IReadOnlyDictionary<TKey, TValue> {
-        private Dictionary<TKey, TValue> dic = new Dictionary<TKey, TValue>();
+        private readonly Dictionary<TKey, TValue> dic = new Dictionary<TKey, TValue>();
 
         public int Count => dic.Count;
 

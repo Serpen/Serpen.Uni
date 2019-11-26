@@ -7,6 +7,11 @@ using System.Linq;
 namespace Serpen.Uni.Automat {
     public static class Tests {
 
+        public static void RunAllTests() {
+            throw new System.NotImplementedException();
+        }
+
+        public static IAutomat[][] CastToEveryPossibility() => CastToEveryPossibility(KnownAutomat.GetAllAutomats());
         public static IAutomat[][] CastToEveryPossibility(IAutomat[] automats) {
             var retAutomats = new List<IAutomat[]>();
 
@@ -19,16 +24,16 @@ namespace Serpen.Uni.Automat {
                     ret1Automat.Add(NfromD);
 
                     NFAe NEfromD = (NFAe)D;
-                    ret1Automat.Add(NfromD);
+                    ret1Automat.Add(NEfromD);
 
                     NFAe NEfromN = (NFAe)NfromD;
-                    ret1Automat.Add(NEfromD);
+                    ret1Automat.Add(NEfromN);
 
                     StatePDA QPDAfromNe = (StatePDA)NEfromD;
                     ret1Automat.Add(QPDAfromNe);
 
                     StackPDA SPDAFromQPDA = (StackPDA)QPDAfromNe;
-                    // ret1Automat.Add(SPDAFromQPDA);
+                    ret1Automat.Add(SPDAFromQPDA);
 
                     try {
                         DPDA DPDAFromD = (DPDA)D;
@@ -36,7 +41,7 @@ namespace Serpen.Uni.Automat {
                     } catch { }
 
                     TuringMachineSingleBand TMfromD = (TuringMachineSingleBand)D;
-                    // ret1Automat.Add(TMfromD);
+                    ret1Automat.Add(TMfromD);
 
                 } else if (automat is NFA N) {
                     ret1Automat.Add(N);
@@ -54,7 +59,7 @@ namespace Serpen.Uni.Automat {
                     ret1Automat.Add(QPDAfromNe);
 
                     StackPDA SPDAFromQPDA = (StackPDA)QPDAfromNe;
-                    // ret1Automat.Add(SPDAFromQPDA);
+                    ret1Automat.Add(SPDAFromQPDA);
 
                     try {
                         DPDA DPDAFromD = (DPDA)DfromN;
@@ -62,7 +67,7 @@ namespace Serpen.Uni.Automat {
                     } catch { }
 
                     TuringMachineSingleBand TMfromD = (TuringMachineSingleBand)DfromN;
-                    // ret1Automat.Add(TMfromD);
+                    ret1Automat.Add(TMfromD);
 
                 } else if (automat is NFAe Ne) {
                     ret1Automat.Add(Ne);
@@ -71,11 +76,12 @@ namespace Serpen.Uni.Automat {
                     ret1Automat.Add(DfromNe);
 
                     // NFA NfromD = (NFAe)DfromNe;
+
                     StatePDA QPDAfromNe = (StatePDA)Ne;
                     ret1Automat.Add(QPDAfromNe);
 
                     StackPDA SPDAFromQPDA = (StackPDA)QPDAfromNe;
-                    // ret1Automat.Add(SPDAFromQPDA);
+                    ret1Automat.Add(SPDAFromQPDA);
 
                     try {
                         DPDA DPDAFromD = (DPDA)DfromNe;
@@ -84,7 +90,7 @@ namespace Serpen.Uni.Automat {
 
 
                     TuringMachineSingleBand TMfromD = (TuringMachineSingleBand)DfromNe;
-                    // ret1Automat.Add(TMfromD);
+                    ret1Automat.Add(TMfromD);
 
                 } else if (automat is StatePDA QPDA) {
                     ret1Automat.Add(QPDA);
@@ -94,6 +100,7 @@ namespace Serpen.Uni.Automat {
                         ret1Automat.Add(SPDAfromQPDA);
 
                         // NTM1659 NTMfromQPDA = (NTM1659)QPDA;
+                        // ret1Automat.Add(NTMfromQPDA);
                     } catch { }
                 } else if (automat is StackPDA SPDA) {
                     var QPDAfromSPDA = (StackPDA)SPDA;
@@ -117,7 +124,7 @@ namespace Serpen.Uni.Automat {
             foreach (DFA D in KnownAutomat.GetDFAModels()) {
                 NFA NfromD = (NFA)D;
                 NFAe NEfromD = (NFAe)D;
-                NFAe NEfromN = (NFAe)NfromD;
+                // NFAe NEfromN = (NFAe)NfromD;
 
                 if (!D.Equals(D))
                     return false;
@@ -206,7 +213,7 @@ namespace Serpen.Uni.Automat {
                 retAut.Add(StatePDA.GenerateRandom());
                 retAut.Add(StackPDA.GenerateRandom());
                 retAut.Add(DPDA.GenerateRandom());
-                retAut.Add(TuringMachineSingleBand.GenerateRandom());
+                // retAut.Add(TuringMachineSingleBand.GenerateRandom());
                 retAut.Add(TuringMachineSingleBand1659.GenerateRandom());
                 // retAut.Add(TuringMachineMultiTrack.GenerateRandom());
             }

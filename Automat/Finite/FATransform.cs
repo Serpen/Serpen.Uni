@@ -15,8 +15,7 @@ namespace Serpen.Uni.Automat.Finite {
         internal bool ContainsKey(uint q, char c) => ContainsKey(new EATuple(q, c));
 
         internal bool TryGetValue(uint q, char c, out uint qNext) {
-			uint[] qNextArray;
-            if (TryGetValue(new EATuple(q, c), out qNextArray)) {
+            if (TryGetValue(new EATuple(q, c), out uint[] qNextArray)) {
                 qNext = qNextArray[0];
                 return true;
             } else {

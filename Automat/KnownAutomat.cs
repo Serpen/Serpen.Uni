@@ -7,7 +7,7 @@ namespace Serpen.Uni.Automat {
         public static readonly char[] binAlp = new char[] { '0', '1' };
 
 
-        internal static List<T> GetTypes<T>() {
+        internal static List<T> GetTypes<T>() where T : IAcceptWord {
             var list = new List<T>();
             var mems = typeof(KnownAutomat).FindMembers(MemberTypes.Property, BindingFlags.Public | BindingFlags.Static,
                 new MemberFilter(MemberTypeFilter), typeof(T));
@@ -56,6 +56,7 @@ namespace Serpen.Uni.Automat {
             return list.ToArray();
         }
 
+        [System.Obsolete()]
         public static Finite.NFAe[] GetNFAeModels(int randomCount = 10) {
             var list = GetTypes<Finite.NFAe>();
 
@@ -78,7 +79,9 @@ namespace Serpen.Uni.Automat {
             var AList = new List<IAutomat>();
             AList.AddRange(GetDFAModels());
             AList.AddRange(GetNFAModels());
-            AList.AddRange(GetNFAeModels());
+            AList.AddRange(GetTypes<Finite.DFA>());
+            AList.AddRange(GetTypes<Finite.NFA>());
+            AList.AddRange(GetTypes<Finite.NFAe>());
             AList.AddRange(GetTypes<ContextFree.DPDA>());
             AList.AddRange(GetTypes<ContextFree.PDA>());
             AList.AddRange(GetTypes<ContextFree.StackPDA>());
@@ -87,6 +90,7 @@ namespace Serpen.Uni.Automat {
             AList.AddRange(GetTypes<Turing.TuringMachineSingleBand1659>());
             AList.AddRange(GetTypes<Turing.TuringMachineMultiTrack>());
             AList.AddRange(GetTypes<Turing.NTM1659>());
+            AList.AddRange(Tests.GenerateRandomAutomats(50));
             return AList.ToArray();
         }
 
@@ -105,10 +109,5 @@ namespace Serpen.Uni.Automat {
                     return objPropertyInfo.PropertyType == objSearchType | objSearchType.IsAssignableFrom(objPropertyInfo.PropertyType);
             return false;
         }
-
-        static bool MemberNameFilter(MemberInfo objMemberInfo, object objSearch)
-            => objMemberInfo.Name.StartsWith(objSearch.ToString());
-
-
     }
 }

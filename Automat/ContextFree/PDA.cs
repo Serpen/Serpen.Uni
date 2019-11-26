@@ -106,10 +106,9 @@ namespace Serpen.Uni.Automat.ContextFree {
                     // continue; //TODO: why that
                 }
 
-                PDATransformValue[] qNext;
 
                 //get all possible (e-)transforms
-                if (((PDATransform)Transforms).TryGetValue(ref qStart, out qNext)) {
+                if (((PDATransform)Transforms).TryGetValue(ref qStart, out PDATransformValue[] qNext)) {
                     //iterate each cuple of start and next transform
                     for (int j = 0; j < qNext.Length; j++) {
                         var newStack = new Stack<char>(pcfg.Stack.Reverse());
@@ -153,10 +152,8 @@ namespace Serpen.Uni.Automat.ContextFree {
             List<PDAConfig> retCfgs2;
             if (retCfgs.Count > 100) {
                 retCfgs2 = new List<PDAConfig>();
-                int maxStackLen = int.MaxValue;
                 foreach (var rcfg in retCfgs) {
                     if (rcfg.Stack.Length <= rcfg.word.Length * 3) {
-                        maxStackLen = rcfg.word.Length;
                         retCfgs2.Add(rcfg);
                     }
                 }
@@ -172,7 +169,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             var tcol = new System.Collections.Generic.List<VisualizationTuple>(Transforms.Count);
             foreach (var t in Transforms) {
                 foreach (var v in t.Value) {
-                    string desc = $"{(t.Key.ci.HasValue ? t.Key.ci.Value : Uni.Utils.EPSILON)}|{(t.Key.cw.HasValue ? t.Key.cw.Value : Uni.Utils.EPSILON)}->{(!string.IsNullOrEmpty(v.cw2) ? v.cw2 : Uni.Utils.EPSILON.ToString())}";
+                    string desc = $"{(t.Key.ci ?? Uni.Utils.EPSILON)}|{(t.Key.cw ?? Uni.Utils.EPSILON)}->{(!string.IsNullOrEmpty(v.cw2) ? v.cw2 : Uni.Utils.EPSILON.ToString())}";
                     var vt = new VisualizationTuple(t.Key.q, v.qNext, desc);
                     tcol.Add(vt);
                 }
@@ -186,8 +183,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         public IAutomat Union(IUnion automat) {
 
-            var pda = automat as PDA;
-            if (pda == null)
+            if (!(automat is PDA pda))
                 throw new System.NotSupportedException();
 
             uint offsetD2 = this.StatesCount + 1; //first state of D2
@@ -230,8 +226,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         public IAutomat Concat(IConcat automat) {
 
-            var pda = automat as PDA;
-            if (pda == null)
+            if (!(automat is PDA pda))
                 throw new System.NotSupportedException();
 
             var pdat = new PDATransform();

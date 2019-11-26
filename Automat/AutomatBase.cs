@@ -107,7 +107,7 @@ namespace Serpen.Uni.Automat {
             return fromStartReachable;
         }
 
-        protected (uint[], string[], uint[]) removedStateTranslateTables() {
+        protected (uint[], string[], uint[]) RemovedStateTranslateTables() {
             bool[] fromStartReachable = ReachableStates();
 
             uint[] translate = new uint[fromStartReachable.Count((b) => b)];

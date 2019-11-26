@@ -54,8 +54,7 @@ namespace Serpen.Uni.Automat.Finite {
             for (int i = 0; i < eh.Length; i++) //iterate q+e(q)
             {
                 var t = new EATuple(eh[i], w); //e Transform
-                uint[] qNext; //Transform results
-                if (Transforms.TryGetValue(t, out qNext))
+                if (Transforms.TryGetValue(t, out uint[] qNext))
                     retQ.AddRange(qNext);
             }
             retQ.Sort();
@@ -87,9 +86,8 @@ namespace Serpen.Uni.Automat.Finite {
                 var curQ = toProcess.Pop();
 
                 var t = new EATuple(curQ, null); //e Transform
-                uint[] eQs;
 
-                if (Transforms.TryGetValue(t, out eQs))  //Exists e Transform?
+                if (Transforms.TryGetValue(t, out uint[] eQs))  //Exists e Transform?
                     foreach (var eQ in eQs) //for every e Transform
                         if (!Processed.Contains(eQ)) //only add if not already processed
                             toProcess.Push(eQ);
@@ -144,7 +142,7 @@ namespace Serpen.Uni.Automat.Finite {
         }
 
         public override IAutomat PurgeStates() {
-            (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
+            (uint[] translate, string[] names, uint[] aStates) = base.RemovedStateTranslateTables();
 
             var newT = new NFAeTransform();
             foreach (var t2 in Transforms)

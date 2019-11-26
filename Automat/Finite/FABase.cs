@@ -51,8 +51,7 @@ namespace Serpen.Uni.Automat.Finite {
 
 
         public IAutomat Concat(IConcat automat) {
-            var A = automat as FABase;
-            if (A == null)
+            if (!(automat is FABase A))
                 throw new System.NotSupportedException();
 
             var neaET = new NFAeTransform();
