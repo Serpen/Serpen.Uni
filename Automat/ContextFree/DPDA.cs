@@ -67,15 +67,12 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             //if word is empty, maybe only e-Transform is needed
             if (pcfg.word != "")
-                qStart = new PDATransformKey(pcfg.State, pcfg.word[0], pcfg.Stack[pcfg.Stack.Length - 1]);
+                qStart = new PDATransformKey(pcfg.State, pcfg.word[0], pcfg.Stack[^1]);
             else
-                qStart = new PDATransformKey(pcfg.State, null, pcfg.Stack[pcfg.Stack.Length - 1]);
-
-
-            PDATransformValue qNext;
+                qStart = new PDATransformKey(pcfg.State, null, pcfg.Stack[^1]);
 
             //get all possible (e-)transforms
-            if (!((DPDATransform)Transforms).TryGetValue(ref qStart, out qNext))
+            if (!((DPDATransform)Transforms).TryGetValue(ref qStart, out PDATransformValue qNext))
                 return null;
             else {
                 var newStack = new Stack<char>(pcfg.Stack); //new stack vor pcfg
@@ -135,7 +132,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         public override VisualizationTuple[] VisualizationLines() {
             var tcol = new System.Collections.Generic.List<VisualizationTuple>(Transforms.Count);
             foreach (var t in Transforms) {
-                string desc = $"{(t.Key.ci.HasValue ? t.Key.ci.Value : Uni.Utils.EPSILON)}|{(t.Key.cw.HasValue ? t.Key.cw.Value : Uni.Utils.EPSILON)}->{(!string.IsNullOrEmpty(t.Value.cw2) ? t.Value.cw2 : Uni.Utils.EPSILON.ToString())}";
+                string desc = $"{(t.Key.ci ?? Uni.Utils.EPSILON)}|{(t.Key.cw ?? Uni.Utils.EPSILON)}->{(!string.IsNullOrEmpty(t.Value.cw2) ? t.Value.cw2 : Uni.Utils.EPSILON.ToString())}";
                 var vt = new VisualizationTuple(t.Key.q, t.Value.qNext, desc);
                 tcol.Add(vt);
             }
@@ -170,7 +167,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
         public override IAutomat PurgeStates() {
-			(uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
+			(uint[] translate, string[] names, uint[] aStates) = base.RemovedStateTranslateTables();
 
             var newT = new DPDATransform();
             foreach (var t2 in Transforms)

@@ -16,9 +16,7 @@ namespace Serpen.Uni.Automat.Finite {
 
         protected uint[] GoChar(EATuple eat) => GoChar(eat.q, eat.c.Value);
         protected override uint[] GoChar(uint q, char w) {
-
-            uint qNext;
-            if (((DFATransform)Transforms).TryGetValue(q, w, out qNext))
+            if (((DFATransform)Transforms).TryGetValue(q, w, out uint qNext))
                 return new uint[] { qNext };
             else
                 throw new NotImplementedException();
@@ -149,9 +147,7 @@ namespace Serpen.Uni.Automat.Finite {
         }
 
         public override IAutomat Join(IJoin A) {
-            var D2 = A as DFA;
-
-            if (D2 == null)
+            if (!(A is DFA D2))
                 throw new NotSupportedException();
             if (!this.SameAlphabet(A))
                 throw new NotImplementedException("Different Alphabets are not implemented");
@@ -207,13 +203,9 @@ namespace Serpen.Uni.Automat.Finite {
                     stateNames[index] = $"{i},{j}";
 
                     foreach (char c in D1.Alphabet) {
-                        uint qNext1, qNext2; //next states for D1, D2
-
-                        //tuple for D1,D2
-
                         //Transform exists, out qNext
-                        bool exist1 = ((DFATransform)D1.Transforms).TryGetValue(i, c, out qNext1);
-                        bool exist2 = ((DFATransform)D2.Transforms).TryGetValue(j, c, out qNext2);
+                        bool exist1 = ((DFATransform)D1.Transforms).TryGetValue(i, c, out uint qNext1);
+                        bool exist2 = ((DFATransform)D2.Transforms).TryGetValue(j, c, out uint qNext2);
 
                         //same calc logic for dstIndex in Matrix
                         uint dstIndex;
@@ -280,7 +272,7 @@ namespace Serpen.Uni.Automat.Finite {
 
         public override IAutomat PurgeStates() {
 
-            (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
+            (uint[] translate, string[] names, uint[] aStates) = base.RemovedStateTranslateTables();
 
             var newT = new DFATransform();
             foreach (var t2 in Transforms)

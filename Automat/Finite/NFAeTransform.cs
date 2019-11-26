@@ -6,9 +6,8 @@ namespace Serpen.Uni.Automat.Finite
         internal void Add(uint q1, char? w, params uint[] q2) => Add(new EATuple(q1, w), q2);
 
         internal void AddM(uint q1, char? c, uint qNext) {
-            uint[] qBefore;
             var eat = new EATuple(q1, c);
-            if (TryGetValue(eat, out qBefore))
+            if (TryGetValue(eat, out uint[] qBefore))
                 this[eat] = qBefore.Append(qNext).ToArray();
             else
                 this.Add(eat.q, eat.c, qNext);

@@ -17,7 +17,7 @@ namespace Serpen.Uni.Automat {
             }
         }
 
-        IAutomat[] Automats;
+        public readonly IAutomat[] Automats;
     }
 
     [System.Serializable]

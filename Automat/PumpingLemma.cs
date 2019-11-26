@@ -74,8 +74,8 @@ namespace Serpen.Uni.Automat {
                 for (int j = i; j <= w.Length; j++) {
                     string[] parts = new string[3];
                     parts[0] = w.Substring(0, i);
-                    parts[1] = w.Substring(i, j - i);
-                    parts[2] = w.Substring(j, w.Length - j);
+                    parts[1] = w[i..j];
+                    parts[2] = w[j..];
                     words.Add(parts);
                 }
             }
@@ -90,10 +90,10 @@ namespace Serpen.Uni.Automat {
                         for (int l = k; l <= w.Length; l++) {
                             string[] parts = new string[5];
                             parts[0] = w.Substring(0, i);
-                            parts[1] = w.Substring(i, j - i);
-                            parts[2] = w.Substring(j, k - j);
-                            parts[3] = w.Substring(k, l - k);
-                            parts[4] = w.Substring(l, w.Length - l);
+                            parts[1] = w[i..j];
+                            parts[2] = w[j..k];
+                            parts[3] = w[k..l];
+                            parts[4] = w[l..];
                             words.Add(parts);
                         }
                     }

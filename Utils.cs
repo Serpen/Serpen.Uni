@@ -31,6 +31,12 @@ namespace Serpen.Uni {
 
         static bool CheckBitSet(this int b, int bitNumber) => (b & (1 << bitNumber)) > 0;
 
+        public static bool[] ToBoolArray(this int integer, int minLen) {
+            bool[] ret = new bool[System.Math.Max(Log2(integer)+1, minLen)];
+            for (int i = 0; i < ret.Length; i++)
+                ret[i] = integer.CheckBitSet(i);
+            return ret;
+        }
         public enum eDebugLogLevel { Always, Normal, Verbose }
         internal static eDebugLogLevel DebugLogLevel = eDebugLogLevel.Normal;
 
@@ -58,9 +64,9 @@ namespace Serpen.Uni {
 
         internal static Dictionary<T, List<T>> EqualityClasses<T>(T[] array, System.Func<T, T, bool> comparer) {
 
-            var ret = new Dictionary<T, List<T>>(array.Length);
-
-            ret.Add(array[0], new List<T>(new T[] { array[0] }));
+            var ret = new Dictionary<T, List<T>>(array.Length) {
+                { array[0], new List<T>(new T[] { array[0] }) }
+            };
 
             for (int i = 1; i < array.Length; i++) {
                 int eqIndex = -1;
@@ -115,6 +121,7 @@ namespace Serpen.Uni {
             return newTable;
         }
 
+        public static string FormatArray(bool[,] array) => FormatArray(array);
         public static string FormatArray<T>(T[,] array) {
             var sb = new System.Text.StringBuilder();
             for (int r = 0; r < array.GetLength(0); r++) {
@@ -126,4 +133,5 @@ namespace Serpen.Uni {
         }
 
     } //end class Utils 
+
 }

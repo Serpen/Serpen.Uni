@@ -11,7 +11,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             CheckConstraints();
         }
 
-        public bool isChomskey { get; internal set; }
+        public bool IsChomskey { get; internal set; }
 
         public static CFGrammer GenerateRandom() {
             var rnd = Uni.Utils.RND;
@@ -60,7 +60,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
 
-        public CFGrammer toChomskyNF(AlgSourceMode mode = AlgSourceMode.EAFK) {
+        public CFGrammer ToChomskyNF(AlgSourceMode mode = AlgSourceMode.EAFK) {
             var newVars = new List<char>(Variables);
             var newRS = Rules;
             if (mode == AlgSourceMode.EAFK)
@@ -70,7 +70,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             newRS = Chomskey3_UnitRules(newRS, newVars);
             newRS = Chomskey4_Length(newRS, ref newVars);
             newRS = Chomskey5_Terminals(newRS, ref newVars);
-            return new CFGrammer($"CCFG_({Name})", newVars.ToArray(), Terminals, newRS, StartSymbol) { isChomskey = true };
+            return new CFGrammer($"CCFG_({Name})", newVars.ToArray(), Terminals, newRS, StartSymbol) { IsChomskey = true };
         }
 
         /// <summary>
@@ -255,9 +255,8 @@ namespace Serpen.Uni.Automat.ContextFree {
                     while (newbody.Length > 2) {
                         var replacePart = newbody.Substring(Math.Min(replaceStartPos, newbody.Length - 2), 2);
                         replaceStartPos++;
-                        char nL;
 
-                        if (!translate.TryGetValue(replacePart, out nL)) {
+                        if (!translate.TryGetValue(replacePart, out char nL)) {
                             nL = Utils.NextFreeCapitalLetter(newVars.Union(Terminals).ToArray(), 'X');
                             newVars.Add(nL);
                             translate.Add(replacePart, nL);
@@ -292,8 +291,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                             c2Replaces.Add(newBody[1]);
 
                         foreach (var c2Replace in c2Replaces) {
-                            char nl;
-                            if (translate.TryGetValue(c2Replace, out nl)) { } else {
+                            if (translate.TryGetValue(c2Replace, out char nl)) { } else {
                                 nl = Utils.NextFreeCapitalLetter(newVars.Union(Terminals).ToArray(), c2Replace.ToString().ToUpper()[0]);
                                 newVars.Add(nl);
                                 translate.Add(c2Replace, nl);
@@ -343,7 +341,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         [AlgorithmSource("1659_3.4 CYK,Alg2")]
         public override bool AcceptWord(string w) {
-            if (!isChomskey) throw new NotSupportedException("Only supported in Chomskey normalform");
+            if (!IsChomskey) throw new NotSupportedException("Only supported in Chomskey normalform");
 
             if (w == "") {
                 if (Rules.ContainsKey(StartSymbol))

@@ -41,10 +41,9 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         TuringConfigMultiTrack GoChar(TuringConfigMultiTrack tcfg) {
-            TuringTransformMultiTrack.TuringVal tva;
             var tkey = new TuringTransformMultiTrack.TuringKey(tcfg.State, tcfg.CurSymbol[0..2]);
 
-            if (Transforms.TryGetValue(tkey, out tva)) {
+            if (Transforms.TryGetValue(tkey, out TuringTransformMultiTrack.TuringVal tva)) {
                 tcfg.ReplaceChar(tva.c2, tva.Direction);
                 tcfg.State = tva.qNext;
                 return tcfg;
@@ -82,7 +81,7 @@ namespace Serpen.Uni.Automat.Turing {
         public override string GetBandOutput(string w) {
             string[] wordTracks = new string[Tracks];
             wordTracks[0] = w;
-            
+
             for (int i = 1; i < Tracks; i++)
                 wordTracks[i] = new string(BlankSymbol, w.Length);
 
@@ -105,7 +104,7 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         public override IAutomat PurgeStates() {
-            (uint[] translate, string[] names, uint[] aStates) = base.removedStateTranslateTables();
+            (uint[] translate, string[] names, uint[] aStates) = base.RemovedStateTranslateTables();
 
             var newT = new TuringTransformMultiTrack(((TuringTransformMultiTrack)Transforms).StateTracks);
 
