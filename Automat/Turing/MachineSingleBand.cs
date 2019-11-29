@@ -43,8 +43,13 @@ namespace Serpen.Uni.Automat.Turing {
                 return null;
         }
 
-        public override bool AcceptWord(string w) => AcceptWord(w, true);
-        public bool AcceptWord(string w, bool wordConsumed) {
+        [System.Flags()]
+        public enum TuringAcceptance {wordConsumed, AcceptedState, Hold}
+
+        public TuringAcceptance DefaultAcceptance {get; set;} = TuringAcceptance.wordConsumed;
+
+        public override bool AcceptWord(string w) => AcceptWord(w, DefaultAcceptance);
+        public bool AcceptWord(string w, TuringAcceptance acceptance) {
             CheckWordInAlphabet(w);
 
             var tcfg = new TuringConfigSingleBand(BlankSymbol, w, 0) { State = StartState };
@@ -52,7 +57,10 @@ namespace Serpen.Uni.Automat.Turing {
             int runs = 0;
             uint lastQ = tcfg.State;
 
-            while (tcfg != null && (!IsAcceptedState(tcfg.State) || wordConsumed) && (!wordConsumed || tcfg.Band.Replace(BlankSymbol.ToString(), "") != "")) {
+            while (tcfg != null && (
+                    (!(acceptance.HasFlag(TuringAcceptance.AcceptedState) && IsAcceptedState(lastQ) && tcfg.CleanBand() == ""))
+                    || (!(acceptance.HasFlag(TuringAcceptance.wordConsumed) && tcfg.CleanBand() == ""))
+                    || (!(tcfg != null && (acceptance.HasFlag(TuringAcceptance.Hold)))))) {
                 Utils.DebugMessage(tcfg.ToString(), this, Uni.Utils.eDebugLogLevel.Verbose);
                 tcfg = GoChar(tcfg);
                 if (tcfg != null)
@@ -61,9 +69,12 @@ namespace Serpen.Uni.Automat.Turing {
                     throw new TuringCycleException($"possible Turing cycle at {runs} with {w} now is: {tcfg.Band.Trim(BlankSymbol)}", this);
                 runs++;
             }
-            if (tcfg != null && (!wordConsumed || tcfg.Band.Replace(BlankSymbol.ToString(), "") == ""))
+
+            if (acceptance.HasFlag(TuringAcceptance.AcceptedState) && IsAcceptedState(lastQ) && (tcfg == null || tcfg.CleanBand() == ""))
                 return true;
-            else if (IsAcceptedState(lastQ))
+            else if (tcfg != null && (acceptance.HasFlag(TuringAcceptance.wordConsumed) && tcfg.CleanBand() == ""))
+                return true;
+            else if (tcfg != null && (acceptance.HasFlag(TuringAcceptance.Hold)))
                 return true;
             else
                 return false;
@@ -107,7 +118,7 @@ namespace Serpen.Uni.Automat.Turing {
             var bandAlphabet = new System.Collections.Generic.List<char>(dfa.Alphabet.Length + 1);
             bandAlphabet.AddRange(dfa.Alphabet);
             bandAlphabet.Add(BLANK);
-            return new Turing.TuringMachineSingleBand($"TM_({dfa.Name})", dfa.States, dfa.Alphabet, bandAlphabet.ToArray(), tt, dfa.StartState, BLANK, dfa.AcceptedStates);
+            return new Turing.TuringMachineSingleBand($"TM_({dfa.Name})", dfa.States, dfa.Alphabet, bandAlphabet.ToArray(), tt, dfa.StartState, BLANK, dfa.AcceptedStates) {DefaultAcceptance=TuringAcceptance.AcceptedState};
         }
 
         public static TuringMachineSingleBand GenerateRandom() {

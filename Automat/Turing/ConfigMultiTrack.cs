@@ -3,6 +3,7 @@ namespace Serpen.Uni.Automat.Turing {
 
         public TuringConfigMultiTrack(char blankSymbol, string[] bands, int bandPos) : base(blankSymbol) {
             base.band = bands;
+            position = new int[bands.Length];
             Position = bandPos;
         }
 

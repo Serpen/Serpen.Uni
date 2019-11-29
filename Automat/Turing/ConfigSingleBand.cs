@@ -16,6 +16,8 @@ namespace Serpen.Uni.Automat.Turing {
             }
         }
 
+        public string CleanBand() => Band.Trim(BlankSymbol);
+
         public int Position {
             get => position[0];
             set {
