@@ -45,7 +45,7 @@ namespace Serpen.Uni.Automat {
                 return tmpen;
             }
         }
-        static readonly Font FONT = new Font("Courier New", 14);
+        static readonly Font CourierNewFont = new Font("Courier New", 14);
 
         static readonly Pen PEN = Pens.Black;
 
@@ -91,28 +91,31 @@ namespace Serpen.Uni.Automat {
             g.DrawString(A.Name, headFont, Brushes.Black, 20, 20);
 
             //Draw full declaration to bottom
-            var FullDesc = A.ToString();
-            try {
-                FullDesc = FullDesc.Replace(A.Name, "").Trim();
-            } catch { }
+            var FullDesc = A.ToString().Replace(A.Name, "").Trim();
+            // try {
+            //     FullDesc = FullDesc.Replace(A.Name, "").Trim();
+            // } catch { }
 
-            var FullDescSize = g.MeasureString(new string(' ', 10) + FullDesc + new string(' ', 10), FONT);
-            if (FullDescSize.Width < bmpwidth - 30)
-                g.DrawString(FullDesc, FONT, Brushes.Black, 15, bmp.Height - FullDescSize.Height * 2);
+            const int MARGIN = 10;
+
+            var FullDescSize = g.MeasureString(FullDesc, CourierNewFont);
+            if (FullDescSize.Width < bmpwidth - MARGIN*2)
+                g.DrawString(FullDesc, CourierNewFont, Brushes.Black, 15f, bmp.Height - FullDescSize.Height * 1.5f);
             else {
-                int DescPartCount = (int)Math.Ceiling((bmpwidth - 15 * 3) / (FullDescSize.Width + 10)) + 2;
-                int toStringSplitFactor = FullDesc.Length / DescPartCount;
+                int DescPartCount = (int)Math.Ceiling(FullDescSize.Width / (bmpwidth - MARGIN*2));
+                int toStringSplitFactor = (int)Math.Ceiling((float)FullDesc.Length / DescPartCount);
                 for (int i = 0; i < DescPartCount; i++) {
-                    g.DrawString(FullDesc.Substring(i * toStringSplitFactor, toStringSplitFactor),
-                        FONT, Brushes.Black, 15, bmp.Height - (DescPartCount - i + 1) * (FullDescSize.Height + 2));
+                    string rowString = FullDesc.Substring(i * toStringSplitFactor, Math.Min(toStringSplitFactor, FullDesc.Length-i*toStringSplitFactor));
+                    g.DrawString(rowString, CourierNewFont, Brushes.Black, 15, 
+                        bmp.Height - (DescPartCount - i + 1) * (FullDescSize.Height));
                 }
             }
 
 
             // draw States
             for (uint iq = 0; iq < A.StatesCount; iq++) {
-                var strSize = g.MeasureString(A.States[iq], FONT);
-                g.DrawString(A.States[iq], FONT, Brushes.Black, qPos(iq) + STATE_DIAMETER / 2 - strSize.Width / 2, vCenter - strSize.Height / 2);
+                var strSize = g.MeasureString(A.States[iq], CourierNewFont);
+                g.DrawString(A.States[iq], CourierNewFont, Brushes.Black, qPos(iq) + STATE_DIAMETER / 2 - strSize.Width / 2, vCenter - strSize.Height / 2);
 
                 var ellipsePen = PEN;
                 if (A.IsAcceptedState(iq))
@@ -138,7 +141,7 @@ namespace Serpen.Uni.Automat {
         }
 
         static void DrawTransformLine(ref Graphics g, int qStart, int qEnd, string desc, int vCenter, ref int lastCurveHeigth, ref AlreadyDrawnClass alreadyDrawn) {
-            var descSize = g.MeasureString(desc, FONT);
+            var descSize = g.MeasureString(desc, CourierNewFont);
 
             var penArrow = PEN_ARROW;
             var alreadyDrawnIndex = alreadyDrawn[qStart, qEnd];
@@ -148,21 +151,21 @@ namespace Serpen.Uni.Automat {
                 int lineX2 = qPos(qEnd);
 
                 g.DrawLine(penArrow, lineX, vCenter, lineX2, vCenter);
-                g.DrawString(desc, FONT, Brushes.Black, (lineX + lineX2) / 2 - descSize.Width / 2 + 10, vCenter - 5 - descSize.Height - alreadyDrawnIndex);
+                g.DrawString(desc, CourierNewFont, Brushes.Black, (lineX + lineX2) / 2 - descSize.Width / 2 + 10, vCenter - 5 - descSize.Height - alreadyDrawnIndex);
 
             } else if (qStart == qEnd + 1) { //state right to left
                 int lineX = qPos(qStart);
                 int lineX2 = qPos(qEnd) + STATE_DIAMETER;
 
                 g.DrawLine(penArrow, lineX, vCenter, lineX2, vCenter);
-                g.DrawString(desc, FONT, Brushes.Black, (lineX + lineX2) / 2 - descSize.Width / 2 - 10, vCenter + 5 + alreadyDrawnIndex);
+                g.DrawString(desc, CourierNewFont, Brushes.Black, (lineX + lineX2) / 2 - descSize.Width / 2 - 10, vCenter + 5 + alreadyDrawnIndex);
 
             } else if (qStart == qEnd) { //loop above
                 int lineX = qPos(qStart) + STATE_DIAMETER / 2 - LOOP_WIDTH / 4;
                 int lineY = vCenter - STATE_DIAMETER / 2 - LOOP_WIDTH;
 
                 g.DrawEllipse(PEN_ARROW, lineX, lineY, LOOP_WIDTH / 2, LOOP_WIDTH);
-                g.DrawString(desc, FONT, Brushes.Black, lineX + LOOP_WIDTH / 4 - descSize.Width / 2, lineY - descSize.Height + alreadyDrawnIndex);
+                g.DrawString(desc, CourierNewFont, Brushes.Black, lineX + LOOP_WIDTH / 4 - descSize.Width / 2, lineY - descSize.Height + alreadyDrawnIndex);
 
             } else { //other connections below
                 int lineX = qPos(qStart) + STATE_DIAMETER / 2;
@@ -182,11 +185,11 @@ namespace Serpen.Uni.Automat {
                         new Point(lineX2, vCenter+STATE_DIAMETER/2)};
 
                     g.DrawCurve(penArrow, ps);
-                    g.DrawString(desc, FONT, Brushes.Black, lineM - descSize.Width / 2,
+                    g.DrawString(desc, CourierNewFont, Brushes.Black, lineM - descSize.Width / 2,
                         vCenter + STATE_DIAMETER / 2 + thisCurveHeigth);
                 } else {
                     thisCurveHeigth = lastCurveHeigth - CURVE_BONUS;
-                    g.DrawString(desc, FONT, Brushes.Black, lineM - descSize.Width / 2,
+                    g.DrawString(desc, CourierNewFont, Brushes.Black, lineM - descSize.Width / 2,
                         vCenter + STATE_DIAMETER / 2 + thisCurveHeigth + alreadyDrawnIndex);
                 }
             }
