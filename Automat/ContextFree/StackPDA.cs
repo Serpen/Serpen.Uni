@@ -20,48 +20,47 @@ namespace Serpen.Uni.Automat.ContextFree {
         : base(name, states, InputAlphabet, Workalphabet, Transform, StartState, Startsymbol, new uint[] { }) {
         }
 
-        public static readonly StackPDA Empty = new StackPDA("SPDA_Empty", 1, new char[] {}, new char[] {}, new PDATransform(), 0, START); 
+        public static readonly StackPDA Empty = new StackPDA("SPDA_Empty", 1, new char[] { }, new char[] { }, new PDATransform(), 0, START);
 
         [AlgorithmSource("1659_L33")]
         public static explicit operator StackPDA(StatePDA pda) {
-            var newt = new PDATransform {
-                { 0, null, null, pda.StartSymbol.ToString(), 1 }
-            };
 
+            // find new unused Stack Startsymbol for workalphabet
             char extra_symbol = Utils.NextFreeCapitalLetter(pda.Alphabet.Concat(pda.WorkAlphabet).ToArray(), EXTRASYMBOLS[0], EXTRASYMBOLS);
-            
-            uint qPump = pda.StatesCount;
-
-            for (int i = 0; i < pda.Transforms.Count; i++) {
-                var t = pda.Transforms.ElementAt(i);
-                for (int j = 0; j < t.Value.Length; j++) {
-                    //inc all States cause of new first § state
-                    newt.AddM(t.Key.q + 1, t.Key.ci, t.Key.cw, t.Value[j].cw2, t.Value[j].qNext + 1);
-
-                    //accepted state goes to qPump
-                    if (pda.IsAcceptedState(t.Key.q)) {
-                        newt.AddM(t.Key.q + 1, null, null, null, qPump);
-                    }
-                }
-            }
-
             var spdaWorkAlphabet = new System.Collections.Generic.List<char>(pda.WorkAlphabet) {
                 extra_symbol
             };
-            
-            foreach (char c in pda.Alphabet) {
-                if (!spdaWorkAlphabet.Contains(c))
-                    spdaWorkAlphabet.Add(c);
-                newt.Add(qPump, null, c, null, qPump);
-            }
-            newt.Add(qPump, null, extra_symbol, null, qPump);
 
-            return new StackPDA($"SPDA_({pda.Name})", pda.StatesCount + 1, pda.Alphabet, spdaWorkAlphabet.ToArray(), newt, 0, extra_symbol);
+            byte inc = 1;
+
+            // start Stackpda with new pushed Stackstartsymbol
+            var newt = new PDATransform {
+                { 0, null, null, extra_symbol.ToString(), pda.StartState+inc }
+            };
+
+            if (pda.StartSymbol != (char)0)
+                newt.Add(pda.StartState + 1, null, null, pda.StartSymbol.ToString(), pda.StartState + ++inc);
+
+            uint qPump = pda.StatesCount + inc; // ;
+
+            // inc all States cause of new first § state
+            foreach (var t in pda.Transforms) {
+                for (int j = 0; j < t.Value.Length; j++) {
+                    newt.AddM(t.Key.q + inc, t.Key.ci, t.Key.cw, t.Value[j].cw2, t.Value[j].qNext + inc);
+                }
+            }
+
+            // all accepted states goes to qPump
+            for (int i = 0; i < pda.AcceptedStates.Length; i++)
+                newt.TryAdd(new PDATransformKey(pda.AcceptedStates[i] + inc, null, extra_symbol),
+                new PDATransformValue[] { new PDATransformValue(null, qPump) });
+
+            return new StackPDA($"SPDA_({pda.Name})", pda.StatesCount + inc + 1, pda.Alphabet, spdaWorkAlphabet.ToArray(), newt, 0, (char)0);
         }
 
         public override bool AcceptWord(string w) {
             CheckWordInAlphabet(w);
-            
+
             int runCount = 0;
             //construct start config
             PDAConfig[] pcfgs;
@@ -73,11 +72,10 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             //while any pcfg exists
             while (pcfgs.Length > 0) { //&& (pcfg.Where((a) => a.Stack.Length>0).Any())
-                foreach (var p in pcfgs) {
-                    if ((p.Stack.Count() == 0 || (p.Stack[p.Stack.Count() - 1] == this.StartSymbol && p.Stack.Count() == 1)) && p.word.Length == 0) {
+                foreach (var p in pcfgs)
+                    if ((p.Stack.Count() == 0 || (p.Stack[p.Stack.Count() - 1] == this.StartSymbol && p.Stack.Count() == 1)) && p.word.Length == 0)
                         return true;
-                    }
-                }
+
                 pcfgs = GoChar(pcfgs);
 
                 runCount++;
@@ -101,38 +99,38 @@ namespace Serpen.Uni.Automat.ContextFree {
             int stateCount = rnd.Next(1, MAX_STATES);
 
             char[] inputAlphabet = new char[rnd.Next(1, MAX_CHAR)];
-            for (int i=0; i < inputAlphabet.Length; i++)
+            for (int i = 0; i < inputAlphabet.Length; i++)
                 inputAlphabet[i] = (char)rnd.Next('a', 'z');
             inputAlphabet = inputAlphabet.Distinct().ToArray();
 
             char[] workAlphabet = new char[rnd.Next(1, MAX_CHAR)];
-            for (int i=1; i < workAlphabet.Length; i++)
+            for (int i = 1; i < workAlphabet.Length; i++)
                 workAlphabet[i] = (char)rnd.Next('a', 'z');
             workAlphabet[0] = START;
             workAlphabet = workAlphabet.Distinct().ToArray();
 
             for (uint i = 0; i < stateCount; i++) {
                 int transformsRnd = rnd.Next(0, inputAlphabet.Length);
-                for (int j = 0; j < transformsRnd; j++) {
+                for (int j = 0; j < transformsRnd; j++)
                     t.AddM(i, inputAlphabet.RndElement(), workAlphabet.RndElement(), workAlphabet.RndElement().ToString(), (uint)rnd.Next(0, stateCount));
-                }
+
             }
 
-            var ret = new StackPDA("SPDA_Random", (uint)stateCount, inputAlphabet, workAlphabet, t, (uint)rnd.Next(0,stateCount), START);
+            var ret = new StackPDA("SPDA_Random", (uint)stateCount, inputAlphabet, workAlphabet, t, (uint)rnd.Next(0, stateCount), START);
             ret.Name = $"SPDA_Random_{ret.GetHashCode()}";
             return ret;
         }
 
         public override IAutomat PurgeStates() {
             (uint[] translate, string[] names, _) = base.RemovedStateTranslateTables();
-                
+
             var newT = new PDATransform();
             foreach (var t2 in Transforms)
                 if (translate.Contains(t2.Key.q))
                     foreach (var v in t2.Value)
                         if (translate.Contains(v.qNext))
                             newT.AddM(translate.ArrayIndex(t2.Key.q), t2.Key.ci, t2.Key.cw, v.cw2, translate.ArrayIndex(v.qNext));
-            
+
             return new StackPDA($"{Name}_purged", names, Alphabet, WorkAlphabet, newT, translate.ArrayIndex(StartState), StartSymbol);
         }
 
@@ -151,7 +149,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             foreach (char c in cfg.Terminals)
                 t.Add(qSim, c, c, null, qSim);
-            
+
             t.Add(qSim, null, ContextFree.PDA.START, null, qSim);
             names.Add(qSim, "sim");
 
@@ -174,7 +172,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
                     } else
                         t.AddM(qSim, null, r.Key, body, qSim);
-                    
+
                 }
             }
 
@@ -182,5 +180,8 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             return new ContextFree.StackPDA($"SPDA_({cfg.Name})", names.Values.ToArray(), cfg.Terminals, WorkAlphabet, t, 0, START);
         }
+
+        public override string ToString() => $"{Name} SPDA(|{States.Length}|={string.Join(";", States)}), {{{string.Join(',', Alphabet)}}},{{{string.Join(',', WorkAlphabet)}}}, {{{Transforms.ToString()}}}, {StartState}, {StartSymbol})".Trim();
+
     }
 }

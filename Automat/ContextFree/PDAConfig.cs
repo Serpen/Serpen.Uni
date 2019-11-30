@@ -23,5 +23,8 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
         public override string ToString() => $"({State},'{word}','{string.Join("", Stack)}')";
+
+        public override bool Equals(object obj) => (obj is PDAConfig pobj) && string.Join(',', this.Stack)==string.Join(',', pobj.Stack) && this.State==pobj.State && this.word==pobj.word;
+        public override int GetHashCode() => ToString().GetHashCode();
     }
 }

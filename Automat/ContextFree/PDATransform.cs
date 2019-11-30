@@ -22,12 +22,9 @@ namespace Serpen.Uni.Automat.ContextFree {
             this.cw = cw;
         }
 
-        public override bool Equals(object obj) {
-            if (obj is PDATransformKey pk) {
-                return pk.q == this.q && pk.ci == this.ci && pk.cw == this.cw;
-            }
-            return false;
-        }
+        public override bool Equals(object obj)
+            => (obj is PDATransformKey pk) &&
+            pk.q == this.q && pk.ci == this.ci && pk.cw == this.cw;
 
         public override int GetHashCode() => this.ToString().GetHashCode();
 
@@ -47,7 +44,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         public override string ToString() => $"({(!string.IsNullOrEmpty(cw2) ? cw2 : Uni.Utils.EPSILON.ToString())}, {qNext})";
     }
 
-    
+
     public class PDATransform : TransformBase<PDATransformKey, PDATransformValue[]> {
         public void Add(uint q, char? ci, char? cw, string cw2, uint qNext)
             => Add(new PDATransformKey(q, ci, cw), new PDATransformValue[] { new PDATransformValue(cw2, qNext) });

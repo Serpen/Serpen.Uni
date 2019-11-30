@@ -65,14 +65,13 @@ namespace Serpen.Uni.Automat.ContextFree {
             t.Add(0, null, null, cfg.StartSymbol.ToString(), qSim);
             names.Add(0, "start");
 
-            foreach (char c in cfg.Terminals) {
+            foreach (char c in cfg.Terminals)
                 t.Add(qSim, c, c, null, qSim);
-            }
+
             names.Add(qSim, "sim");
 
             foreach (var r in cfg.Rules) {
                 foreach (string body in r.Value) {
-
                     if (body.Length > 2) {
                         t.AddM(qSim, null, r.Key, body.Substring(body.Length - 1, 1), q);
                         names.TryAdd(q, $"{q}; {r.Key}=>{body}");

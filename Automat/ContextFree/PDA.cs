@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Serpen.Uni.Automat.ContextFree {
 
-    public interface IPDA : IAutomat, IReverse { 
-        char[] WorkAlphabet {get;}
-        char StartSymbol {get;}
+    public interface IPDA : IAutomat, IReverse {
+        char[] WorkAlphabet { get; }
+        char StartSymbol { get; }
 
         PDAConfig[] GoChar(PDAConfig[] pcfgs);
     }
@@ -18,9 +18,8 @@ namespace Serpen.Uni.Automat.ContextFree {
         protected const int MAX_RUNS_OR_STACK = 10000;
         protected static readonly char[] EXTRASYMBOLS = new char[] { '§', '$', '%', '&' };
         public const char START = '$';
-        public char[] WorkAlphabet {get;}
-        //public readonly PDATransform Transform;
-        public char StartSymbol {get;}
+        public char[] WorkAlphabet { get; }
+        public char StartSymbol { get; }
 
         /// <summary>
         /// Create a PDA which accepts when ending in Accepted States
@@ -69,7 +68,6 @@ namespace Serpen.Uni.Automat.ContextFree {
                         throw new AlphabetException(t.Key.cw.Value, this);
                     else if (t.Value[i].cw2 != null && t.Value[i].cw2 != "" && !WorkAlphabet.Contains(t.Value[i].cw2[0]))
                         throw new AlphabetException(t.Value[i].cw2[0], this);
-
                 }
             }
             for (int i = 0; i < AcceptedStates.Length; i++)
@@ -79,7 +77,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         //nondeterministic makes it grow exponetially, maybe it is best, to do a BFS instead of DFS, follow one path to its possible end
         public PDAConfig[] GoChar(PDAConfig[] pcfgs) {
-            var retCfgs = new List<PDAConfig>(1000);
+            var retCfgs = new HashSet<PDAConfig>(1000);
 
             if (pcfgs.Length > MAX_RUNS_OR_STACK) {
                 Utils.DebugMessage($"Stack >= {pcfgs.Length} abort", this, Uni.Utils.eDebugLogLevel.Always);
@@ -93,7 +91,6 @@ namespace Serpen.Uni.Automat.ContextFree {
                 if (pcfg.word != "") {
                     if (pcfg.Stack.Any())
                         qStart[0] = new PDATransformKey(pcfg.State, pcfg.word[0], pcfg.Stack[0]);
-                    // qStart[0] = new PDATransformKey(pcfg.q, pcfg.word[0], pcfg.Stack[pcfg.Stack.Length-1]);
                     else
                         qStart[0] = new PDATransformKey(pcfg.State, pcfg.word[0], null);
                     // continue; //TODO: why that //maybe empty stack that is not accepted should be thrown away
@@ -114,24 +111,23 @@ namespace Serpen.Uni.Automat.ContextFree {
                         var newStack = new Stack<char>(pcfg.Stack.Reverse());
                         var qNextj = qNext[j];
 
-                        //stack symbol cw2 replaces cw
                         if (qStart[j].cw.HasValue && qNext[j].cw2 != null) {
+                            // stack symbol cw2 replaces cw
                             newStack.Pop();
                             for (int i = qNextj.cw2.Length - 1; i >= 0; i--)
                                 newStack.Push(qNextj.cw2[i]);
 
-                            //cw was used, replace with e, so pop
                         } else if (qStart[j].cw.HasValue && qNext[j].cw2 == null) {
+                            // cw was used, replace with e, so pop
                             newStack.Pop();
 
-                            //any (e-cw) should be replaced by cw2
                         } else if (!qStart[j].cw.HasValue && qNext[j].cw2 != null) {
+                            //any (e-cw) should be replaced by cw2
                             for (int i = qNextj.cw2.Length - 1; i >= 0; i--)
                                 newStack.Push(qNextj.cw2[i]);
 
-                            //cw's not relevant, no stack action
                         } else if (!qStart[j].cw.HasValue && qNext[j].cw2 == null) {
-                            //do nothing
+                            // cw's not relevant, no stack action -> NOOP
                         } else
                             throw new System.NotSupportedException("some condition forgotten??");
 
@@ -152,11 +148,10 @@ namespace Serpen.Uni.Automat.ContextFree {
             List<PDAConfig> retCfgs2;
             if (retCfgs.Count > 100) {
                 retCfgs2 = new List<PDAConfig>();
-                foreach (var rcfg in retCfgs) {
-                    if (rcfg.Stack.Length <= rcfg.word.Length * 3) {
+                foreach (var rcfg in retCfgs)
+                    if (rcfg.Stack.Length <= rcfg.word.Length * 3)
                         retCfgs2.Add(rcfg);
-                    }
-                }
+
             } else
                 retCfgs2 = new List<PDAConfig>(retCfgs);
 
