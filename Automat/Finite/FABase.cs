@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace Serpen.Uni.Automat.Finite {
 
+    [System.Serializable]
     public abstract class FABase : AutomatBase<EATuple, uint[]>, IAlleAbgeschlossenheitseigenschaften {
 
         public FABase(uint stateCount, char[] alphabet, TransformBase<EATuple, uint[]> eat, uint startState, uint[] acceptedStates, string name = "")
@@ -39,7 +40,7 @@ namespace Serpen.Uni.Automat.Finite {
 
         public IAutomat Complement() {
             var Dc = this.MemberwiseClone() as FABase;
-            var accStates = new List<uint>((int)StatesCount-AcceptedStates.Length);
+            var accStates = new List<uint>((int)StatesCount - AcceptedStates.Length);
 
             for (uint i = 0; i < this.States.Length; i++)
                 if (!this.IsAcceptedState(i))
@@ -93,13 +94,13 @@ namespace Serpen.Uni.Automat.Finite {
             uint[] accStates = new uint[this.AcceptedStates.Length + fa.AcceptedStates.Length];
             char[] nAlphabet = this.Alphabet.Union(fa.Alphabet).ToArray();
 
-			var neat = new NFAeTransform
-			{
-				{ 0, null, 1, offsetD2 }
-			};
+            var neat = new NFAeTransform
+            {
+                { 0, null, 1, offsetD2 }
+            };
 
-			//add each D1 transform, +1
-			foreach (var item in this.Transforms)
+            //add each D1 transform, +1
+            foreach (var item in this.Transforms)
                 foreach (uint val in item.Value)
                     neat.AddM(item.Key.q + 1, item.Key.c, val + 1);
 
@@ -156,25 +157,28 @@ namespace Serpen.Uni.Automat.Finite {
         }
 
         public IAutomat KleeneStern() {
-			var neaET = new NFAeTransform
-			{
-				//accepted front state
-				{ 0, null, 1 }
+            var neaET = new NFAeTransform
+            {
+                { 0, null, this.StartState+1 } // accepted front state
 			};
 
-			//add transforms, +1
-			foreach (var item in this.Transforms) {
+            // add transforms, +1
+            foreach (var item in this.Transforms) {
                 uint[] qnext = new uint[item.Value.Length];
                 for (int i = 0; i < item.Value.Length; i++)
                     qnext[i] = item.Value[i] + 1;
                 neaET.Add(item.Key.q + 1, item.Key.c, qnext);
             }
 
-            //add e-transform from org accepted to front state
-            for (uint i = 0; i < this.AcceptedStates.Length; i++)
+            var acceptedStates = new uint[this.AcceptedStates.Length+1];
+            acceptedStates[0] = 0;
+            // add e-transform from org accepted to front state
+            for (uint i = 0; i < this.AcceptedStates.Length; i++) {
+                acceptedStates[i+1] = this.AcceptedStates[i]+1; // a little redundant, because all accepted states must go back to first
                 neaET.Add(this.AcceptedStates[i] + 1, null, 0);
+            }
 
-            return new NFAe($"NFAe_KleeneStern({Name})", this.StatesCount, this.Alphabet, neaET, 0, 0);
+            return new NFAe($"NFAe_KleeneStern({Name})", this.StatesCount+1, this.Alphabet, neaET, 0, acceptedStates);
         }
 
         public abstract IAutomat HomomorphismChar(System.Collections.Generic.Dictionary<char, char> Translate);

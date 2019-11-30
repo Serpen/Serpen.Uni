@@ -28,6 +28,8 @@ namespace Serpen.Uni.Automat {
         VisualizationTuple[] VisualizationLines();
     }
 
+
+    [System.Serializable]
     public abstract class AutomatBase<TKey, TVal> : IAutomat where TKey : ITransformKey {
         public TransformBase<TKey, TVal> Transforms { get; protected set; }
         public string[] States { get; }
@@ -37,7 +39,8 @@ namespace Serpen.Uni.Automat {
         public string Name { get; protected set; }
         public uint[] AcceptedStates { get; protected set; }
 
-        internal System.Func<string, bool> SimplyfiedAcceptFunction { get; set; }
+        [System.NonSerialized()]
+        internal System.Func<string, bool> SimplyfiedAcceptFunction;
 
         public AutomatBase(uint stateCount, char[] alphabet, uint startState, string name, uint[] acceptedStates) {
             var sortAlp = alphabet.ToList();

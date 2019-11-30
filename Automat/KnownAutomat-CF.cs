@@ -11,7 +11,7 @@ namespace Serpen.Uni.Automat {
                     { 2, 'b', 'a', null, 2 },
                     { 2, null, PDA.START, null, 3 }
                 };
-                return new StatePDA(nameof(QPDA_1659_A33_K1_anbn), 4, new char[] { 'a', 'b' }, new char[] { 'a', PDA.START }, pdaT, 0, (char)0, new uint[] { 3 });
+                return new StatePDA(nameof(QPDA_1659_A33_K1_anbn), 4, new char[] { 'a', 'b' }, new char[] { 'a', PDA.START }, pdaT, 0, null, new uint[] { 3 });
             }
         }
 
@@ -50,7 +50,7 @@ namespace Serpen.Uni.Automat {
                     { 0, '1', null, "1", 1 },
                     { 1, '0', '1', null, 0 }
                 };
-                return new StackPDA(nameof(SPDA_simple_10), 2, binAlp, binAlp, pdaT, 0, (char)0);
+                return new StackPDA(nameof(SPDA_simple_10), 2, binAlp, binAlp, pdaT, 0, null);
             }
         }
 
@@ -98,7 +98,7 @@ namespace Serpen.Uni.Automat {
                     { 0, '1', null, "1", 1 },
                     { 1, '0', '1', null, 0 }
                 };
-                return new StatePDA(nameof(QPDA_simple_10), 2, binAlp, binAlp, pdaT, 0, (char)0, new uint[] { 0 });
+                return new StatePDA(nameof(QPDA_simple_10), 2, binAlp, binAlp, pdaT, 0, null, new uint[] { 0 });
             }
         }
 

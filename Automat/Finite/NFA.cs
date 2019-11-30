@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Serpen.Uni.Automat.Finite {
 
+    [System.Serializable]
     public class NFA : FABase, INFA {
 
         public NFA(string name, uint StateCount, char[] Alphabet, NFAeTransform Transform, uint StartState, params uint[] acceptedStates)
@@ -20,7 +21,7 @@ namespace Serpen.Uni.Automat.Finite {
             for (int i = 0; i < q.Length; i++)
                 if (neat.ContainsKey(q[i], w))
                     retQ.AddRange(neat[q[i], w]);
-            
+
             retQ.Sort();
             return retQ.Distinct().ToArray();
         }

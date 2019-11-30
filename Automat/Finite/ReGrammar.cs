@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Serpen.Uni.Automat {
+
+    [System.Serializable]
     public abstract class GrammerBase : IAcceptWord {
         protected GrammerBase(string name, char[] variables, char[] terminals, RuleSet rules, char startSymbol) {
             this.Variables = variables;

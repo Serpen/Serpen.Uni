@@ -1,7 +1,9 @@
 using System.Linq;
 
 namespace Serpen.Uni.Automat.Turing {
-public class TuringTransformMultiTrack : TransformBase<TuringTransformMultiTrack.TuringKey, TuringTransformMultiTrack.TuringVal> {
+    
+    [System.Serializable]
+    public class TuringTransformMultiTrack : TransformBase<TuringTransformMultiTrack.TuringKey, TuringTransformMultiTrack.TuringVal> {
         internal string[] StateTracks { get; }
         public TuringTransformMultiTrack(string[] stateTracks) {
             StateTracks = stateTracks;
@@ -16,22 +18,23 @@ public class TuringTransformMultiTrack : TransformBase<TuringTransformMultiTrack
             }
             return sw.ToString();
         }
-        
+
         public void AddByStateStoreAndTracks(string q, string c1, string qNext, string c2, TMDirection dir) {
-            Add(new TuringTransformMultiTrack.TuringKey(StateTracks.ArrayIndex(q), 
+            Add(new TuringTransformMultiTrack.TuringKey(StateTracks.ArrayIndex(q),
                     c1.Replace(",", string.Empty).ToCharArray().Reverse().ToArray()),
-                new TuringTransformMultiTrack.TuringVal(StateTracks.ArrayIndex(qNext), 
+                new TuringTransformMultiTrack.TuringVal(StateTracks.ArrayIndex(qNext),
                     c2.Replace(",", string.Empty).ToCharArray().Reverse().ToArray(), dir));
 
         }
-        
+
+        [System.Serializable]
         public struct TuringKey : ITransformKey {
             public TuringKey(uint q, char[] c) {
                 this.q = q;
                 this.c = c;
             }
-            public uint q {get;}
-            public char[] c {get;}
+            public uint q { get; }
+            public char[] c { get; }
 
             public override bool Equals(object obj) {
                 if (obj is TuringKey tk) {
@@ -45,6 +48,7 @@ public class TuringTransformMultiTrack : TransformBase<TuringTransformMultiTrack
             public override string ToString() => $"({q}, {string.Join("", c)})";
         }
 
+        [System.Serializable]
         public struct TuringVal : ITransformValue {
             public TuringVal(uint qNext, char[] c, TMDirection dir) {
                 this.qNext = qNext;

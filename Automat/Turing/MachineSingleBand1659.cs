@@ -1,6 +1,8 @@
 using System.Linq;
 
 namespace Serpen.Uni.Automat.Turing {
+
+    [System.Serializable]
     public class TuringMachineSingleBand1659 : TuringMachineBase<TuringKey, TuringVal> {
 
         public TuringMachineSingleBand1659(string name, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, TuringTransformSingleBand transform, uint startState, char blankSymbol, uint acceptedState, uint discardState)

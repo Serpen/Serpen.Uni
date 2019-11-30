@@ -1,6 +1,8 @@
 using System.Linq;
 namespace Serpen.Uni.Automat.Finite
 {
+
+    [System.Serializable]
     public class NFAeTransform : TransformBase<EATuple, uint[]>
     {
         internal void Add(uint q1, char? w, params uint[] q2) => Add(new EATuple(q1, w), q2);

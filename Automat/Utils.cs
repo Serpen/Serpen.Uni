@@ -63,6 +63,14 @@ namespace Serpen.Uni.Automat {
         
         public static void SaveAutomatImageToTemp(this IAutomat automat)
             => Visualization.DrawAutomat(automat).Save(System.Environment.ExpandEnvironmentVariables($@"%temp%\automat\{automat.Name}.png"));
+        
+        public static void ExportToTemp(this IAutomat automat) {
+            SaveAutomatImageToTemp(automat);
+            var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+            var stream = new System.IO.FileStream(System.Environment.ExpandEnvironmentVariables($@"%temp%\automat\{automat.Name}.bin"), System.IO.FileMode.Create, System.IO.FileAccess.Write);
+            formatter.Serialize(stream, automat);
+            stream.Close();
+        }
 
         public static bool EqualAlphabets(this char[] alphabet, char[] anotherAlphabet) {
             if (alphabet.Length != anotherAlphabet.Length) return false;

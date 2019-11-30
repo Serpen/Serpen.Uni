@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Serpen.Uni.Automat.ContextFree {
+    
+    [System.Serializable]
     public struct PDATransformKey : ITransformKey {
         public uint q { get; }
         public char? ci { get; }
@@ -32,6 +34,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             => $"({q}, {(ci ?? Uni.Utils.EPSILON)}, {(cw ?? Uni.Utils.EPSILON)})";
     }
 
+    [System.Serializable]
     public struct PDATransformValue : ITransformValue {
         public PDATransformValue(string cw2, uint qnext) {
             this.cw2 = cw2;
@@ -44,7 +47,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         public override string ToString() => $"({(!string.IsNullOrEmpty(cw2) ? cw2 : Uni.Utils.EPSILON.ToString())}, {qNext})";
     }
 
-
+    [System.Serializable]
     public class PDATransform : TransformBase<PDATransformKey, PDATransformValue[]> {
         public void Add(uint q, char? ci, char? cw, string cw2, uint qNext)
             => Add(new PDATransformKey(q, ci, cw), new PDATransformValue[] { new PDATransformValue(cw2, qNext) });

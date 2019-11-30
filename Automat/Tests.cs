@@ -8,7 +8,20 @@ namespace Serpen.Uni.Automat {
     public static class Tests {
 
         public static void RunAllTests() {
-            var allAutomats = CastToEveryPossibility();
+            var allAutomats1 = new List<IAutomat>();
+            allAutomats1.AddRange(GenerateComplements());
+            allAutomats1.AddRange(GenerateComplements());
+            allAutomats1.AddRange(GenerateConcats());
+            allAutomats1.AddRange(GenerateDiffs());
+            allAutomats1.AddRange(GenerateIntersects());
+            allAutomats1.AddRange(GenerateJoins());
+            allAutomats1.AddRange(GenerateKleeneStern());
+            allAutomats1.AddRange(GenerateReverses());
+            allAutomats1.AddRange(GenerateUnions());
+            allAutomats1.AddRange(GenerateRandomAutomats(100));
+
+            var allAutomats = CastToEveryPossibility(allAutomats1);
+            
             for (int i = 0; i < allAutomats.GetLength(0); i++) {
                 for (int j = 0; j < allAutomats[i].GetLength(0); j++) {
                     if (!TestEqualWithWords(allAutomats[i][0], allAutomats[i][j], 10)) {
@@ -22,19 +35,10 @@ namespace Serpen.Uni.Automat {
                     }
                 }
             }
-            GenerateComplements();
-            GenerateConcats();
-            GenerateDiffs();
-            GenerateIntersects();
-            GenerateJoins();
-            GenerateKleeneStern();
-            GenerateReverses();
-            GenerateUnions();
-            GenerateRandomAutomats(100);
         }
 
         public static IAutomat[][] CastToEveryPossibility() => CastToEveryPossibility(KnownAutomat.GetAllAutomats());
-        public static IAutomat[][] CastToEveryPossibility(IAutomat[] automats) {
+        public static IAutomat[][] CastToEveryPossibility(IEnumerable<IAutomat> automats) {
             var retAutomats = new List<IAutomat[]>();
 
             foreach (IAutomat automat in automats) {

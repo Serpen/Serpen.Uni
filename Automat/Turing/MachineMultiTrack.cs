@@ -1,6 +1,8 @@
 using System.Linq;
 
 namespace Serpen.Uni.Automat.Turing {
+
+    [System.Serializable]
     public class TuringMachineMultiTrack : TuringMachineBase<TuringTransformMultiTrack.TuringKey, TuringTransformMultiTrack.TuringVal> {
 
         public readonly uint Tracks;

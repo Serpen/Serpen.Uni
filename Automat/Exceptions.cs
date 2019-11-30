@@ -12,7 +12,10 @@ namespace Serpen.Uni.Automat {
             Automats = automats;
             foreach (var automat in automats) {
                 try {
-                    Utils.SaveAutomatImageToTemp(automat);
+                    Utils.ExportToTemp(automat);
+                }
+                catch (System.Runtime.Serialization.SerializationException sex) {
+                    Serpen.Uni.Utils.DebugMessage(sex.Message, Uni.Utils.eDebugLogLevel.Always);
                 } catch { }
             }
         }

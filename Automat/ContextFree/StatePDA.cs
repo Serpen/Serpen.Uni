@@ -1,13 +1,14 @@
 using System.Linq;
 
 namespace Serpen.Uni.Automat.ContextFree {
-    public class StatePDA : PDA {
+    [System.Serializable()]
+    public class StatePDA : PDA, IKleeneStern {
 
-        public StatePDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char Startstacksymbol, uint[] AcceptedStates)
+        public StatePDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char? Startstacksymbol, uint[] AcceptedStates)
          : base(name, StatesCount, InputAlphabet, Workalphabet, Transform, StartState, Startstacksymbol, AcceptedStates) {
         }
 
-        public StatePDA(string name, string[] names, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char Startstacksymbol, uint[] AcceptedStates)
+        public StatePDA(string name, string[] names, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char? Startstacksymbol, uint[] AcceptedStates)
          : base(name, names, InputAlphabet, Workalphabet, Transform, StartState, Startstacksymbol, AcceptedStates) {
         }
 
@@ -29,27 +30,17 @@ namespace Serpen.Uni.Automat.ContextFree {
             return new StatePDA($"QPDA_({pda.Name})", pda.StatesCount + 2, pda.Alphabet, pda.WorkAlphabet.Append(extra_symbol).ToArray(), newt, 0, pda.StartSymbol, new uint[] { pda.StatesCount + 1 });
         }
 
-        public static explicit operator StatePDA(Finite.NFAe N) {
+        [AlgorithmComplexity("n²")]
+        public static explicit operator StatePDA(Finite.FABase FA) {
             var pdat = new PDATransform();
 
-            foreach (var t in (Finite.NFAeTransform)N.Transforms) {
+            foreach (var t in FA.Transforms) {
                 var newVals = new PDATransformValue[t.Value.Length];
                 for (int i = 0; i < newVals.Length; i++)
                     newVals[i] = new PDATransformValue(null, t.Value[i]);
                 pdat.Add(new PDATransformKey(t.Key.q, t.Key.c, null), newVals);
             }
-            return new StatePDA($"QPDA_({N.Name})", N.StatesCount, N.Alphabet, new char[] { }, pdat, N.StartState, (char)0, N.AcceptedStates);
-        }
-        public static explicit operator StatePDA(Finite.NFA N) {
-            var pdat = new PDATransform();
-
-            foreach (var t in (Finite.NFAeTransform)N.Transforms) {
-                var newVals = new PDATransformValue[t.Value.Length];
-                for (int i = 0; i < newVals.Length; i++)
-                    newVals[i] = new PDATransformValue(null, t.Value[i]);
-                pdat.Add(new PDATransformKey(t.Key.q, t.Key.c, null), newVals);
-            }
-            return new StatePDA($"QPDA_({N.Name})", N.StatesCount, N.Alphabet, new char[] { }, pdat, N.StartState, (char)0, N.AcceptedStates);
+            return new StatePDA($"QPDA_({FA.Name})", FA.StatesCount, FA.Alphabet, new char[] { }, pdat, FA.StartState, null, FA.AcceptedStates);
         }
 
         [AlgorithmSource("1659_L3.1_P76")]
@@ -107,8 +98,8 @@ namespace Serpen.Uni.Automat.ContextFree {
             //construct start config
             int runCount = 0;
             PDAConfig[] pcfgs;
-            if (StartSymbol != 0)
-                pcfgs = new PDAConfig[] { new PDAConfig(StartState, w, new char[] { StartSymbol }, null) };
+            if (StartSymbol.HasValue)
+                pcfgs = new PDAConfig[] { new PDAConfig(StartState, w, new char[] { StartSymbol.Value }, null) };
             else
                 pcfgs = new PDAConfig[] { new PDAConfig(StartState, w, new char[] { }, null) };
 
@@ -123,8 +114,8 @@ namespace Serpen.Uni.Automat.ContextFree {
                 pcfgs = GoChar(pcfgs);
 
                 runCount++;
-                if (pcfgs.Length > MAX_RUNS_OR_STACK && runCount > MAX_RUNS_OR_STACK)
-                    throw new PDAStackException($"{runCount}: Stack >= {pcfgs.Length}, {runCount}. run abort", this);
+                if (pcfgs.Length > MAX_RUNS_OR_STACK || runCount > MAX_RUNS_OR_STACK)
+                    throw new PDAStackException($"Stack >= {pcfgs.Length}, {runCount}. run abort", this);
             }
 
             return false;
@@ -167,5 +158,30 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             return new StatePDA($"{Name}_purged", names, Alphabet, WorkAlphabet, newT, translate.ArrayIndex(StartState), StartSymbol, aStates);
         }
+
+        public IAutomat KleeneStern() {
+            var pdaT = new PDATransform
+            {
+                { 0, null, null, null, this.StartState+1 } // accepted front state
+			};
+
+            // add transforms, +1
+            foreach (var item in this.Transforms) {
+                PDATransformValue[] qnext = new PDATransformValue[item.Value.Length];
+                for (int i = 0; i < item.Value.Length; i++)
+                    pdaT.Add(item.Key.q + 1, item.Key.ci, item.Key.cw, item.Value[i].cw2, item.Value[i].qNext + 1);
+            }
+
+            var acceptedStates = new uint[this.AcceptedStates.Length + 1];
+            acceptedStates[0] = 0;
+            // add e-transform from org accepted to front state
+            for (uint i = 0; i < this.AcceptedStates.Length; i++) {
+                acceptedStates[i + 1] = this.AcceptedStates[i] + 1; // a little redundant, because all accepted states must go back to first
+                pdaT.Add(this.AcceptedStates[i] + 1, null, null, null, 0);
+            }
+
+            return new StatePDA($"QPDA_KleeneStern({Name})", this.StatesCount + 1, this.Alphabet, this.WorkAlphabet, pdaT, 0, null, acceptedStates);
+        }
+
     }
 }

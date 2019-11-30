@@ -5,7 +5,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
     public interface IPDA : IAutomat, IReverse {
         char[] WorkAlphabet { get; }
-        char StartSymbol { get; }
+        char? StartSymbol { get; }
 
         PDAConfig[] GoChar(PDAConfig[] pcfgs);
     }
@@ -13,13 +13,14 @@ namespace Serpen.Uni.Automat.ContextFree {
     /// <summary>
     /// nondeterministic PDA with Stack Symbol, which must end as empty stack and accepted state
     /// </summary>
+    [System.Serializable]
     public abstract class PDA : AutomatBase<PDATransformKey, PDATransformValue[]>, IPDA, IReverse, IUnion, IConcat {
 
         protected const int MAX_RUNS_OR_STACK = 10000;
         protected static readonly char[] EXTRASYMBOLS = new char[] { '§', '$', '%', '&' };
         public const char START = '$';
         public char[] WorkAlphabet { get; }
-        public char StartSymbol { get; }
+        public char? StartSymbol { get; }
 
         /// <summary>
         /// Create a PDA which accepts when ending in Accepted States
@@ -29,26 +30,26 @@ namespace Serpen.Uni.Automat.ContextFree {
         /// <param name="workalphabet"></param>
         /// <param name="transform"></param>
         /// <param name="startState"></param>
-        /// <param name="startstacksymbol"></param>
+        /// <param name="startStackSymbol"></param>
         /// <param name="acceptedStates">Accepted Endstates</param>
-        public PDA(string name, uint statesCount, char[] inputAlphabet, char[] workalphabet, PDATransform transform, uint startState, char startstacksymbol, uint[] acceptedStates)
+        public PDA(string name, uint statesCount, char[] inputAlphabet, char[] workalphabet, PDATransform transform, uint startState, char? startStackSymbol, uint[] acceptedStates)
         : base(statesCount, inputAlphabet, startState, name, acceptedStates) {
             this.WorkAlphabet = workalphabet;
-            if (!workalphabet.Contains(startstacksymbol))
-                this.WorkAlphabet = this.WorkAlphabet.Append(startstacksymbol).ToArray();
+            if (startStackSymbol.HasValue && !workalphabet.Contains(startStackSymbol.Value))
+                this.WorkAlphabet = this.WorkAlphabet.Append(startStackSymbol.Value).ToArray();
             this.Transforms = transform;
-            this.StartSymbol = startstacksymbol;
+            this.StartSymbol = startStackSymbol;
 
             CheckConstraints();
         }
 
-        public PDA(string name, string[] states, char[] inputAlphabet, char[] workalphabet, PDATransform transform, uint startState, char startStacksymbol, uint[] acceptedStates)
+        public PDA(string name, string[] states, char[] inputAlphabet, char[] workalphabet, PDATransform transform, uint startState, char? startStackSymbol, uint[] acceptedStates)
         : base(states, inputAlphabet, startState, name, acceptedStates) {
             this.WorkAlphabet = workalphabet;
-            if (!workalphabet.Contains(startStacksymbol))
-                this.WorkAlphabet = this.WorkAlphabet.Append(startStacksymbol).ToArray();
+            if (startStackSymbol.HasValue && !workalphabet.Contains(startStackSymbol.Value))
+                this.WorkAlphabet = this.WorkAlphabet.Append(startStackSymbol.Value).ToArray();
             this.Transforms = transform;
-            this.StartSymbol = startStacksymbol;
+            this.StartSymbol = startStackSymbol;
 
             CheckConstraints();
         }
@@ -212,9 +213,9 @@ namespace Serpen.Uni.Automat.ContextFree {
                 accStates[i + j] = (pda.AcceptedStates[j] + offsetD2);
 
             if (this is StatePDA)
-                return new StatePDA($"Union({Name}+{pda.Name})", this.StatesCount + pda.StatesCount + 1, inputAlphabet, workAlphabet, pdat, 0, (char)0, accStates);
+                return new StatePDA($"Union({Name}+{pda.Name})", this.StatesCount + pda.StatesCount + 1, inputAlphabet, workAlphabet, pdat, 0, null, accStates);
             else if (this is StackPDA)
-                return new StackPDA($"Union({Name}+{pda.Name})", this.StatesCount + pda.StatesCount + 1, inputAlphabet, workAlphabet, pdat, 0, (char)0);
+                return new StackPDA($"Union({Name}+{pda.Name})", this.StatesCount + pda.StatesCount + 1, inputAlphabet, workAlphabet, pdat, 0, null);
             else
                 throw new System.NotImplementedException();
         }
@@ -257,9 +258,9 @@ namespace Serpen.Uni.Automat.ContextFree {
             accStates.Sort();
 
             if (this is StatePDA)
-                return new StatePDA($"Union({Name}+{pda.Name})", this.StatesCount + pda.StatesCount, inputAlphabet, workAlphabet, pdat, 0, (char)0, accStates.ToArray());
+                return new StatePDA($"Union({Name}+{pda.Name})", this.StatesCount + pda.StatesCount, inputAlphabet, workAlphabet, pdat, 0, null, accStates.ToArray());
             else if (this is StackPDA)
-                return new StackPDA($"Union({Name}+{pda.Name})", this.StatesCount + pda.StatesCount, inputAlphabet, workAlphabet, pdat, 0, (char)0);
+                return new StackPDA($"Union({Name}+{pda.Name})", this.StatesCount + pda.StatesCount, inputAlphabet, workAlphabet, pdat, 0, null);
             else
                 throw new System.NotImplementedException();
 

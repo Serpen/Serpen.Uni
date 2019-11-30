@@ -1,6 +1,8 @@
 using System.Linq;
 
 namespace Serpen.Uni.Automat.Turing {
+
+    [System.Serializable]
     public class NTM1659 : TuringMachineBase<TuringKey, TuringVal[]>, ITuringMachine {
 
         public NTM1659(string name, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, NTM1659Transform transform, uint startState, char blankSymbol, uint acceptedState, uint discardState)
@@ -131,6 +133,7 @@ namespace Serpen.Uni.Automat.Turing {
 
     }
 
+    [System.Serializable]
     public sealed class NTM1659Transform : TransformBase<TuringKey, TuringVal[]> {
 
         public override string ToString() {

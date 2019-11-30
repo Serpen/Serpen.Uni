@@ -1,4 +1,6 @@
 namespace Serpen.Uni.Automat {
+
+    [System.Serializable]
     public class TransformBase<TKey, TVal> : Graph.EdgeBase<TKey, TVal> where TKey : ITransformKey { }
 
     public interface ITransformKey {

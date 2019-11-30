@@ -3,6 +3,8 @@ using System.Linq;
 using System.Collections.Generic;
 
 namespace Serpen.Uni.Automat.Finite {
+
+    [System.Serializable]
     public class NFAe : FABase, INFA {
 
         public static readonly FABase Empty = new NFAe("Empty", 1, new char[] { }, new NFAeTransform(), 0, new uint[] { });
@@ -200,7 +202,7 @@ namespace Serpen.Uni.Automat.Finite {
 
             accStates.Sort();
 
-            return new NFAe($"NFAe_Join({Name}+{automat.Name})", nfae.StatesCount + sc, this.Alphabet, neat, this.StartState, accStates.ToArray());
+            return new NFAe($"NFAe_Join({Name}+{automat.Name})", nfae.StatesCount + sc, this.Alphabet.Union(automat.Alphabet).ToArray(), neat, this.StartState, accStates.ToArray());
         }
         public override IAutomat Union(IUnion A) => throw new System.NotImplementedException();
         public override IAutomat Intersect(IIntersect A) => throw new System.NotImplementedException();

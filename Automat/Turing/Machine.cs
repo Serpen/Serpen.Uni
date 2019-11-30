@@ -8,6 +8,7 @@ namespace Serpen.Uni.Automat.Turing {
         char BlankSymbol {get;}
     }
 
+    [System.Serializable]
     public abstract class TuringMachineBase<TKey, TVal> : AutomatBase<TKey, TVal>, ITuringMachine where TKey : ITransformKey { //where TConfig : ITuringConfig {
 
         public const char BLANK = '_';

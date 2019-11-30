@@ -6,8 +6,9 @@ namespace Serpen.Uni.Automat.ContextFree {
     /// <summary>
     /// deterministic PDA with Stack Symbol, which must end as empty stack and accepted state
     /// </summary>
+    [System.Serializable]
     public class DPDA : AutomatBase<PDATransformKey, PDATransformValue>, IPDA {
-        public DPDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, DPDATransform Transform, uint StartState, char Startsymbol, uint[] acceptedStates)
+        public DPDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, DPDATransform Transform, uint StartState, char? Startsymbol, uint[] acceptedStates)
         : base(StatesCount, InputAlphabet, StartState, name, acceptedStates) {
             this.WorkAlphabet = Workalphabet;
             this.Transforms = Transform;
@@ -16,7 +17,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             CheckConstraints();
         }
 
-        public DPDA(string name, string[] names, char[] InputAlphabet, char[] Workalphabet, DPDATransform Transform, uint StartState, char Startsymbol, uint[] acceptedStates)
+        public DPDA(string name, string[] names, char[] InputAlphabet, char[] Workalphabet, DPDATransform Transform, uint StartState, char? Startsymbol, uint[] acceptedStates)
         : base(names, InputAlphabet, StartState, name, acceptedStates) {
             this.WorkAlphabet = Workalphabet;
             this.Transforms = Transform;
@@ -59,7 +60,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         public const char START = '$';
         public char[] WorkAlphabet { get; }
-        public char StartSymbol { get; }
+        public char? StartSymbol { get; }
 
         PDAConfig[] IPDA.GoChar(PDAConfig[] pcfgs) => new PDAConfig[] { GoChar(pcfgs[0]) };
         public PDAConfig GoChar(PDAConfig pcfg) {
@@ -111,7 +112,11 @@ namespace Serpen.Uni.Automat.ContextFree {
             CheckWordInAlphabet(w);
 
             //construct start config
-            var pcfg = new PDAConfig(StartState, w, new char[] { StartSymbol }, null);
+            PDAConfig pcfg;
+            if (StartSymbol.HasValue)
+                pcfg = new PDAConfig(StartState, w, new char[] { StartSymbol.Value }, null);
+            else
+                pcfg = new PDAConfig(StartState, w, new char[] {}, null);
 
             //while new pcfg exists and stack is still not empty
             while (pcfg != null && (pcfg.Stack.Length > 0)) {
@@ -206,6 +211,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
     } //end class
 
+    [System.Serializable]
     public class DPDATransform : TransformBase<PDATransformKey, PDATransformValue> {
         public void Add(uint q, char? ci, char? cw, string cw2, uint qNext)
             => base.Add(new PDATransformKey(q, ci, cw), new PDATransformValue(cw2, qNext));

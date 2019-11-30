@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Serpen.Uni.Automat.Finite {
 
+    [System.Serializable]
     public class DFA : FABase, IAlleAbgeschlossenheitseigenschaften { // IAbgeschlossenheitseigenschaften<FABase, NFAe> {
 
         public DFA(string name, uint stateCount, char[] alphabet, DFATransform transform, uint startState, params uint[] acceptedStates)
@@ -285,7 +286,7 @@ namespace Serpen.Uni.Automat.Finite {
         }
 
 
-        public static readonly DFA Empty = new DFA("DFA_Empty", new String[] { }, new char[] { }, new DFATransform(), 0, new uint[] { });
+        public static readonly DFA Empty = new DFA("DFA_Empty", 1, new char[] { }, new DFATransform(), 0, new uint[] { });
 
         public override bool Equals(object obj1) {
             DFA dobj;

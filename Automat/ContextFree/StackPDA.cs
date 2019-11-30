@@ -1,6 +1,8 @@
 using System.Linq;
 
 namespace Serpen.Uni.Automat.ContextFree {
+
+    [System.Serializable]
     public class StackPDA : PDA {
 
         /// <summary>
@@ -12,11 +14,11 @@ namespace Serpen.Uni.Automat.ContextFree {
         /// <param name="Transform"></param>
         /// <param name="StartState">State from which to start</param>
         /// <param name="Startsymbol">Inital Stack Population</param>
-        public StackPDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char Startsymbol)
+        public StackPDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char? Startsymbol)
         : base(name, StatesCount, InputAlphabet, Workalphabet, Transform, StartState, Startsymbol, new uint[] { }) {
         }
 
-        public StackPDA(string name, string[] states, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char Startsymbol)
+        public StackPDA(string name, string[] states, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char? Startsymbol)
         : base(name, states, InputAlphabet, Workalphabet, Transform, StartState, Startsymbol, new uint[] { }) {
         }
 
@@ -31,15 +33,18 @@ namespace Serpen.Uni.Automat.ContextFree {
                 extra_symbol
             };
 
-            byte inc = 1;
 
             // start Stackpda with new pushed Stackstartsymbol
-            var newt = new PDATransform {
-                { 0, null, null, extra_symbol.ToString(), pda.StartState+inc }
-            };
+            var newt = new PDATransform();
 
-            if (pda.StartSymbol != (char)0)
-                newt.Add(pda.StartState + 1, null, null, pda.StartSymbol.ToString(), pda.StartState + ++inc);
+            byte inc = 1;
+            if (pda.StartSymbol != null) {
+                inc = 2;
+                newt.Add(0, null, null, extra_symbol.ToString(), 1);
+                newt.Add(1, null, null, pda.StartSymbol.ToString(), pda.StartState + inc);
+            } else
+                newt.Add(0, null, null, extra_symbol.ToString(), pda.StartState + 1);
+
 
             uint qPump = pda.StatesCount + inc; // ;
 
@@ -52,10 +57,12 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             // all accepted states goes to qPump
             for (int i = 0; i < pda.AcceptedStates.Length; i++)
-                newt.TryAdd(new PDATransformKey(pda.AcceptedStates[i] + inc, null, extra_symbol),
-                new PDATransformValue[] { new PDATransformValue(null, qPump) });
+                newt.AddM(pda.AcceptedStates[i] + inc, null, null, null, qPump);
+                
+            foreach (char cw in spdaWorkAlphabet)
+                newt.Add(qPump, null, cw, null, qPump);
 
-            return new StackPDA($"SPDA_({pda.Name})", pda.StatesCount + inc + 1, pda.Alphabet, spdaWorkAlphabet.ToArray(), newt, 0, (char)0);
+            return new StackPDA($"SPDA_({pda.Name})", pda.StatesCount + inc + 1, pda.Alphabet, spdaWorkAlphabet.ToArray(), newt, 0, null);
         }
 
         public override bool AcceptWord(string w) {
@@ -64,8 +71,8 @@ namespace Serpen.Uni.Automat.ContextFree {
             int runCount = 0;
             //construct start config
             PDAConfig[] pcfgs;
-            if (StartSymbol != 0)
-                pcfgs = new PDAConfig[] { new PDAConfig(StartState, w, new char[] { StartSymbol }, null) };
+            if (StartSymbol.HasValue)
+                pcfgs = new PDAConfig[] { new PDAConfig(StartState, w, new char[] { StartSymbol.Value }, null) };
             else
                 pcfgs = new PDAConfig[] { new PDAConfig(StartState, w, new char[] { }, null) };
 
