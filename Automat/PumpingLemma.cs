@@ -13,7 +13,7 @@ namespace Serpen.Uni.Automat {
                 return PumpResult.NoAcceptedWordExists;
 
             bool foundAtLeastOneAcceptedWordForTest = false;
-            foreach (string w in Automat.GetRandomWords(words, pumpLaenge, maxWordLen)) {
+            foreach (string w in Automat.GetRandomWords(words, pumpLaenge, maxWordLen, new string[]{})) {
                 if (Automat.AcceptWord(w)) {
                     foundAtLeastOneAcceptedWordForTest = true;
                     bool foundAccepted = false;

@@ -35,7 +35,7 @@ namespace Serpen.Uni.Automat {
             return w;
         }
 
-        public string[] GetRandomWords(int count, int minLen, int maxLen) {
+        public string[] GetRandomWords(int count, int minLen, int maxLen, string[] blocked) {
             var words = new System.Collections.Generic.List<string>();
             var rnd = Uni.Utils.RND;
 
@@ -49,7 +49,7 @@ namespace Serpen.Uni.Automat {
                 for (int k = 0; k < wLen; k++)
                     w = w.Insert(k, Terminals[rnd.Next(0, Terminals.Length)].ToString());
 
-                if (!words.Contains(w))
+                if (!words.Contains(w) && !blocked.Contains(w))
                     words.Add(w);
 
                 if (i > count * 10) {

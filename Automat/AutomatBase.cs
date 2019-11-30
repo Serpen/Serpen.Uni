@@ -7,7 +7,7 @@ namespace Serpen.Uni.Automat {
         string Name { get; }
         bool AcceptWord(string w);
 
-        string[] GetRandomWords(int count, int minLen, int maxLen);
+        string[] GetRandomWords(int count, int minLen, int maxLen, string[] blocked);
         char[] Alphabet { get; }
 
         // System.Func<string,bool> SimplifiedAcceptFunction {get; internal set;}
@@ -155,7 +155,7 @@ namespace Serpen.Uni.Automat {
 
         public abstract override string ToString();
 
-		public string[] GetRandomWords(int count, int minLen, int maxLen) {
+		public string[] GetRandomWords(int count, int minLen, int maxLen, string[] blocked) {
 			var words = new System.Collections.Generic.List<string>();
 			var rnd = Uni.Utils.RND;
 
@@ -170,7 +170,7 @@ namespace Serpen.Uni.Automat {
 				for (int k = 0; k < wLen; k++)
 					w = w.Insert(k, Alphabet[rnd.Next(0, Alphabet.Length)].ToString());
 
-				if (!words.Contains(w))
+				if (!words.Contains(w) && !blocked.Contains(w))
 					words.Add(w);
 
 				if (i > count * 10) {
@@ -194,5 +194,7 @@ namespace Serpen.Uni.Automat {
 namespace Serpen.Uni.Automat.Finite {
     public interface INFA : IAutomat, IAlleAbgeschlossenheitseigenschaften {
         uint[] GoChar(uint[] q, char w);
+
+        TransformBase<EATuple, uint[]> Transforms {get;}
     }
 }

@@ -8,7 +8,29 @@ namespace Serpen.Uni.Automat {
     public static class Tests {
 
         public static void RunAllTests() {
-            throw new System.NotImplementedException();
+            var allAutomats = CastToEveryPossibility();
+            for (int i = 0; i < allAutomats.GetLength(0); i++) {
+                for (int j = 0; j < allAutomats[i].GetLength(0); j++) {
+                    if (!TestEqualWithWords(allAutomats[i][0], allAutomats[i][j], 10)) {
+                        try {
+                            throw new Automat.Exception("Automats not equal", new IAutomat[] { allAutomats[i][0], allAutomats[i][j] });
+                            // throw new Automat.Exception("Automats not equal", allAutomats[i]);
+                        } catch (System.Exception) {
+
+                        }
+
+                    }
+                }
+            }
+            GenerateComplements();
+            GenerateConcats();
+            GenerateDiffs();
+            GenerateIntersects();
+            GenerateJoins();
+            GenerateKleeneStern();
+            GenerateReverses();
+            GenerateUnions();
+            GenerateRandomAutomats(100);
         }
 
         public static IAutomat[][] CastToEveryPossibility() => CastToEveryPossibility(KnownAutomat.GetAllAutomats());
@@ -33,7 +55,7 @@ namespace Serpen.Uni.Automat {
                     ret1Automat.Add(QPDAfromNe);
 
                     StackPDA SPDAFromQPDA = (StackPDA)QPDAfromNe;
-                    ret1Automat.Add(SPDAFromQPDA);
+                    // ret1Automat.Add(SPDAFromQPDA);
 
                     try {
                         DPDA DPDAFromD = (DPDA)D;
@@ -224,7 +246,7 @@ namespace Serpen.Uni.Automat {
             foreach (IAutomat a in automats) {
                 if (a is NFA nfa) {
                     var nfa_removed = nfa.PurgeStates();
-                    string[] rwords = nfa.GetRandomWords(words, 1, words);
+                    string[] rwords = nfa.GetRandomWords(words, 1, words, new string[]{});
                     for (int i = 0; i < rwords.Length; i++) {
                         if (!nfa.AcceptWord(rwords[i]) == nfa_removed.AcceptWord(rwords[i]))
                             throw new Automat.Exception($"Automats not equal by word {rwords[i]}", nfa, nfa_removed);
@@ -252,7 +274,7 @@ namespace Serpen.Uni.Automat {
                     }
 
 
-                    string[] rwords = dfa.GetRandomWords(words, 1, words);
+                    string[] rwords = dfa.GetRandomWords(words, 1, words, new string[]{});
 
                     for (int i = 0; i < rwords.Length; i++)
                         if (!dfa.AcceptWord(rwords[i]) == dfa_min.AcceptWord(rwords[i])) {
@@ -399,9 +421,10 @@ namespace Serpen.Uni.Automat {
             int onceTrue = 0, onceFalse = 0;
             int passLevel = System.Math.Min(initialCount / 10, 5);
 
+            string[] words = new string[]{};
             int count = 0;
             while ((onceTrue < passLevel | onceFalse < passLevel) && count < initialCount * 2) {
-                string[] words = A1.GetRandomWords(initialCount / 2, 1, initialCount / 2);
+                words = A1.GetRandomWords(initialCount / 2, 1, initialCount / 2, words);
                 foreach (string w in words) {
                     try {
                         var erg1 = A1.AcceptWord(w);
