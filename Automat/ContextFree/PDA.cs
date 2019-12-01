@@ -14,7 +14,7 @@ namespace Serpen.Uni.Automat.ContextFree {
     /// nondeterministic PDA with Stack Symbol, which must end as empty stack and accepted state
     /// </summary>
     [System.Serializable]
-    public abstract class PDA : AutomatBase<PDATransformKey, PDATransformValue[]>, IPDA, IReverse, IUnion, IConcat {
+    public abstract class PDA : AutomatBase<PDATransformKey, PDATransformValue[]>, IPDA, IReverse, IUnion, IJoin, IConcat {
 
         protected const int MAX_RUNS_OR_STACK = 10000;
         protected static readonly char[] EXTRASYMBOLS = new char[] { '§', '$', '%', '&' };
@@ -40,7 +40,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             this.Transforms = transform;
             this.StartSymbol = startStackSymbol;
 
-            CheckConstraints();
+            // CheckConstraints();
         }
 
         public PDA(string name, string[] states, char[] inputAlphabet, char[] workalphabet, PDATransform transform, uint startState, char? startStackSymbol, uint[] acceptedStates)
@@ -177,93 +177,77 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         #region "Operations"
 
-        public IAutomat Union(IUnion automat) {
+        public IAutomat Join(IJoin automat) => JoinConcatUnion(automat, JoinConcatUnionKind.Join);
+        public IAutomat Concat(IConcat automat) => JoinConcatUnion(automat, JoinConcatUnionKind.Concat);
+        public IAutomat Union(IUnion automat) => JoinConcatUnion(automat, JoinConcatUnionKind.Union);
 
-            if (!(automat is PDA pda))
+        IAutomat JoinConcatUnion(IAutomat automat, JoinConcatUnionKind unionConcatJoinKind) {
+            if (!(automat is PDA pda2))
                 throw new System.NotSupportedException();
 
-            uint offsetD2 = this.StatesCount + 1; //first state of D2
-            uint[] accStates = new uint[this.AcceptedStates.Length + pda.AcceptedStates.Length];
-            char[] inputAlphabet = this.Alphabet.Union(pda.Alphabet).ToArray();
-            char[] workAlphabet = this.WorkAlphabet.Union(pda.WorkAlphabet).ToArray();
-
-            var pdat = new PDATransform();
-            //add new start state, with e to both starts
-            pdat.Add(0, null, null, this.StartSymbol.ToString(), 1);
-            pdat.AddM(0, null, null, pda.StartSymbol.ToString(), offsetD2);
-
-            //add each D1 transform, +1
-            foreach (var item in this.Transforms)
-                foreach (var val in item.Value)
-                    pdat.AddM(item.Key.q + 1, item.Key.ci, item.Key.cw, val.cw2, val.qNext + 1);
-
-            //add each D1 transform, +offset
-            foreach (var item in pda.Transforms)
-                foreach (var val in item.Value)
-                    pdat.AddM(item.Key.q + offsetD2, item.Key.ci, item.Key.cw, val.cw2, val.qNext + offsetD2);
-
-
-            int i; //store where D1 acc ends
-            //iterate D1 acc and +1
-            for (i = 0; i < this.AcceptedStates.Length; i++)
-                accStates[i] = this.AcceptedStates[i] + 1;
-
-            //iterate D2 acc and add offset
-            for (int j = 0; j < pda.AcceptedStates.Length; j++)
-                accStates[i + j] = (pda.AcceptedStates[j] + offsetD2);
-
-            if (this is StatePDA)
-                return new StatePDA($"Union({Name}+{pda.Name})", this.StatesCount + pda.StatesCount + 1, inputAlphabet, workAlphabet, pdat, 0, null, accStates);
-            else if (this is StackPDA)
-                return new StackPDA($"Union({Name}+{pda.Name})", this.StatesCount + pda.StatesCount + 1, inputAlphabet, workAlphabet, pdat, 0, null);
-            else
-                throw new System.NotImplementedException();
-        }
-
-        public IAutomat Concat(IConcat automat) {
-
-            if (!(automat is PDA pda))
-                throw new System.NotSupportedException();
-
-            var pdat = new PDATransform();
-
-            char[] inputAlphabet = this.Alphabet.Union(pda.Alphabet).ToArray();
-            char[] workAlphabet = this.WorkAlphabet.Union(pda.WorkAlphabet).ToArray();
-
-            // if (!Utils.SameAlphabet(this, A))
-            //     throw new System.NotImplementedException("Different Alphabets are not implemented");
-
-            var accStates = new List<uint>(pda.AcceptedStates.Length);
-            uint offset = this.StatesCount;
-
-            foreach (var t in this.Transforms)
-                foreach (var val in t.Value)
-                    pdat.AddM(t.Key.q, t.Key.ci, t.Key.cw, val.cw2, val.qNext);
-
-            foreach (var t in pda.Transforms) {
-                uint[] qnexts = new uint[t.Value.Length];
-                for (int i = 0; i < t.Value.Length; i++) {
-                    qnexts[i] = t.Value[i].qNext + offset;
-                    pdat.AddM(t.Key.q + offset, t.Key.ci, t.Key.cw, t.Value[i].cw2, qnexts[i]);
-                }
+            uint offsetA1 = 0; // first state of A2
+            uint offsetA2 = this.StatesCount; // first state of A2
+            if (unionConcatJoinKind == JoinConcatUnionKind.Union) {
+                offsetA1 = 1;
+                offsetA2++;
             }
 
+            char[] inputAlphabet = this.Alphabet.Union(pda2.Alphabet).ToArray();
+            char[] workAlphabet = this.WorkAlphabet.Union(pda2.WorkAlphabet).ToArray();
 
-            for (int i = 0; i < this.AcceptedStates.Length; i++)
-                pdat.AddM(this.AcceptedStates[i], null, null, null, offset);
+            var pdat = new PDATransform();
 
-            for (int i = 0; i < pda.AcceptedStates.Length; i++)
-                accStates.Add((pda.AcceptedStates[i] + offset));
+            uint startState;
+            // Union: add new start state, with e to both starts
+            if (unionConcatJoinKind == JoinConcatUnionKind.Union) {
+                startState = 0;
+                pdat.Add(0, null, null, null, this.StartState + offsetA1);
+                pdat.AddM(0, null, null, null, pda2.StartState + offsetA2);
+            } else
+                startState = this.StartState;
 
-            accStates.Sort();
+            // add each D1 transform + offset of A1
+            foreach (var item in this.Transforms)
+                foreach (var val in item.Value)
+                    pdat.AddM(item.Key.q + offsetA1, item.Key.ci, item.Key.cw, val.cw2, val.qNext + offsetA1);
+
+            // add each D1 transform, + offset of A2
+            foreach (var item in pda2.Transforms)
+                foreach (var val in item.Value)
+                    pdat.AddM(item.Key.q + offsetA2, item.Key.ci, item.Key.cw, val.cw2, val.qNext + offsetA2);
+
+
+            uint[] accStates;
+            if (unionConcatJoinKind == JoinConcatUnionKind.Concat)
+                // Concat: has only accepted states from A2
+                accStates = new uint[pda2.AcceptedStates.Length];
+            else
+                // Join, Union has A1, A2 accpted states
+                accStates = new uint[this.AcceptedStates.Length + pda2.AcceptedStates.Length];
+
+            int i = 0; // store where D1 acc ends
+            // iterate A1 acc
+            for (; i < this.AcceptedStates.Length; i++)
+                if (unionConcatJoinKind == JoinConcatUnionKind.Concat)
+                    // Concat: lead accepted states from A1 to A2 start
+                    pdat.AddM(this.AcceptedStates[i] + offsetA1, null, null, null, pda2.StartState + offsetA2);
+                else
+                    // Join, Union: states from A1 are normal accepted
+                    accStates[i] = this.AcceptedStates[i] + offsetA1;
+                
+            if (unionConcatJoinKind == JoinConcatUnionKind.Concat)
+                i = 0;
+
+            // iterate A2 acs and + offsetA2
+            for (int j = 0; j < pda2.AcceptedStates.Length; j++)
+                accStates[i + j] = (pda2.AcceptedStates[j] + offsetA2);
 
             if (this is StatePDA)
-                return new StatePDA($"Union({Name}+{pda.Name})", this.StatesCount + pda.StatesCount, inputAlphabet, workAlphabet, pdat, 0, null, accStates.ToArray());
+                return new StatePDA($"{unionConcatJoinKind.ToString()}({Name}+{pda2.Name})", this.StatesCount + pda2.StatesCount + offsetA1, inputAlphabet, workAlphabet, pdat, startState, null, accStates);
             else if (this is StackPDA)
-                return new StackPDA($"Union({Name}+{pda.Name})", this.StatesCount + pda.StatesCount, inputAlphabet, workAlphabet, pdat, 0, null);
+                return new StackPDA($"{unionConcatJoinKind.ToString()}({Name}+{pda2.Name})", this.StatesCount + pda2.StatesCount + offsetA1, inputAlphabet, workAlphabet, pdat, startState, null);
             else
                 throw new System.NotImplementedException();
-
         }
 
         public IAutomat Reverse() {

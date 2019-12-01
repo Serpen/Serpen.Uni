@@ -58,7 +58,8 @@ namespace Serpen.Uni.Automat.ContextFree {
             // all accepted states goes to qPump
             for (int i = 0; i < pda.AcceptedStates.Length; i++)
                 newt.AddM(pda.AcceptedStates[i] + inc, null, null, null, qPump);
-                
+
+            // qPump consumes whole alphabet, to empty stack    
             foreach (char cw in spdaWorkAlphabet)
                 newt.Add(qPump, null, cw, null, qPump);
 
