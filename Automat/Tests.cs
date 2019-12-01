@@ -9,6 +9,8 @@ namespace Serpen.Uni.Automat {
 
         public static void RunAllTests() {
             var allAutomats1 = new List<IAutomat>();
+            allAutomats1.AddRange(GenerateRandomAutomats(100));
+
             allAutomats1.AddRange(GenerateComplements());
             allAutomats1.AddRange(GenerateComplements());
             allAutomats1.AddRange(GenerateConcats());
@@ -16,15 +18,18 @@ namespace Serpen.Uni.Automat {
             allAutomats1.AddRange(GenerateIntersects());
             allAutomats1.AddRange(GenerateJoins());
             allAutomats1.AddRange(GenerateKleeneStern());
-            allAutomats1.AddRange(GenerateReverses());
+
+            var revs = GenerateReverses();
+            TestDoubleReversesByWord(revs);
+            allAutomats1.AddRange(revs);
+
             allAutomats1.AddRange(GenerateUnions());
-            allAutomats1.AddRange(GenerateRandomAutomats(100));
 
             var allAutomats = CastToEveryPossibility(allAutomats1);
             
             for (int i = 0; i < allAutomats.GetLength(0); i++) {
                 for (int j = 0; j < allAutomats[i].GetLength(0); j++) {
-                    if (!TestEqualWithWords(allAutomats[i][0], allAutomats[i][j], 10)) {
+                    if (!TestEqualWithWords(allAutomats[i][0], allAutomats[i][j], 20)) {
                         try {
                             throw new Automat.Exception("Automats not equal", new IAutomat[] { allAutomats[i][0], allAutomats[i][j] });
                             // throw new Automat.Exception("Automats not equal", allAutomats[i]);
@@ -239,9 +244,10 @@ namespace Serpen.Uni.Automat {
                 retAut.Add(StatePDA.GenerateRandom());
                 retAut.Add(StackPDA.GenerateRandom());
                 retAut.Add(DPDA.GenerateRandom());
-                // retAut.Add(TuringMachineSingleBand.GenerateRandom());
+                retAut.Add(TuringMachineSingleBand.GenerateRandom());
                 retAut.Add(TuringMachineSingleBand1659.GenerateRandom());
-                // retAut.Add(TuringMachineMultiTrack.GenerateRandom());
+                retAut.Add(TuringMachineMultiTrack.GenerateRandom());
+                retAut.Add(NTM1659.GenerateRandom());
             }
             return retAut.ToArray();
         }
@@ -380,12 +386,12 @@ namespace Serpen.Uni.Automat {
             return ret.ToArray();
         }
 
-        public static IAutomat[] GenerateReverses() {
+        public static IReverse[] GenerateReverses() {
             var automats = KnownAutomat.GetTypes<IReverse>();
-            var ret = new List<IAutomat>(automats.Count());
+            var ret = new List<IReverse>(automats.Count());
 
             foreach (var a in automats)
-                ret.Add(a.Reverse());
+                ret.Add((IReverse)a.Reverse());
 
             return ret.ToArray();
         }
@@ -400,11 +406,14 @@ namespace Serpen.Uni.Automat {
             return ret.ToArray();
         }
 
-        public static void TestDoubleReversesByWord(IReverse[] automats) {
+        public static bool TestDoubleReversesByWord(IReverse[] automats) {
+            bool ret = true;
             foreach (var a in automats) {
                 var a2 = ((IReverse)a.Reverse()).Reverse();
-                TestEqualWithWords(a, a2, 200);
+                if (!TestEqualWithWords(a, a2, 200))
+                    ret = false;
             }
+            return ret;
         }
 
         public static IAutomat[] GenerateConcats() {
@@ -437,24 +446,24 @@ namespace Serpen.Uni.Automat {
                         if (erg1) onceTrue++;
                         if (!erg1) onceFalse++;
                         if (erg1 != erg2) {
-                            Utils.DebugMessage($"{count}. word '{w}' divides Automates", A1, Uni.Utils.eDebugLogLevel.Always);
+                            Utils.DebugMessage($"{count}. word '{w}' divides Automates", Uni.Utils.eDebugLogLevel.Always, A1, A2);
                             return false;
                         }
-                        Utils.DebugMessage($"{count}. word '{w}' passes", A1, Uni.Utils.eDebugLogLevel.Verbose);
+                        Utils.DebugMessage($"{count}. word '{w}' passes", Uni.Utils.eDebugLogLevel.Verbose, A1, A2);
+                        count++;
                     } catch (TuringCycleException) {
                     } catch (PDAStackException) { }
-                    count++;
                 }
             }
             if (onceTrue >= passLevel && onceFalse >= passLevel) {
-                Utils.DebugMessage($"{count} words passed ({onceTrue}/{onceFalse})", A1, Uni.Utils.eDebugLogLevel.Verbose);
+                Utils.DebugMessage($"{count} words passed ({onceTrue}/{onceFalse})", Uni.Utils.eDebugLogLevel.Verbose, A1, A2);
                 return true;
             } else {
                 if (A1.Equals(A2)) {
-                    Utils.DebugMessage($"{count} words passed, but not both tested ({onceTrue}/{onceFalse}), but Equals works", A1, Uni.Utils.eDebugLogLevel.Normal);
+                    Utils.DebugMessage($"{count} words passed, but not both tested ({onceTrue}/{onceFalse}), but Equals works", Uni.Utils.eDebugLogLevel.Verbose, A1, A2);
                     return true;
                 } else {
-                    Utils.DebugMessage($"{count} words passed, but not both tested ({onceTrue}/{onceFalse}), Equals not working", A1, Uni.Utils.eDebugLogLevel.Always);
+                    Utils.DebugMessage($"{count} words passed, but not both tested ({onceTrue}/{onceFalse}), Equals not working", Uni.Utils.eDebugLogLevel.Normal, A1, A2);
                     return true;
                 }
 

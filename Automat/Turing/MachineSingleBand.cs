@@ -137,7 +137,7 @@ namespace Serpen.Uni.Automat.Turing {
 
             var t = new TuringTransformSingleBand();
             for (uint i = 0; i < stateCount; i++) {
-                int transformsRnd = rnd.Next(0, inputAlphabet.Length);
+                int transformsRnd = rnd.Next(0, stateCount);
                 for (uint j = 0; j < transformsRnd; j++) {
                     var tk = new TuringKey(i, bandAlphabet.RndElement());
                     var tv = new TuringVal(j, bandAlphabet.RndElement(), TMDirection.Right);

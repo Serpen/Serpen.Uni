@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Serpen.Uni.Automat {
 
@@ -82,6 +83,20 @@ namespace Serpen.Uni.Automat {
                     smethod.Name +
                     ":" + sframe.GetFileLineNumber() + " " +
                     (a != null ? "[" + a.Name + "] " : " ") +
+                    message);
+            }
+        }
+
+        internal static void DebugMessage(string message, Serpen.Uni.Utils.eDebugLogLevel level, params IAcceptWord[] As) {
+            if (Serpen.Uni.Utils.DebugLogLevel >= level && System.Diagnostics.Debugger.IsAttached) {
+                var stack = new System.Diagnostics.StackTrace(true);
+                var sframe = stack.GetFrame(1);
+                var smethod = sframe.GetMethod();
+                System.Diagnostics.Debug.WriteLine(
+                    smethod.DeclaringType.Name + "." +
+                    smethod.Name +
+                    ":" + sframe.GetFileLineNumber() + " " +
+                    (As != null ? "[" + string.Join(",", (from a in As select a.Name)) + "] " : " ") +
                     message);
             }
         }

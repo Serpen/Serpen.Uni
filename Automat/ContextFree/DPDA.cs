@@ -41,7 +41,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         protected override void CheckConstraints() {
             base.CheckConstraints();
             foreach (var t in Transforms) {
-                if (t.Key.q > StatesCount | t.Value.qNext > StatesCount) //transform states within states
+                if (t.Key.q >= StatesCount | t.Value.qNext >= StatesCount) //transform states within states
                     throw new StateException(t.Key.q, this);
                 else if (t.Key.ci.HasValue && !Alphabet.Contains(t.Key.ci.Value)) //input alphabet of transform key
                     throw new AlphabetException(t.Key.ci.Value, this);
@@ -54,7 +54,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             //accepted States in States
             for (int i = 0; i < AcceptedStates.Length; i++)
-                if (AcceptedStates[i] > StatesCount)
+                if (AcceptedStates[i] >= StatesCount)
                     throw new StateException(AcceptedStates[i], this);
         }
 

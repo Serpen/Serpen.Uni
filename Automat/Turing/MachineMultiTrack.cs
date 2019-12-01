@@ -43,7 +43,7 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         TuringConfigMultiTrack GoChar(TuringConfigMultiTrack tcfg) {
-            var tkey = new TuringTransformMultiTrack.TuringKey(tcfg.State, tcfg.CurSymbol[0..2]);
+            var tkey = new TuringTransformMultiTrack.TuringKey(tcfg.State, tcfg.CurSymbol[0..(int)Tracks]);
 
             if (Transforms.TryGetValue(tkey, out TuringTransformMultiTrack.TuringVal tva)) {
                 tcfg.ReplaceChar(tva.c2, tva.Direction);
