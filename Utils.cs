@@ -5,37 +5,30 @@ namespace Serpen.Uni {
 
     public static class Utils {
 
-        public const char EPSILON = 'ε';
         public static readonly System.Random RND = new System.Random();
         public static int Pow(int bas, int exp) => (int)System.Math.Pow(bas, exp);
         public static int Pow2(int exp) => (int)System.Math.Pow(2, exp);
         public static int Sqrt(int exp) => (int)System.Math.Sqrt(exp);
         public static int Log2(int z) => (int)System.Math.Log2(z);
-        public static bool HasBitSet(this byte i, int b) => (b & (1 << i)) > 0;
-
-
-        /// <summary>
-        /// Get Random Array Elemet
-        /// </summary>
-        /// <param name="array"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
+        public static bool HasBitSet(this int num, byte bit) {
+            if (bit > 31)
+                throw new System.ArgumentOutOfRangeException(nameof(bit));
+            return (num & (1 << bit)) != 0;
+        } 
 
         public static bool[,] GetPowerSet(int bitscount, int additionalCols = 0) {
             var ret = new bool[Pow2(bitscount), bitscount + additionalCols];
 
             for (int i = 0; i < ret.GetLength(0); i++)
                 for (byte j = 0; j < bitscount; j++)
-                    ret[i, j] = CheckBitSet(i, j);
+                    ret[i, j] = i.HasBitSet(j);
             return ret;
         }
 
-        static bool CheckBitSet(this int b, int bitNumber) => (b & (1 << bitNumber)) > 0;
-
         public static bool[] ToBoolArray(this int integer, int minLen) {
-            bool[] ret = new bool[System.Math.Max(Log2(integer)+1, minLen)];
-            for (int i = 0; i < ret.Length; i++)
-                ret[i] = integer.CheckBitSet(i);
+            bool[] ret = new bool[System.Math.Max(Log2(integer) + 1, minLen)];
+            for (byte i = 0; i < ret.Length; i++)
+                ret[i] = HasBitSet((byte)integer, i);
             return ret;
         }
         public enum eDebugLogLevel { Always, Normal, Verbose }
@@ -111,7 +104,7 @@ namespace Serpen.Uni {
         }
 
         public static T[,] RemoveArrayRow<T>(this T[,] table, int row) {
-            var newTable = new T[table.GetLength(0)-1, table.GetLength(1)];
+            var newTable = new T[table.GetLength(0) - 1, table.GetLength(1)];
             int indexModifier = 0;
             for (int r = 0; r < newTable.GetLength(0); r++) {
                 if (r == row)
@@ -122,7 +115,6 @@ namespace Serpen.Uni {
             return newTable;
         }
 
-        public static string FormatArray(bool[,] array) => FormatArray(array);
         public static string FormatArray<T>(T[,] array) {
             var sb = new System.Text.StringBuilder();
             for (int r = 0; r < array.GetLength(0); r++) {
@@ -134,5 +126,4 @@ namespace Serpen.Uni {
         }
 
     } //end class Utils 
-
 }

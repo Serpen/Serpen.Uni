@@ -4,6 +4,8 @@ namespace Serpen.Uni.Automat {
 
     public static class Utils {
 
+        public const char EPSILON = 'ε';
+
         internal static void AcceptWordConsoleLine(this IAcceptWord A, string w) {
             try {
                 System.Console.WriteLine($"{A.Name} accepts |{w.Length}| '{w}': {A.AcceptWord(w)}");
@@ -52,11 +54,9 @@ namespace Serpen.Uni.Automat {
             for (int i = (int)'Έ'; i < (int)'Ϋ' + 1; i++) {
                 if (i == 0x03a2 || i == 907 | i == 909)
                     continue;
-                if (!alphabet.Contains((char)i)) {
+                if (!alphabet.Contains((char)i))
                     return (char)i;
-                }
             }
-
 
             throw new System.ArgumentOutOfRangeException();
         }
@@ -72,15 +72,7 @@ namespace Serpen.Uni.Automat {
             stream.Close();
         }
 
-        public static bool EqualAlphabets(this char[] alphabet, char[] anotherAlphabet) {
-            if (alphabet.Length != anotherAlphabet.Length) return false;
-            for (int i = 0; i < alphabet.Length; i++)
-                if (alphabet[i] != anotherAlphabet[i])
-                    return false;
-            return true;
-        }
-
-        internal static void DebugMessage(string message, Automat.IAcceptWord a, Serpen.Uni.Utils.eDebugLogLevel level) {
+        internal static void DebugMessage(string message, IAcceptWord a, Serpen.Uni.Utils.eDebugLogLevel level) {
             if (Serpen.Uni.Utils.DebugLogLevel >= level && System.Diagnostics.Debugger.IsAttached) {
                 var stack = new System.Diagnostics.StackTrace(true);
                 var sframe = stack.GetFrame(1);

@@ -11,7 +11,7 @@ namespace Serpen.Uni.CompSys {
 
             byte gray = DualToGray(number);
             bool[] numbool = new bool[Utils.Log2(number)];
-            for (int i = 0; i < numbool.Length; i++)
+            for (byte i = 0; i < numbool.Length; i++)
                 numbool[i] = Utils.HasBitSet(number, i);
             return numbool;
         }

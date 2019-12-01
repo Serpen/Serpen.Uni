@@ -31,7 +31,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         public override int GetHashCode() => this.ToString().GetHashCode();
 
         public override string ToString()
-            => $"({q}, {(ci ?? Uni.Utils.EPSILON)}, {(cw ?? Uni.Utils.EPSILON)})";
+            => $"({q}, {(ci ?? Utils.EPSILON)}, {(cw ?? Utils.EPSILON)})";
     }
 
     [System.Serializable]
@@ -44,7 +44,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         public string cw2 { get; }
         public uint qNext { get; }
 
-        public override string ToString() => $"({(!string.IsNullOrEmpty(cw2) ? cw2 : Uni.Utils.EPSILON.ToString())}, {qNext})";
+        public override string ToString() => $"({(!string.IsNullOrEmpty(cw2) ? cw2 : Utils.EPSILON.ToString())}, {qNext})";
     }
 
     [System.Serializable]

@@ -86,7 +86,7 @@ namespace Serpen.Uni.Automat.Finite {
                         if (k == 0) {
                             var toAdd = new List<string>();
                             if (i == j)  //from i to i, means ε 
-                                toAdd.Add(Uni.Utils.EPSILON.ToString());
+                                toAdd.Add(Utils.EPSILON.ToString());
 
                             //check if any char loops in this state
                             foreach (char c in D.Alphabet) {
@@ -94,7 +94,7 @@ namespace Serpen.Uni.Automat.Finite {
                                     toAdd.Add(c.ToString());
                             }
                             R[i, j, 0] = string.Join('+', toAdd);
-                            if (R[i, j, 0] == Uni.Utils.EPSILON.ToString()) R[i, j, 0] = "";
+                            if (R[i, j, 0] == Utils.EPSILON.ToString()) R[i, j, 0] = "";
 
                         } else {
                             //R is now calculated by previous R^(k-1)

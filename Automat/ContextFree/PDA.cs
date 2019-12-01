@@ -14,7 +14,7 @@ namespace Serpen.Uni.Automat.ContextFree {
     /// nondeterministic PDA with Stack Symbol, which must end as empty stack and accepted state
     /// </summary>
     [System.Serializable]
-    public abstract class PDA : AutomatBase<PDATransformKey, PDATransformValue[]>, IPDA, IReverse, IUnion, IJoin, IConcat {
+    public abstract class PDA : AutomatBase<PDATransformKey, PDATransformValue[]>, IPDA, IReverse, IUnion {
 
         protected const int MAX_RUNS_OR_STACK = 10000;
         protected static readonly char[] EXTRASYMBOLS = new char[] { '§', '$', '%', '&' };
@@ -40,7 +40,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             this.Transforms = transform;
             this.StartSymbol = startStackSymbol;
 
-            // CheckConstraints();
+            CheckConstraints();
         }
 
         public PDA(string name, string[] states, char[] inputAlphabet, char[] workalphabet, PDATransform transform, uint startState, char? startStackSymbol, uint[] acceptedStates)
@@ -165,7 +165,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             var tcol = new System.Collections.Generic.List<VisualizationTuple>(Transforms.Count);
             foreach (var t in Transforms) {
                 foreach (var v in t.Value) {
-                    string desc = $"{(t.Key.ci ?? Uni.Utils.EPSILON)}|{(t.Key.cw ?? Uni.Utils.EPSILON)}->{(!string.IsNullOrEmpty(v.cw2) ? v.cw2 : Uni.Utils.EPSILON.ToString())}";
+                    string desc = $"{(t.Key.ci ?? Utils.EPSILON)}|{(t.Key.cw ?? Utils.EPSILON)}->{(!string.IsNullOrEmpty(v.cw2) ? v.cw2 : Utils.EPSILON.ToString())}";
                     var vt = new VisualizationTuple(t.Key.q, v.qNext, desc);
                     tcol.Add(vt);
                 }

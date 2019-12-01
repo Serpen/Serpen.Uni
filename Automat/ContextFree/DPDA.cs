@@ -137,7 +137,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         public override VisualizationTuple[] VisualizationLines() {
             var tcol = new System.Collections.Generic.List<VisualizationTuple>(Transforms.Count);
             foreach (var t in Transforms) {
-                string desc = $"{(t.Key.ci ?? Uni.Utils.EPSILON)}|{(t.Key.cw ?? Uni.Utils.EPSILON)}->{(!string.IsNullOrEmpty(t.Value.cw2) ? t.Value.cw2 : Uni.Utils.EPSILON.ToString())}";
+                string desc = $"{(t.Key.ci ?? Utils.EPSILON)}|{(t.Key.cw ?? Utils.EPSILON)}->{(!string.IsNullOrEmpty(t.Value.cw2) ? t.Value.cw2 : Utils.EPSILON.ToString())}";
                 var vt = new VisualizationTuple(t.Key.q, t.Value.qNext, desc);
                 tcol.Add(vt);
             }

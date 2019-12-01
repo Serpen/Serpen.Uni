@@ -4,7 +4,6 @@ using Math = System.Math;
 namespace Serpen.Uni.Automat {
 
     public class VisualizationTuple : System.Tuple<int, int, string> {
-        public VisualizationTuple(int q, int q2, string desc) : base(q, q2, desc) { }
         public VisualizationTuple(uint q, uint q2, string desc) : base((int)q, (int)q2, desc) { }
     }
 
