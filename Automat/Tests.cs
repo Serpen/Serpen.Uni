@@ -428,7 +428,7 @@ namespace Serpen.Uni.Automat {
             string[] words = new string[]{};
             int count = 0;
             while ((onceTrue < passLevel | onceFalse < passLevel) && count < initialCount * 2) {
-                words = A1.GetRandomWords(initialCount / 2, 1, initialCount / 2, words);
+                words = A1.GetRandomWords(initialCount / 2, 1, Serpen.Uni.Utils.Sqrt(initialCount), words);
                 foreach (string w in words) {
                     try {
                         var erg1 = A1.AcceptWord(w);
@@ -447,14 +447,14 @@ namespace Serpen.Uni.Automat {
                 }
             }
             if (onceTrue >= passLevel && onceFalse >= passLevel) {
-                Utils.DebugMessage($"{count} words passed", A1, Uni.Utils.eDebugLogLevel.Verbose);
+                Utils.DebugMessage($"{count} words passed ({onceTrue}/{onceFalse})", A1, Uni.Utils.eDebugLogLevel.Verbose);
                 return true;
             } else {
                 if (A1.Equals(A2)) {
-                    Utils.DebugMessage($"{count} words passed, but not both tested, but Equals works", A1, Uni.Utils.eDebugLogLevel.Normal);
+                    Utils.DebugMessage($"{count} words passed, but not both tested ({onceTrue}/{onceFalse}), but Equals works", A1, Uni.Utils.eDebugLogLevel.Normal);
                     return true;
                 } else {
-                    Utils.DebugMessage($"{count} words passed, but not both tested, Equals not working", A1, Uni.Utils.eDebugLogLevel.Always);
+                    Utils.DebugMessage($"{count} words passed, but not both tested ({onceTrue}/{onceFalse}), Equals not working", A1, Uni.Utils.eDebugLogLevel.Always);
                     return true;
                 }
 

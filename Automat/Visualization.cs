@@ -78,7 +78,19 @@ namespace Serpen.Uni.Automat {
 
             int lastCurveHeigth = 3 * CURVE_BONUS;
 
-            int bmpwidth = Math.Max(500, (int)(IMAGE_SPACE + (A.StatesCount) * (STATE_DIAMETER + IMAGE_SPACE)));
+            float relFactor = 1;
+
+            var vls = A.VisualizationLines();
+
+            if (vls.Length > A.StatesCount*3) {
+                relFactor *= vls.Length/(A.StatesCount*3);
+                Utils.DebugMessage($"corrected bmpRelFactor to {relFactor} by transform count", A, Uni.Utils.eDebugLogLevel.Verbose);
+            } else if (A.Alphabet.Length > A.StatesCount*4) {
+                relFactor *= A.Alphabet.Length/(A.StatesCount*4);
+                Utils.DebugMessage($"corrected bmpRelFactor to {relFactor} by alphabet count", A, Uni.Utils.eDebugLogLevel.Verbose);
+            }
+
+            int bmpwidth = Math.Max(500, (int)(IMAGE_SPACE + (A.StatesCount) * (STATE_DIAMETER + IMAGE_SPACE)*relFactor));
             var bmp = new Bitmap(bmpwidth, (int)(bmpwidth / 1.5));
 
             Graphics g = Graphics.FromImage(bmp);
@@ -134,7 +146,7 @@ namespace Serpen.Uni.Automat {
             }
 
             // draw Transform Lines, depends which automat, because of inconsistent transform inheritance and nondeterministic transform 
-            foreach (var vtl in A.VisualizationLines())
+            foreach (var vtl in vls)
                 DrawTransformLine(ref g, vtl.Item1, vtl.Item2, vtl.Item3, vCenter, ref lastCurveHeigth, ref alreadyDrawn);
 
             return bmp;

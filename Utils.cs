@@ -9,6 +9,7 @@ namespace Serpen.Uni {
         public static readonly System.Random RND = new System.Random();
         public static int Pow(int bas, int exp) => (int)System.Math.Pow(bas, exp);
         public static int Pow2(int exp) => (int)System.Math.Pow(2, exp);
+        public static int Sqrt(int exp) => (int)System.Math.Sqrt(exp);
         public static int Log2(int z) => (int)System.Math.Log2(z);
         public static bool HasBitSet(this byte i, int b) => (b & (1 << i)) > 0;
 
