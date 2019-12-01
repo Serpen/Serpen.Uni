@@ -6,13 +6,13 @@ namespace Serpen.Uni.Automat.Finite {
     [System.Serializable]
     public abstract class FABase : AutomatBase<EATuple, uint[]>, IAlleAbgeschlossenheitseigenschaften {
 
-        public FABase(uint stateCount, char[] alphabet, TransformBase<EATuple, uint[]> eat, uint startState, uint[] acceptedStates, string name = "")
+        protected FABase(uint stateCount, char[] alphabet, TransformBase<EATuple, uint[]> eat, uint startState, uint[] acceptedStates, string name = "")
         : base(stateCount, alphabet, startState, name, acceptedStates) {
             this.Transforms = eat;
             CheckConstraints();
         }
 
-        public FABase(string[] names, char[] alphabet, TransformBase<EATuple, uint[]> eat, uint startState, uint[] acceptedStates, string name = "")
+		protected FABase(string[] names, char[] alphabet, TransformBase<EATuple, uint[]> eat, uint startState, uint[] acceptedStates, string name = "")
         : base(names, alphabet, startState, name, acceptedStates) {
             this.Transforms = eat;
             CheckConstraints();

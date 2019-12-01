@@ -3,7 +3,7 @@ using System.Linq;
 using RegExText = System.Text.RegularExpressions.Regex;
 
 namespace Serpen.Uni.Automat.Finite {
-    public class Converter {
+    public static class Converter {
 
         [AlgorithmSource("EAFK-2.3.5", "EAFK-2.5.5","1659-D-2.8")]
         public static Finite.DFA Nea2TeilmengenDea(Finite.INFA N) {

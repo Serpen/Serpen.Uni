@@ -7,7 +7,7 @@ namespace Serpen.Uni.Automat.Finite {
     [System.Serializable]
     public class NFAe : FABase, INFA {
 
-        public static readonly FABase Empty = new NFAe("Empty", 1, new char[] { }, new NFAeTransform(), 0, new uint[] { });
+        public static readonly FABase Empty = new NFAe("Empty", 1, Array.Empty<char>(), new NFAeTransform(), 0, Array.Empty<uint>());
 
         public NFAe(string name, uint stateCount, char[] Alphabet, NFAeTransform transform, uint startState, params uint[] acceptedStates)
             : base(stateCount, Alphabet, transform, startState, acceptedStates, name) {

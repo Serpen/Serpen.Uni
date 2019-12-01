@@ -42,7 +42,7 @@ namespace Serpen.Uni.Automat {
         [System.NonSerialized()]
         internal System.Func<string, bool> SimplyfiedAcceptFunction;
 
-        public AutomatBase(uint stateCount, char[] alphabet, uint startState, string name, uint[] acceptedStates) {
+        protected AutomatBase(uint stateCount, char[] alphabet, uint startState, string name, uint[] acceptedStates) {
             var sortAlp = alphabet.ToList();
             sortAlp.Sort();
             this.Alphabet = sortAlp.ToArray();

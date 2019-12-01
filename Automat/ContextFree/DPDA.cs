@@ -67,7 +67,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             PDATransformKey qStart;
 
             //if word is empty, maybe only e-Transform is needed
-            if (pcfg.word != "")
+            if (!string.IsNullOrEmpty(pcfg.word))
                 qStart = new PDATransformKey(pcfg.State, pcfg.word[0], pcfg.Stack[^1]);
             else
                 qStart = new PDATransformKey(pcfg.State, null, pcfg.Stack[^1]);
@@ -116,7 +116,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             if (StartSymbol.HasValue)
                 pcfg = new PDAConfig(StartState, w, new char[] { StartSymbol.Value }, null);
             else
-                pcfg = new PDAConfig(StartState, w, new char[] {}, null);
+                pcfg = new PDAConfig(StartState, w, System.Array.Empty<char>(), null);
 
             //while new pcfg exists and stack is still not empty
             while (pcfg != null && (pcfg.Stack.Length > 0)) {

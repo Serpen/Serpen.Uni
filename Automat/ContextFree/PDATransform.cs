@@ -13,7 +13,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                 if (ci.HasValue)
                     return new char[] { ci.Value };
                 else
-                    return new char[] { };
+                    return System.Array.Empty<char>();
             }
         }
         public char? cw { get; }

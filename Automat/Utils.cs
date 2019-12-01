@@ -26,7 +26,7 @@ namespace Serpen.Uni.Automat {
                 return true;
         }
 
-        internal static char NextFreeCapitalLetter(ICollection<char> alphabet, char inputChar) => NextFreeCapitalLetter(alphabet, inputChar, new char[] { });
+        internal static char NextFreeCapitalLetter(ICollection<char> alphabet, char inputChar) => NextFreeCapitalLetter(alphabet, inputChar, System.Array.Empty<char>());
         internal static char NextFreeCapitalLetter(ICollection<char> alphabet, char inputChar, char[] wishChars) {
             if (inputChar == 'S' & !alphabet.Contains('Ŝ')) return 'Ŝ';
             if (inputChar == 'A' & !alphabet.Contains('Â')) return 'Â';

@@ -32,7 +32,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         /// <param name="startState"></param>
         /// <param name="startStackSymbol"></param>
         /// <param name="acceptedStates">Accepted Endstates</param>
-        public PDA(string name, uint statesCount, char[] inputAlphabet, char[] workalphabet, PDATransform transform, uint startState, char? startStackSymbol, uint[] acceptedStates)
+        protected PDA(string name, uint statesCount, char[] inputAlphabet, char[] workalphabet, PDATransform transform, uint startState, char? startStackSymbol, uint[] acceptedStates)
         : base(statesCount, inputAlphabet, startState, name, acceptedStates) {
             this.WorkAlphabet = workalphabet;
             if (startStackSymbol.HasValue && !workalphabet.Contains(startStackSymbol.Value))
@@ -82,7 +82,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             if (pcfgs.Length > MAX_RUNS_OR_STACK) {
                 Utils.DebugMessage($"Stack >= {pcfgs.Length} abort", this, Uni.Utils.eDebugLogLevel.Always);
-                return new PDAConfig[0];
+                return System.Array.Empty<PDAConfig>();
             }
 
             foreach (var pcfg in pcfgs) {

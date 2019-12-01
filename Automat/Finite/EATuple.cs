@@ -9,7 +9,7 @@ namespace Serpen.Uni.Automat.Finite {
                 if (c.HasValue)
                     return new char[] { c.Value };
                 else
-                    return new char[] { };
+                    return System.Array.Empty<char>();
             }
         }
 

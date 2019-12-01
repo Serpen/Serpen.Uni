@@ -343,7 +343,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         public override bool AcceptWord(string w) {
             if (!IsChomskey) throw new NotSupportedException("Only supported in Chomskey normalform");
 
-            if (w == "") {
+            if (string.IsNullOrEmpty(w)) {
                 if (Rules.ContainsKey(StartSymbol))
                     return Rules[StartSymbol].Contains("");
                 else
