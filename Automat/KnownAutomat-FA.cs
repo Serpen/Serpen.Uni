@@ -162,7 +162,7 @@ namespace Serpen.Uni.Automat {
                 deaT.AddBinTuple(0, 1, 0);
                 deaT.AddBinTuple(1, 2, 0);
                 deaT.AddBinTuple(2, 2, 0);
-                return new DFA(nameof(DEA_A21_B25_MN), new string[] { $"[{Uni.Utils.EPSILON.ToString()}]", "[0]", "[00]" }, binAlp, deaT, 0, 2) { SimplyfiedAcceptFunction = w => w.EndsWith("00") };
+                return new DFA(nameof(DEA_A21_B25_MN), new string[] { $"[{Utils.EPSILON.ToString()}]", "[0]", "[00]" }, binAlp, deaT, 0, 2) { SimplyfiedAcceptFunction = w => w.EndsWith("00") };
             }
         }
 
@@ -227,10 +227,11 @@ namespace Serpen.Uni.Automat {
             }
         }
         public static DFA DEA_1659_A219 {
-            get => DFA.UnionProduct(DEA_1659_M1_A22_0even, DEA_1659_M2_A24_01_Contains01);
+            get => (DFA)(DEA_1659_M1_A22_0even.Union(DEA_1659_M2_A24_01_Contains01));
         }
+
         public static NFAe NEAe_1659_A220 {
-            get => DEA_1659_M1_A22_0even.UnionNEA(DEA_1659_M2_A24_01_Contains01);
+            get => (NFAe)(DEA_1659_M1_A22_0even.UnionNea(DEA_1659_M2_A24_01_Contains01));
         }
 
         public static DFA DEA_1659_A216_M3_min {

@@ -177,34 +177,7 @@ namespace Serpen.Uni.Automat.Finite {
 
             return new NFAe($"NFAe_HomomorphismChar({Name})", this.StatesCount, Alp, neat, this.StartState, this.AcceptedStates);
         }
-
-        public override IAutomat Join(IJoin automat) {
-            if (!(automat is NFAe nfae))
-                throw new NotSupportedException();
-
-            var neat = new NFAeTransform();
-
-            var accStates = new List<uint>(this.AcceptedStates.Length + nfae.AcceptedStates.Length);
-            uint sc = this.StatesCount;
-
-            foreach (var t in this.Transforms)
-                neat.Add(t.Key.q, t.Key.c, t.Value);
-            foreach (var t in nfae.Transforms) {
-                uint[] qnexts = new uint[t.Value.Length];
-                for (int i = 0; i < t.Value.Length; i++)
-                    qnexts[i] = t.Value[i] + sc;
-                neat.Add(t.Key.q + sc, t.Key.c, qnexts);
-            }
-
-            accStates.AddRange(this.AcceptedStates);
-            for (int i = 0; i < nfae.AcceptedStates.Length; i++)
-                accStates.Add(nfae.AcceptedStates[i] + sc);
-
-            accStates.Sort();
-
-            return new NFAe($"NFAe_Join({Name}+{automat.Name})", nfae.StatesCount + sc, this.Alphabet.Union(automat.Alphabet).ToArray(), neat, this.StartState, accStates.ToArray());
-        }
-        public override IAutomat Union(IUnion A) => throw new System.NotImplementedException();
+        
         public override IAutomat Intersect(IIntersect A) => throw new System.NotImplementedException();
         public override IAutomat Diff(IDiff A) => throw new System.NotImplementedException();
 

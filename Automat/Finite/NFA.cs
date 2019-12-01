@@ -119,39 +119,11 @@ namespace Serpen.Uni.Automat.Finite {
 
             return new NFA($"NFA_HomomorphismChar({Name})", StatesCount, Alp, neat, StartState, AcceptedStates);
         }
-        public override IAutomat Join(IJoin automat) {
-            if (!(automat is NFA nfa))
-                throw new System.NotSupportedException();
-
-            var neat = new NFAeTransform();
-
-            var accStates = new List<uint>(this.AcceptedStates.Length + nfa.AcceptedStates.Length);
-            uint sc = this.StatesCount;
-
-            foreach (var t in this.Transforms)
-                neat.Add(t.Key.q, t.Key.c.Value, t.Value);
-
-            foreach (var t in nfa.Transforms) {
-                uint[] qnexts = new uint[t.Value.Length];
-                for (int i = 0; i < t.Value.Length; i++)
-                    qnexts[i] = t.Value[i] + sc;
-                neat.Add(t.Key.q + sc, t.Key.c.Value, qnexts);
-            }
-
-            accStates.AddRange(this.AcceptedStates);
-            for (int i = 0; i < nfa.AcceptedStates.Length; i++)
-                accStates.Add(nfa.AcceptedStates[i] + sc);
-
-            accStates.Sort();
-
-            return new NFA($"Join({Name}+{nfa.Name})", (nfa.StatesCount + sc), this.Alphabet, neat, this.StartState, accStates.ToArray());
-        }
-        public override IAutomat Union(IUnion A) => throw new System.NotImplementedException();
+        
         public override IAutomat Intersect(IIntersect A) => throw new System.NotImplementedException();
         public override IAutomat Diff(IDiff A) => throw new System.NotImplementedException();
 
         #endregion
-
 
         public static explicit operator NFA(DFA D) {
             var neaet = new NFAeTransform();

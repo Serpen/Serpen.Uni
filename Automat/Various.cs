@@ -1,6 +1,6 @@
 namespace Serpen.Uni.Automat {
 
-    public interface IUnion : IAutomat { IAutomat Union(IUnion A); }
+    public interface IUnion : IAutomat, IConcat, IJoin { IAutomat Union(IUnion A); }
     public interface IIntersect : IAutomat { IAutomat Intersect(IIntersect A); }
     public interface IComplement : IAutomat { IAutomat Complement(); }
     public interface IDiff : IAutomat { IAutomat Diff(IDiff A); }

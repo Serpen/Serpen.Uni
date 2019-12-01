@@ -123,13 +123,6 @@ namespace Serpen.Uni.Automat.Finite {
 
         #region "Operations"
 
-        /// <returns>
-        /// D1 ∩ ⌐D2
-        /// return Intersect(D1, Complement(D2));
-        /// </returns>
-        public static DFA Diff(DFA D1, DFA D2) =>
-            ProductDea(D1, D2, eProductDeaMode.Diff);
-
         public override IAutomat HomomorphismChar(Dictionary<char, char> Translate) {
             var deat = new DFATransform();
             var Alp = (char[])this.Alphabet.Clone();
@@ -172,15 +165,10 @@ namespace Serpen.Uni.Automat.Finite {
             return new DFA($"DFA_Join({Name}+{A.Name})", (D2.StatesCount + sc), this.Alphabet, deat, this.StartState, accStates.ToArray());
         }
 
-        public override IAutomat Union(IUnion A) => UnionProduct(this, (DFA)A);
-        public override IAutomat Intersect(IIntersect A) => Intersect(this, (DFA)A);
-        public override IAutomat Diff(IDiff A) => Diff(this, (DFA)A);
-
-        public static DFA UnionProduct(DFA D1, DFA D2)
-            => ProductDea(D1, D2, eProductDeaMode.Union);
-
-        public static DFA Intersect(DFA D1, DFA D2)
-            => ProductDea(D1, D2, eProductDeaMode.Intersect);
+        public override IAutomat Union(IUnion A) => ProductDea(this, (DFA)A, eProductDeaMode.Union);
+        public IAutomat UnionNea(IUnion A) => base.Union(A);
+        public override IAutomat Intersect(IIntersect A) => ProductDea(this, (DFA)A, eProductDeaMode.Intersect);
+        public override IAutomat Diff(IDiff A) => ProductDea(this, (DFA)A, eProductDeaMode.Diff);
 
         public enum eProductDeaMode { Union, Intersect, Diff }
         public static DFA ProductDea(DFA D1, DFA D2, eProductDeaMode mode) {
@@ -242,7 +230,7 @@ namespace Serpen.Uni.Automat.Finite {
                 }
             }
 
-            return new DFA($"DEA_Product_({mode},{D1.Name}+{D2.Name})", stateNames, D1.Alphabet, deat, 0, accStates.Distinct().ToArray());
+            return new DFA($"DEA_Product{mode}({D1.Name}+{D2.Name})", stateNames, D1.Alphabet, deat, 0, accStates.Distinct().ToArray());
         }
 
         #endregion

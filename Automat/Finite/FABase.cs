@@ -29,7 +29,7 @@ namespace Serpen.Uni.Automat.Finite {
             foreach (var t in Transforms) {
                 string desc = t.Key.c.ToString();
                 if (desc == "")
-                    desc = Uni.Utils.EPSILON.ToString();
+                    desc = Utils.EPSILON.ToString();
                 foreach (uint v in t.Value) {
                     var vt = new VisualizationTuple(t.Key.q, v, desc);
                     tcol.Add(vt);
@@ -50,79 +50,73 @@ namespace Serpen.Uni.Automat.Finite {
             return Dc;
         }
 
-
-        public IAutomat Concat(IConcat automat) {
-            if (!(automat is FABase A))
+        IAutomat JoinConcatUnion(IAutomat automat, JoinConcatUnionKind unionConcatJoinKind) {
+            if (!(automat is FABase fa2))
                 throw new System.NotSupportedException();
 
-            var neaET = new NFAeTransform();
-
-            var accStates = new List<uint>(A.AcceptedStates.Length);
-            uint offset = this.StatesCount;
-
-            foreach (var t in this.Transforms)
-                neaET.Add(t.Key.q, t.Key.c, t.Value);
-
-            foreach (var t in A.Transforms) {
-                uint[] qnexts = new uint[t.Value.Length];
-                for (int i = 0; i < t.Value.Length; i++)
-                    qnexts[i] = t.Value[i] + offset;
-                neaET.Add(t.Key.q + offset, t.Key.c, qnexts);
+            uint offsetA1 = 0; // first state of A2
+            uint offsetA2 = this.StatesCount; // first state of A2
+            if (unionConcatJoinKind == JoinConcatUnionKind.Union) {
+                offsetA1 = 1;
+                offsetA2++;
             }
 
+            char[] inputAlphabet = this.Alphabet.Union(fa2.Alphabet).ToArray();
 
-            for (int i = 0; i < this.AcceptedStates.Length; i++)
-                neaET.Add(this.AcceptedStates[i], null, offset);
+            var neaeT = new NFAeTransform();
 
-            for (int i = 0; i < A.AcceptedStates.Length; i++)
-                accStates.Add((A.AcceptedStates[i] + offset));
+            uint startState;
+            // Union: add new start state, with e to both starts
+            if (unionConcatJoinKind == JoinConcatUnionKind.Union) {
+                startState = 0;
+                neaeT.Add(0, null, this.StartState + offsetA1);
+                neaeT.AddM(0, null, fa2.StartState + offsetA2);
+            } else
+                startState = this.StartState;
 
-            accStates.Sort();
-
-            char[] bothAlphabets = this.Alphabet.Union(A.Alphabet).ToArray();
-
-            return new NFAe($"Concat({Name}+{A.Name})", A.StatesCount + offset, bothAlphabets, neaET, this.StartState, accStates.ToArray());
-        }
-
-
-        /// <summary>
-        /// Unions two EAs to a NEA, which has a StartState with e to both Start States
-        /// </summary>
-        /// <returns></returns>
-        public NFAe UnionNEA(FABase fa) {
-            uint offsetD2 = this.StatesCount + 1; //first state of D2
-            uint[] accStates = new uint[this.AcceptedStates.Length + fa.AcceptedStates.Length];
-            char[] nAlphabet = this.Alphabet.Union(fa.Alphabet).ToArray();
-
-            var neat = new NFAeTransform
-            {
-                { 0, null, 1, offsetD2 }
-            };
-
-            //add each D1 transform, +1
+            // add each A1 transform + offset of A1
             foreach (var item in this.Transforms)
-                foreach (uint val in item.Value)
-                    neat.AddM(item.Key.q + 1, item.Key.c, val + 1);
+                foreach (var val in item.Value)
+                    neaeT.AddM(item.Key.q + offsetA1, item.Key.c, val + offsetA1);
 
-            //add each D1 transform, +offset
-            foreach (var item in fa.Transforms)
-                foreach (uint val in item.Value)
-                    neat.AddM(item.Key.q + offsetD2, item.Key.c, val + offsetD2);
+            // add each A1 transform, + offset of A2
+            foreach (var item in fa2.Transforms)
+                foreach (var val in item.Value)
+                    neaeT.AddM(item.Key.q + offsetA2, item.Key.c, val + offsetA2);
 
 
-            int i; //store where D1 acc ends
-            //iterate D1 acc and +1
-            for (i = 0; i < this.AcceptedStates.Length; i++)
-                accStates[i] = this.AcceptedStates[i] + 1;
+            uint[] accStates;
+            if (unionConcatJoinKind == JoinConcatUnionKind.Concat)
+                // Concat: has only accepted states from A2
+                accStates = new uint[fa2.AcceptedStates.Length];
+            else
+                // Join, Union has A1, A2 accpted states
+                accStates = new uint[this.AcceptedStates.Length + fa2.AcceptedStates.Length];
 
-            //iterate D2 acc and add offset
-            for (int j = 0; j < fa.AcceptedStates.Length; j++)
-                accStates[i + j] = (fa.AcceptedStates[j] + offsetD2);
+            int i = 0; // store where D1 acc ends
+            // iterate A1 acc
+            for (; i < this.AcceptedStates.Length; i++)
+                if (unionConcatJoinKind == JoinConcatUnionKind.Concat)
+                    // Concat: lead accepted states from A1 to A2 start
+                    neaeT.AddM(this.AcceptedStates[i] + offsetA1, null, fa2.StartState + offsetA2);
+                else
+                    // Join, Union: states from A1 are normal accepted
+                    accStates[i] = this.AcceptedStates[i] + offsetA1;
+                
+            if (unionConcatJoinKind == JoinConcatUnionKind.Concat)
+                i = 0;
 
-            return new NFAe($"NFAe_Union({Name}+{fa.Name})", this.StatesCount + fa.StatesCount + 1, nAlphabet, neat, 0, accStates);
+            // iterate A2 acs and + offsetA2
+            for (int j = 0; j < fa2.AcceptedStates.Length; j++)
+                accStates[i + j] = (fa2.AcceptedStates[j] + offsetA2);
+
+            
+            return new NFAe($"NEAe{unionConcatJoinKind.ToString()}({Name}+{fa2.Name})", this.StatesCount + fa2.StatesCount + offsetA1, inputAlphabet, neaeT, startState, accStates);
         }
 
-        public abstract IAutomat Union(IUnion a);
+        public virtual IAutomat Join(IJoin automat) => JoinConcatUnion(automat, JoinConcatUnionKind.Join);
+        public virtual IAutomat Concat(IConcat automat) => JoinConcatUnion(automat, JoinConcatUnionKind.Concat);
+        public virtual IAutomat Union(IUnion automat) => JoinConcatUnion(automat, JoinConcatUnionKind.Union);
         public abstract IAutomat Intersect(IIntersect a);
         public abstract IAutomat Diff(IDiff a);
 
@@ -182,7 +176,6 @@ namespace Serpen.Uni.Automat.Finite {
         }
 
         public abstract IAutomat HomomorphismChar(System.Collections.Generic.Dictionary<char, char> Translate);
-        public abstract IAutomat Join(IJoin A);
 
         public abstract override bool Equals(object obj);
         public abstract override string ToString();
