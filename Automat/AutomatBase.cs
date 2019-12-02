@@ -1,5 +1,5 @@
+using System.Collections.Generic;
 using System.Linq;
-using Serpen.Uni;
 
 namespace Serpen.Uni.Automat {
 
@@ -110,6 +110,13 @@ namespace Serpen.Uni.Automat {
             return fromStartReachable;
         }
 
+        public Dictionary<string,List<string>> FindMNEqClasses() {
+            var rndwords = GetRandomWords(100,0, 10, System.Array.Empty<string>());
+
+            return Serpen.Uni.Utils.EqualityClasses(rndwords, 
+                (s1,s2) => Tests.InMyhillNerodeRelation(s1, s2, this));
+        }
+
         protected (uint[], string[], uint[]) RemovedStateTranslateTables() {
             bool[] fromStartReachable = ReachableStates();
 
@@ -130,7 +137,7 @@ namespace Serpen.Uni.Automat {
             for (int i = 0; i < translate.Length; i++)
                 names[i] = translate[i].ToString();
 
-            var astates = new System.Collections.Generic.List<uint>(AcceptedStates.Length);
+            var astates = new List<uint>(AcceptedStates.Length);
             foreach (var accept in AcceptedStates)
                 if (translate.Contains(accept))
                     astates.Add(translate.ArrayIndex(accept));
@@ -159,10 +166,13 @@ namespace Serpen.Uni.Automat {
         public abstract override string ToString();
 
 		public string[] GetRandomWords(int count, int minLen, int maxLen, string[] blocked) {
-			var words = new System.Collections.Generic.List<string>();
+			var words = new List<string>();
 			var rnd = Uni.Utils.RND;
 
 			int i = 0;
+
+            if (minLen==0 && !blocked.Contains(""))
+                words.Add("");
 
 			// count shouldn't be higher than words available with maxLen
 			count = System.Math.Min(count, Alphabet.Length * maxLen * maxLen);

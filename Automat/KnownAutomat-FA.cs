@@ -155,6 +155,24 @@ namespace Serpen.Uni.Automat {
             }
         }
 
+        public static DFA DEA_1659_T23_aua {
+            get {
+                var deaT = new DFATransform() {
+                    {0,'0',1},
+                    {0,'1',2},
+                    {1,'0',3},
+                    {1,'1',1},
+                    {2,'0',2},
+                    {2,'1',4},
+                    {3,'0',3},
+                    {3,'1',1},
+                    {4,'0',2},
+                    {4,'1',4},
+                };
+                return new DFA(nameof(DEA_1659_T23_aua), 5, binAlp, deaT, 0, 3, 4);
+            }
+        }
+
         [AcceptedWordSamples("10000", "100")]
         public static DFA DEA_1659_A214_B25_MN {
             get {

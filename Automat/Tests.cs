@@ -9,25 +9,24 @@ namespace Serpen.Uni.Automat {
 
         public static void RunAllTests() {
             var allAutomats1 = new List<IAutomat>();
-            allAutomats1.AddRange(GenerateRandomAutomats(100));
 
-            allAutomats1.AddRange(GenerateComplements());
             allAutomats1.AddRange(GenerateComplements());
             allAutomats1.AddRange(GenerateConcats());
             allAutomats1.AddRange(GenerateDiffs());
             allAutomats1.AddRange(GenerateIntersects());
             allAutomats1.AddRange(GenerateJoins());
             allAutomats1.AddRange(GenerateKleeneStern());
-
-            var revs = GenerateReverses();
-            TestDoubleReversesByWord(revs);
-            allAutomats1.AddRange(revs);
-
+            // allAutomats1.AddRange(GenerateDoubleReverses());
             allAutomats1.AddRange(GenerateUnions());
 
+            allAutomats1.AddRange(GenerateRandomAutomats(100));
+
             var allAutomats = CastToEveryPossibility(allAutomats1);
-            
+
             for (int i = 0; i < allAutomats.GetLength(0); i++) {
+                try {
+                    PurgeEquality(allAutomats[i], 20);
+                } catch (ContextFree.PDAStackException) { } catch (Turing.TuringCycleException) { }
                 for (int j = 0; j < allAutomats[i].GetLength(0); j++) {
                     if (!TestEqualWithWords(allAutomats[i][0], allAutomats[i][j], 20)) {
                         try {
@@ -40,6 +39,7 @@ namespace Serpen.Uni.Automat {
                     }
                 }
             }
+            TestMinimizedDeaIsMHCount();
         }
 
         public static IAutomat[][] CastToEveryPossibility() => CastToEveryPossibility(KnownAutomat.GetAllAutomats());
@@ -138,101 +138,25 @@ namespace Serpen.Uni.Automat {
 
                     ret1Automat.Add(SPDA);
                     ret1Automat.Add(QPDAfromSPDA);
+                } else if (automat is DPDA dpda) {
+                    var QPDAfromDPDA = (StatePDA)dpda;
+
+                    ret1Automat.Add(dpda);
+                    ret1Automat.Add(QPDAfromDPDA);
                 } else if (automat is TuringMachineSingleBand tm1) {
                     ret1Automat.Add(tm1);
                 } else {
                     ret1Automat.Add(automat);
                 }
 
+                if (automat is IReverse Arev) {
+                    ret1Automat.Add((IReverse)((IReverse)Arev.Reverse()).Reverse());
+                }
+
                 retAutomats.Add(ret1Automat.ToArray());
             }
 
             return retAutomats.ToArray();
-        }
-
-        [System.Obsolete()]
-        public static bool CastingEquality() { //IAutomat[][] automats
-            foreach (DFA D in KnownAutomat.GetDFAModels()) {
-                NFA NfromD = (NFA)D;
-                NFAe NEfromD = (NFAe)D;
-                // NFAe NEfromN = (NFAe)NfromD;
-
-                if (!D.Equals(D))
-                    return false;
-                if (!D.Equals(NfromD))
-                    return false;
-                if (!D.Equals(NEfromD))
-                    return false;
-
-                if (!NfromD.Equals(D))
-                    return false;
-                if (!NfromD.Equals(NfromD))
-                    return false;
-                if (!NfromD.Equals(NEfromD))
-                    return false;
-
-                if (!NEfromD.Equals(D))
-                    return false;
-                if (!NEfromD.Equals(NfromD))
-                    return false;
-                if (!NEfromD.Equals(NEfromD))
-                    return false;
-            }
-
-            foreach (var N in KnownAutomat.GetNFAModels()) {
-                DFA DfromN = Converter.Nea2TeilmengenDea(N);
-                NFAe NEfromD = (NFAe)DfromN;
-                NFAe NEfromN = (NFAe)N;
-
-                if (!DfromN.Equals(DfromN))
-                    return false;
-                if (!DfromN.Equals(N))
-                    return false;
-                if (!DfromN.Equals(NEfromD))
-                    return false;
-
-                if (!N.Equals(DfromN))
-                    return false;
-                if (!N.Equals(N))
-                    return false;
-                if (!N.Equals(NEfromD))
-                    return false;
-
-                if (!NEfromD.Equals(DfromN))
-                    return false;
-                if (!NEfromD.Equals(N))
-                    return false;
-                if (!NEfromD.Equals(NEfromD))
-                    return false;
-            }
-
-            foreach (var Ne in KnownAutomat.GetNFAeModels()) {
-                DFA DfromNe = Converter.Nea2TeilmengenDea(Ne);
-                NFA NFromD = (NFA)DfromNe;
-
-                if (!DfromNe.Equals(DfromNe))
-                    return false;
-                if (!DfromNe.Equals(NFromD))
-                    return false;
-                if (!DfromNe.Equals(Ne))
-                    return false;
-
-                if (!NFromD.Equals(DfromNe))
-                    return false;
-                if (!NFromD.Equals(NFromD))
-                    return false;
-                if (!NFromD.Equals(Ne))
-                    return false;
-
-                if (!Ne.Equals(DfromNe))
-                    return false;
-                if (!Ne.Equals(NFromD))
-                    return false;
-                if (!Ne.Equals(Ne))
-                    return false;
-            }
-
-            return true;
         }
 
         public static IAutomat[] GenerateRandomAutomats(int count) {
@@ -254,17 +178,15 @@ namespace Serpen.Uni.Automat {
 
         public static void PurgeEquality(IAutomat[] automats, int words = 100) {
             foreach (IAutomat a in automats) {
-                if (a is NFA nfa) {
-                    var nfa_removed = nfa.PurgeStates();
-                    string[] rwords = nfa.GetRandomWords(words, 1, words, System.Array.Empty<string>());
-                    for (int i = 0; i < rwords.Length; i++) {
-                        if (!nfa.AcceptWord(rwords[i]) == nfa_removed.AcceptWord(rwords[i]))
-                            throw new Automat.Exception($"Automats not equal by word {rwords[i]}", nfa, nfa_removed);
-                    }
-                    if (!nfa.Equals(nfa_removed)) {
-                        throw new Automat.Exception("Automats not equal", nfa, nfa_removed);
-                    }
+                var a_removed = a.PurgeStates();
+                string[] rwords = a.GetRandomWords(words, 1, words, System.Array.Empty<string>());
+                for (int i = 0; i < rwords.Length; i++) {
+                    if (!a.AcceptWord(rwords[i]) == a_removed.AcceptWord(rwords[i]))
+                        throw new Automat.Exception($"Automats not equal by word {rwords[i]}", a, a_removed);
                 }
+                // if (!a.Equals(a_removed)) {
+                //     throw new Automat.Exception("Automats not equal", a, a_removed);
+                // }
             }
         }
 
@@ -274,8 +196,8 @@ namespace Serpen.Uni.Automat {
         public static void MinimizeEquality(Automat.Finite.DFA[] automats, int words = 100) {
             foreach (IAutomat a in automats) {
                 if (a is DFA dfa) {
-                    var dfa_min = dfa.MinimizeTF();
-                    var dfa_min_min = dfa_min.MinimizeTF();
+                    var dfa_min = dfa.Minimize();
+                    var dfa_min_min = dfa_min.Minimize();
 
                     if (dfa_min.StatesCount > dfa_min_min.StatesCount) {
                         Automat.Utils.SaveAutomatImageToTemp(dfa);
@@ -386,12 +308,12 @@ namespace Serpen.Uni.Automat {
             return ret.ToArray();
         }
 
-        public static IReverse[] GenerateReverses() {
+        public static IReverse[] GenerateDoubleReverses() {
             var automats = KnownAutomat.GetTypes<IReverse>();
             var ret = new List<IReverse>(automats.Count());
 
             foreach (var a in automats)
-                ret.Add((IReverse)a.Reverse());
+                ret.Add((IReverse)((IReverse)a.Reverse()).Reverse());
 
             return ret.ToArray();
         }
@@ -444,11 +366,11 @@ namespace Serpen.Uni.Automat {
                         var erg2 = A2.AcceptWord(w);
 
                         if (erg1) onceTrue++;
-                        if (!erg1) onceFalse++;
-                        if (erg1 != erg2) {
-                            Utils.DebugMessage($"{count}. word '{w}' divides Automates", Uni.Utils.eDebugLogLevel.Always, A1, A2);
-                            return false;
-                        }
+                        else onceFalse++;
+                        
+                        if (erg1 != erg2)
+                            throw new Automat.Exception($"{count}. word '{w}' divides Automates", A1, A2);
+
                         Utils.DebugMessage($"{count}. word '{w}' passes", Uni.Utils.eDebugLogLevel.Verbose, A1, A2);
                         count++;
                     } catch (TuringCycleException) {
@@ -465,6 +387,33 @@ namespace Serpen.Uni.Automat {
                 } else {
                     Utils.DebugMessage($"{count} words passed, but not both tested ({onceTrue}/{onceFalse}), Equals not working", Uni.Utils.eDebugLogLevel.Normal, A1, A2);
                     return true;
+                }
+
+            }
+        }
+
+        [AlgorithmSource("1659_D2.11_P37")]
+        public static bool InMyhillNerodeRelation(string w1, string w2, IAcceptWord automat, int count = 50) {
+            var words = automat.GetRandomWords(count, 0, Serpen.Uni.Utils.Sqrt(count), System.Array.Empty<string>());
+
+            foreach (string w in words)
+                if (automat.AcceptWord(w1 + w) != automat.AcceptWord(w2+w)) {
+                    Utils.DebugMessage($"word {w} divides {w1},{w2}", automat, Uni.Utils.eDebugLogLevel.Verbose);
+                    return false;
+                }
+
+            return true;
+        }
+
+        public static void TestMinimizedDeaIsMHCount() {
+            var dfas = KnownAutomat.GetDFAModels();
+            foreach (var dfa in dfas) {
+                DFA dmin = ((DFA)dfa.PurgeStates()).Minimize();
+                var mheqs = dfa.FindMNEqClasses();
+                if (dmin.StatesCount != mheqs.Count) {
+                    dmin.SaveAutomatImageToTemp();
+                    Utils.DebugMessage($"DFA min {dmin.StatesCount} != MH {mheqs.Count}", dfa, Uni.Utils.eDebugLogLevel.Always);
+                    dmin = null;
                 }
 
             }
