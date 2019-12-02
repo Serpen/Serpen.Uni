@@ -156,13 +156,13 @@ namespace Serpen.Uni.Automat {
         }
 
         [AcceptedWordSamples("10000", "100")]
-        public static DFA DEA_A21_B25_MN {
+        public static DFA DEA_1659_A214_B25_MN {
             get {
                 var deaT = new DFATransform();
                 deaT.AddBinTuple(0, 1, 0);
                 deaT.AddBinTuple(1, 2, 0);
                 deaT.AddBinTuple(2, 2, 0);
-                return new DFA(nameof(DEA_A21_B25_MN), new string[] { $"[{Utils.EPSILON.ToString()}]", "[0]", "[00]" }, binAlp, deaT, 0, 2) { SimplyfiedAcceptFunction = w => w.EndsWith("00") };
+                return new DFA(nameof(DEA_1659_A214_B25_MN), new string[] { $"[{Utils.EPSILON.ToString()}]", "[0]", "[00]" }, binAlp, deaT, 0, 2) { SimplyfiedAcceptFunction = w => w.EndsWith("00") };
             }
         }
 
@@ -235,7 +235,7 @@ namespace Serpen.Uni.Automat {
         }
 
         public static DFA DEA_1659_A216_M3_min {
-            get => DEA_1659_A215_M3_TF.MinimizeTF();
+            get => DEA_1659_A215_M3_TF.Minimize();
         }
         public static DFA DEA_1659_A217_TF {
             get {

@@ -181,13 +181,19 @@ namespace Serpen.Uni.Automat.ContextFree {
         public IAutomat Concat(IConcat automat) => JoinConcatUnion(automat, JoinConcatUnionKind.Concat);
         public IAutomat Union(IUnion automat) => JoinConcatUnion(automat, JoinConcatUnionKind.Union);
 
-        IAutomat JoinConcatUnion(IAutomat automat, JoinConcatUnionKind unionConcatJoinKind) {
+        IAutomat JoinConcatUnion(IAutomat automat, JoinConcatUnionKind kind) {
             if (!(automat is PDA pda2))
                 throw new System.NotSupportedException();
+            if (kind != JoinConcatUnionKind.Join && !(automat is StatePDA))
+                throw new System.NotSupportedException();
+            // TODO: investigate more, State PDA is perfect Stack PDA seems complicated
 
+            // TODO: what if A1 or A2 has a StackStartsymbol set, should it be transformed
+            // to a transform or applied
+            
             uint offsetA1 = 0; // first state of A2
             uint offsetA2 = this.StatesCount; // first state of A2
-            if (unionConcatJoinKind == JoinConcatUnionKind.Union) {
+            if (kind == JoinConcatUnionKind.Union) {
                 offsetA1 = 1;
                 offsetA2++;
             }
@@ -199,7 +205,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             uint startState;
             // Union: add new start state, with e to both starts
-            if (unionConcatJoinKind == JoinConcatUnionKind.Union) {
+            if (kind == JoinConcatUnionKind.Union) {
                 startState = 0;
                 pdat.Add(0, null, null, null, this.StartState + offsetA1);
                 pdat.AddM(0, null, null, null, pda2.StartState + offsetA2);
@@ -218,7 +224,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
 
             uint[] accStates;
-            if (unionConcatJoinKind == JoinConcatUnionKind.Concat)
+            if (kind == JoinConcatUnionKind.Concat)
                 // Concat: has only accepted states from A2
                 accStates = new uint[pda2.AcceptedStates.Length];
             else
@@ -228,14 +234,14 @@ namespace Serpen.Uni.Automat.ContextFree {
             int i = 0; // store where D1 acc ends
             // iterate A1 acc
             for (; i < this.AcceptedStates.Length; i++)
-                if (unionConcatJoinKind == JoinConcatUnionKind.Concat)
+                if (kind == JoinConcatUnionKind.Concat)
                     // Concat: lead accepted states from A1 to A2 start
                     pdat.AddM(this.AcceptedStates[i] + offsetA1, null, null, null, pda2.StartState + offsetA2);
                 else
                     // Join, Union: states from A1 are normal accepted
                     accStates[i] = this.AcceptedStates[i] + offsetA1;
                 
-            if (unionConcatJoinKind == JoinConcatUnionKind.Concat)
+            if (kind == JoinConcatUnionKind.Concat)
                 i = 0;
 
             // iterate A2 acs and + offsetA2
@@ -243,9 +249,9 @@ namespace Serpen.Uni.Automat.ContextFree {
                 accStates[i + j] = (pda2.AcceptedStates[j] + offsetA2);
 
             if (this is StatePDA)
-                return new StatePDA($"{unionConcatJoinKind.ToString()}({Name}+{pda2.Name})", this.StatesCount + pda2.StatesCount + offsetA1, inputAlphabet, workAlphabet, pdat, startState, null, accStates);
+                return new StatePDA($"{kind.ToString()}({Name}+{pda2.Name})", this.StatesCount + pda2.StatesCount + offsetA1, inputAlphabet, workAlphabet, pdat, startState, pda2.StartSymbol, accStates);
             else if (this is StackPDA)
-                return new StackPDA($"{unionConcatJoinKind.ToString()}({Name}+{pda2.Name})", this.StatesCount + pda2.StatesCount + offsetA1, inputAlphabet, workAlphabet, pdat, startState, null);
+                return new StackPDA($"{kind.ToString()}({Name}+{pda2.Name})", this.StatesCount + pda2.StatesCount + offsetA1, inputAlphabet, workAlphabet, pdat, startState, pda2.StartSymbol);
             else
                 throw new System.NotImplementedException();
         }
@@ -273,9 +279,9 @@ namespace Serpen.Uni.Automat.ContextFree {
                 pdat.AddM(0, null, null, null, newstate[this.AcceptedStates[i]]);
 
             if (this is StatePDA)
-                return new StatePDA($"Reverse({Name})", names, this.Alphabet, this.WorkAlphabet, pdat, 0, START, new uint[] { this.StatesCount });
+                return new StatePDA($"Reverse({Name})", names, this.Alphabet, this.WorkAlphabet, pdat, 0, this.StartSymbol, new uint[] { this.StatesCount });
             else if (this is StackPDA)
-                return new StackPDA($"Reverse({Name})", names, this.Alphabet, this.WorkAlphabet, pdat, 0, START);
+                return new StackPDA($"Reverse({Name})", names, this.Alphabet, this.WorkAlphabet, pdat, 0, this.StartSymbol);
             else
                 throw new System.NotImplementedException();
         }

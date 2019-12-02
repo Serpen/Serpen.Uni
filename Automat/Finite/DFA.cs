@@ -55,7 +55,11 @@ namespace Serpen.Uni.Automat.Finite {
             }
         } // end checkTransFormComplete
 
-        public DFA MinimizeTF() {
+        /// <summary>
+        /// Minimize DFA with TableFillingAlg
+        /// </summary>
+        /// <returns></returns>
+        public DFA Minimize() {
             var tfEqClasses = TableFillingAlgEqClasses(this); //half matrix TF
             var State2eqClass = new uint[this.StatesCount];
 
@@ -91,7 +95,7 @@ namespace Serpen.Uni.Automat.Finite {
 
 
         // Alle Wörter müssen in der gleichen Partition enden (akzeptiert, nicht akzeptiert)
-        [AlgorithmSource("1659_D29")]
+        [AlgorithmSource("1659_D2.9")]
         public bool StatesEqual(uint x, uint y) => StatesEqual(x, y, new List<uint>((int)StatesCount));
 
         bool StatesEqual(uint x, uint y, List<uint> processed) {

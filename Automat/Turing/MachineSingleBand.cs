@@ -162,7 +162,7 @@ namespace Serpen.Uni.Automat.Turing {
                         newT.Add(tk, tv);
                     }
 
-            return new TuringMachineSingleBand($"{Name}_purged", (uint)names.Length, Alphabet, BandAlphabet, newT, translate.ArrayIndex(StartState), BlankSymbol, aStates);
+            return new TuringMachineSingleBand($"{Name}_purged", (uint)names.Length, Alphabet, BandAlphabet, newT, translate.ArrayIndex(StartState), BlankSymbol, aStates) {DefaultAcceptance = this.DefaultAcceptance};
         }
     }
 }

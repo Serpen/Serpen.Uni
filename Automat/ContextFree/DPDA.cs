@@ -37,6 +37,14 @@ namespace Serpen.Uni.Automat.ContextFree {
             return new DPDA($"DPDA_({D.Name})", D.StatesCount + 1, D.Alphabet, new char[] { DPDA.START }, t, D.StartState, DPDA.START, new uint[] { D.StatesCount });
         }
 
+        public static explicit operator StatePDA(DPDA D) {
+            var t = new PDATransform();
+            foreach (var t2 in D.Transforms)
+                t.Add(t2.Key.q, t2.Key.ci, t2.Key.cw, t2.Value.cw2, t2.Value.qNext);
+
+            return new StatePDA($"QPDA_({D.Name})", D.StatesCount, D.Alphabet, D.WorkAlphabet, t, D.StartState, D.StartSymbol, D.AcceptedStates);
+        }
+
 
         protected override void CheckConstraints() {
             base.CheckConstraints();
@@ -158,7 +166,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             uint[] accState = RandomGenerator.RandomAcceptedStates(1, stateCount / 3, stateCount);
 
             for (uint i = 0; i < stateCount; i++) {
-                int transformsRnd = rnd.Next(0, inputAlphabet.Length);
+                int transformsRnd = rnd.Next(1, inputAlphabet.Length);
                 for (int j = 0; j < transformsRnd; j++) {
                     var tk = new PDATransformKey(i, inputAlphabet.RndElement(), workAlphabet.RndElement());
                     var tv = new PDATransformValue(workAlphabet.RndElement().ToString(), (uint)rnd.Next(0, stateCount));
@@ -178,34 +186,12 @@ namespace Serpen.Uni.Automat.ContextFree {
             foreach (var t2 in Transforms)
                 if (translate.Contains(t2.Key.q))
                     if (translate.Contains(t2.Value.qNext))
-                        newT.Add(translate.ArrayIndex(t2.Key.q), t2.Key.ci, t2.Key.cw, t2.Value.cw2, translate.ArrayIndex(t2.Value));
+                        newT.Add(translate.ArrayIndex(t2.Key.q), t2.Key.ci, t2.Key.cw, t2.Value.cw2, translate.ArrayIndex(t2.Value.qNext));
 
             return new DPDA($"{Name}_purged", (uint)names.Length, Alphabet, WorkAlphabet, newT, translate.ArrayIndex(StartState), StartSymbol, aStates);
         }
 
-        public virtual IAutomat Reverse() {
-            var pdat = new DPDATransform();
-
-            string[] names = new string[this.StatesCount + 1];
-
-            //array pointer old to new state            
-            uint[] newstate = new uint[this.StatesCount];
-            for (uint i = 0; i < newstate.Length; i++) {
-                newstate[i] = this.StatesCount - i;
-                names[i + 1] = (newstate[i] - 1).ToString();
-            }
-            names[0] = "new";
-
-            //turn and add each transform
-            foreach (var dt in this.Transforms.Reverse())
-                pdat.Add(newstate[dt.Value.qNext], dt.Key.ci, dt.Key.cw, dt.Value.cw2, newstate[dt.Key.q]);
-
-            //start state is qe, which leads to every old accepted state
-            for (int i = 0; i < this.AcceptedStates.Length; i++)
-                pdat.Add(0, null, null, null, newstate[this.AcceptedStates[i]]);
-
-            return new DPDA($"Reverse({Name})", names, this.Alphabet, this.WorkAlphabet, pdat, 0, START, new uint[] { this.StatesCount });
-        }
+        public virtual IAutomat Reverse() => ((StatePDA)this).Reverse();
 
         public override string ToString() => $"{Name} DPDA(|{States.Length}|={string.Join(";", States)}), {{{string.Join(',', Alphabet)}}},{{{string.Join(',', WorkAlphabet)}}}, {{{Transforms.ToString()}}}, {StartState}, {StartSymbol} {{{string.Join(',', AcceptedStates)}}})".Trim();
 
