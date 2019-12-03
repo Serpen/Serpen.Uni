@@ -12,7 +12,7 @@ namespace Serpen.Uni.Automat.Finite {
             CheckConstraints();
         }
 
-		protected FABase(string[] names, char[] alphabet, TransformBase<EATuple, uint[]> eat, uint startState, uint[] acceptedStates, string name = "")
+        protected FABase(string[] names, char[] alphabet, TransformBase<EATuple, uint[]> eat, uint startState, uint[] acceptedStates, string name = "")
         : base(names, alphabet, startState, name, acceptedStates) {
             this.Transforms = eat;
             CheckConstraints();
@@ -22,11 +22,11 @@ namespace Serpen.Uni.Automat.Finite {
             base.CheckConstraints();
             foreach (var t in Transforms) {
                 for (int i = 0; i < t.Value.Length; i++) {
-                    if (t.Key.q >= StatesCount)
+                    if (t.Key.q >= StatesCount) // q to high
                         throw new StateException(t.Key.q, this);
-                    else if (t.Value[i] >= StatesCount)
+                    if (t.Value[i] >= StatesCount) // qNext to high
                         throw new StateException(t.Value[i], this);
-                    else if (t.Key.c.HasValue && !Alphabet.Contains(t.Key.c.Value))
+                    if (t.Key.c.HasValue && !Alphabet.Contains(t.Key.c.Value)) // char not in alphabet
                         throw new AlphabetException(t.Key.c.Value, this);
                 }
             }
@@ -64,7 +64,7 @@ namespace Serpen.Uni.Automat.Finite {
             else if (this is NFA nfa)
                 return new NFA(this.Name + "_rev", this.States, this.Alphabet, (NFAeTransform)nfa.Transforms, this.StartState, accStates.ToArray());
             else if (this is NFAe nfae)
-                return new NFA(this.Name + "_rev", this.States, this.Alphabet, (NFAeTransform)nfae.Transforms, this.StartState, accStates.ToArray());
+                return new NFAe(this.Name + "_rev", this.States, this.Alphabet, (NFAeTransform)nfae.Transforms, this.StartState, accStates.ToArray());
             else
                 throw new System.NotSupportedException();
         }
@@ -122,7 +122,7 @@ namespace Serpen.Uni.Automat.Finite {
                 else
                     // Join, Union: states from A1 are normal accepted
                     accStates[i] = this.AcceptedStates[i] + offsetA1;
-                
+
             if (unionConcatJoinKind == JoinConcatUnionKind.Concat)
                 i = 0;
 
@@ -130,7 +130,7 @@ namespace Serpen.Uni.Automat.Finite {
             for (int j = 0; j < fa2.AcceptedStates.Length; j++)
                 accStates[i + j] = (fa2.AcceptedStates[j] + offsetA2);
 
-            
+
             return new NFAe($"NEAe{unionConcatJoinKind.ToString()}({Name}+{fa2.Name})", this.StatesCount + fa2.StatesCount + offsetA1, inputAlphabet, neaeT, startState, accStates);
         }
 
@@ -144,7 +144,7 @@ namespace Serpen.Uni.Automat.Finite {
         /// Reverse all transforms, add an qε which goes to all former q ϵ F,
         /// former q0 becomes the only ϵ F
         /// </summary>
-        [AlgorithmSource("EAFK_4.2.2","1659_T2.5_P47")]
+        [AlgorithmSource("EAFK_4.2.2", "1659_T2.5_P47")]
         public IAutomat Reverse() {
             var neaET = new NFAeTransform();
 
@@ -185,15 +185,15 @@ namespace Serpen.Uni.Automat.Finite {
                 neaET.Add(item.Key.q + 1, item.Key.c, qnext);
             }
 
-            var acceptedStates = new uint[this.AcceptedStates.Length+1];
+            var acceptedStates = new uint[this.AcceptedStates.Length + 1];
             acceptedStates[0] = 0;
             // add e-transform from org accepted to front state
             for (uint i = 0; i < this.AcceptedStates.Length; i++) {
-                acceptedStates[i+1] = this.AcceptedStates[i]+1; // a little redundant, because all accepted states must go back to first
+                acceptedStates[i + 1] = this.AcceptedStates[i] + 1; // a little redundant, because all accepted states must go back to first
                 neaET.Add(this.AcceptedStates[i] + 1, null, 0);
             }
 
-            return new NFAe($"NFAe_KleeneStern({Name})", this.StatesCount+1, this.Alphabet, neaET, 0, acceptedStates);
+            return new NFAe($"NFAe_KleeneStern({Name})", this.StatesCount + 1, this.Alphabet, neaET, 0, acceptedStates);
         }
 
         public abstract IAutomat HomomorphismChar(System.Collections.Generic.Dictionary<char, char> Translate);

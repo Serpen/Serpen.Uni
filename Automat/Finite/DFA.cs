@@ -29,66 +29,62 @@ namespace Serpen.Uni.Automat.Finite {
 
             uint q = StartState;
 
-            //process word through GoChar
+            // process word through GoChar
             for (int i = 0; i < w.Length; i++)
                 q = GoChar(q, w[i])[0];
 
             return IsAcceptedState(q);
-        } //end AcceptWord
+        } // end AcceptWord
 
         protected override void CheckConstraints() {
             base.CheckConstraints();
-            //basic length check
+            // basic length check
             if (Transforms.Count != StatesCount * Alphabet.Length)
                 throw new Automat.DeterministicException("Tranformation Count missmatch State*Alphabet", this);
 
-            //check every state, char
+            // check every state, char
             for (uint q = 0; q < StatesCount; q++)
                 foreach (char c in Alphabet)
                     if (!((DFATransform)Transforms).ContainsKey(q, c))
                         throw new Automat.DeterministicException($"q={q}, c={c} is missing", this);
 
             foreach (var t in Transforms) {
-                if (t.Key.q > StatesCount) //to high state
-                    throw new Automat.StateException(t.Key.q, this);
-                if (t.Value[0] > StatesCount) //to high state
-                    throw new Automat.StateException(t.Value[0], this);
-                if (!Alphabet.Contains(t.Key.c.Value)) //char not in alphabet
-                    throw new Automat.AlphabetException(t.Key.c.Value, this);
+                if (!t.Key.c.HasValue)
+                    throw new Automat.DeterministicException("e-Transform not allowed in DFA");
             }
-        } // end checkTransFormComplete
+        }
 
         /// <summary>
         /// Minimize DFA with TableFillingAlg
         /// </summary>
         /// <returns></returns>
         public DFA Minimize() {
-            var tfEqClasses = TableFillingAlgEqClasses(this); //half matrix TF
+            var tfEqClasses = TableFillingAlgEqClasses(this); // half matrix TF
             var State2eqClass = new uint[this.StatesCount];
 
-            //Fill state to eqClass matching
+            // Fill state to eqClass matching
             for (uint i = 0; i < tfEqClasses.Length; i++)
                 for (int j = 0; j < tfEqClasses[i].Length; j++)
                     State2eqClass[tfEqClasses[i][j]] = i;
 
-            //generate Transform, and modify to eqclasses
+            // generate Transform, and modify to eqclasses
             var deaT = new DFATransform();
             foreach (var item in Transforms) {
-                //q,qnext EqClass
+                // q,qnext EqClass
                 uint tSrcEqClass = State2eqClass[item.Key.q];
                 uint tDstEqClass = State2eqClass[item.Value[0]];
 
                 deaT.TryAdd(tSrcEqClass, item.Key.c.Value, tDstEqClass);
             }
 
-            //add eqClasses of accepted states 
+            // add eqClasses of accepted states 
             var acc = new List<uint>(AcceptedStates.Length);
             for (uint i = 0; i < AcceptedStates.Length; i++)
                 acc.Add(State2eqClass[AcceptedStates[i]]);
 
             acc.Sort();
 
-            //give each onging state its eqClass states[] as name 
+            // give each onging state its eqClass states[] as name 
             string[] names = new string[tfEqClasses.Length];
             for (uint i = 0; i < tfEqClasses.Length; i++)
                 names[i] = string.Join(',', tfEqClasses[i]);
@@ -105,28 +101,28 @@ namespace Serpen.Uni.Automat.Finite {
             if (!processed.Contains(x)) {
                 processed.Add(x);
 
-                //not in same Group, devider is e
+                // not in same Group, devider is e
                 if (IsAcceptedState(x) != IsAcceptedState(y)) return false;
 
-                //check for every char
+                // check for every char
                 foreach (char c in Alphabet) {
-                    //get Next States
+                    // get Next States
                     uint x_next = GoChar(x, c)[0];
                     uint y_next = GoChar(y, c)[0];
 
-                    //if this char is okay, other may not be
+                    // if this char is okay, other may not be
                     if (IsAcceptedState(x_next) != IsAcceptedState(y_next))
-                        //c is devider, ending
+                        // c is devider, ending
                         return false;
                     else {
-                        //go to next states for the word
+                        // go to next states for the word
                         bool r = StatesEqual(x_next, y_next, processed);
                         if (!r) return false;
                     }
                 }
             }
             return true;
-        } //end StatesEqual
+        } // end StatesEqual
 
         #region "Operations"
 
@@ -194,19 +190,19 @@ namespace Serpen.Uni.Automat.Finite {
 
             var deat = new DFATransform();
 
-            //iterate Cross D1xD2, chars
+            // iterate Cross D1xD2, chars
             for (uint i = 0; i < D1.StatesCount; i++) {
                 for (uint j = 0; j < D2.StatesCount; j++) {
-                    //index of state in matrix
+                    // index of state in matrix
                     uint index = (i * D2.StatesCount + j);
                     stateNames[index] = $"{i},{j}";
 
                     foreach (char c in newAlphabet) {
-                        //Transform exists, out qNext
+                        // Transform exists, out qNext
                         bool exist1 = ((DFATransform)D1.Transforms).TryGetValue(i, c, out uint qNext1);
                         bool exist2 = ((DFATransform)D2.Transforms).TryGetValue(j, c, out uint qNext2);
 
-                        //same calc logic for dstIndex in Matrix
+                        // same calc logic for dstIndex in Matrix
                         uint dstIndex;
                         if (exist1 & exist2)
                             dstIndex = (qNext1 * D2.StatesCount + qNext2);
@@ -217,22 +213,22 @@ namespace Serpen.Uni.Automat.Finite {
                         else
                             throw new ApplicationException();
 
-                        //add non existing tuple
+                        // add non existing tuple
                         if (!deat.ContainsKey(index, c)) // & exist1 & exist2)
                             deat.Add(index, c, dstIndex);
                         else
                             throw new ApplicationException();
 
                         if (mode == eProductDeaMode.Intersect) {
-                            //add to accStates if one dea state ist acc
+                            // add to accStates if one dea state ist acc
                             if (D1.IsAcceptedState(i) & D2.IsAcceptedState(j))
                                 accStates.Add(index);
                         } else if (mode == eProductDeaMode.Union) {
-                            //add to accStates if both dea state ist acc
+                            // add to accStates if both dea state ist acc
                             if (D1.IsAcceptedState(i) | D2.IsAcceptedState(j))
                                 accStates.Add(index);
                         } else if (mode == eProductDeaMode.Diff) {
-                            //add to accStates if both dea state ist acc
+                            // add to accStates if both dea state ist acc
                             if (D1.IsAcceptedState(i) & !D2.IsAcceptedState(j))
                                 accStates.Add(index);
                         }
@@ -307,7 +303,7 @@ namespace Serpen.Uni.Automat.Finite {
         public static explicit operator DFA(NFA N) => Nea2TeilmengenDea(N);
         public static explicit operator DFA(NFAe Ne) => Nea2TeilmengenDea(Ne);
 
-        [AlgorithmSource("EAFK-2.3.5", "EAFK-2.5.5","1659-D-2.8")]
+        [AlgorithmSource("EAFK-2.3.5", "EAFK-2.5.5", "1659-D-2.8")]
         public static Finite.DFA Nea2TeilmengenDea(Finite.INFA N) {
             var States = new List<uint[]>((int)N.StatesCount);
             var DeaStatesNames2Index = new Dictionary<string, uint>((int)N.StatesCount);
@@ -373,67 +369,83 @@ namespace Serpen.Uni.Automat.Finite {
         /// <summary>
         /// Returns the NOT minimal RegEx for a given DFA
         /// </summary>
-        /// <param name="D"></param>
-        /// <returns></returns>
         [AlgorithmSource("1659-S-2.11")]
-        public static string DEA2RegExp(Finite.DFA D) {
-            //represents R_ij^(k) From i to j, without State higher than k
-            string[,,] R = new string[D.States.Length, D.States.Length, D.States.Length + 1];
+        public string ToRegExp(bool tryTextOptimize = true) {
+            // represents R_ij^(k) From i to j, without State higher than k
+            string[,,] R = new string[this.States.Length, this.States.Length, this.States.Length + 1];
 
-            //first k! then i, j
+            // first k! then i, j
             for (uint k = 0; k < R.GetLength(2); k++) {
                 for (uint i = 0; i < R.GetLength(0); i++) {
                     for (uint j = 0; j < R.GetLength(0); j++) {
                         // k==0 calculates Transforms for direct contact
                         if (k == 0) {
                             var toAdd = new List<string>();
-                            if (i == j)  //from i to i, means ε 
+                            if (i == j)  // from i to i, means ε 
                                 toAdd.Add(Utils.EPSILON.ToString());
 
-                            //check if any char loops in this state
-                            foreach (char c in D.Alphabet) {
-                                if (((Finite.DFATransform)D.Transforms).TryGetValue(i, c, out uint qNext) & qNext == j)
+                            // check if any char loops in this state
+                            foreach (char c in this.Alphabet) {
+                                if (((Finite.DFATransform)this.Transforms).TryGetValue(i, c, out uint qNext) & qNext == j)
                                     toAdd.Add(c.ToString());
                             }
                             R[i, j, 0] = string.Join('+', toAdd);
                             if (R[i, j, 0] == Utils.EPSILON.ToString()) R[i, j, 0] = "";
 
                         } else {
-                            //R is now calculated by previous R^(k-1)
-                            //Rijk = Rijk+Rikk Rkkk* Rjkk
+                            // R is now calculated by previous R^(k-1)
+                            // Rijk = Rijk+Rikk Rkkk* Rjkk
                             var Rijk = R[i, j, k - 1];
                             var Rikk = R[i, k - 1, k - 1];
                             var Rkkk = R[k - 1, k - 1, k - 1];
                             var Rkjk = R[k - 1, j, k - 1];
 
-                            //try some magic to shorten formula
-                            if (Rikk == Rkkk | Rikk == $"({Rkkk})" | $"({Rikk}" == Rkkk)
-                                Rikk = string.Empty;
-                            if (Rkjk == Rkkk | Rkjk == $"({Rkkk})" | $"({Rkjk}" == Rkkk)
-                                Rkjk = string.Empty;
-                            if ($"{Rikk}{Rkkk}{Rkjk}" == Rijk)
-                                Rijk = "";
-                            if (Rijk != string.Empty) Rijk = $"({Rijk})+";
-                            if (Rikk != string.Empty) Rikk = $"({Rikk})";
-                            if (Rkjk != string.Empty) Rkjk = $"({Rkjk})";
-                            if (Rkkk != string.Empty) Rkkk = $"({Rkkk})*";
+                            if (tryTextOptimize) {
+                                // try some magic to shorten formula
+                                if (Rikk == Rkkk)
+                                    Rikk = string.Empty;
 
-                            R[i, j, k] = $"{Rijk}{Rikk}{Rkkk}{Rkjk}";
+                                OptimizeRegEx(ref Rijk);
+                                OptimizeRegEx(ref Rikk);
+                                OptimizeRegEx(ref Rkkk);
+                                OptimizeRegEx(ref Rkjk);
+                            }
 
-                            if (R[i, j, k] == "()*") R[i, j, k] = string.Empty;
 
-                            //try some magic to shorten formula with regex
-                            R[i, j, k] = RegExText.Replace(R[i, j, k], @"\((\w)\)", "$1");
-                            R[i, j, k] = RegExText.Replace(R[i, j, k], @"\((\w)\*\)", "$1*");
-                            //R[i,j,k] = RegExText.Replace(R[i,j,k],@"\(ε\+(\w)\)\*","$1*");
+                            R[i, j, k] = $"({Rijk})+({Rikk})({Rkkk})*({Rkjk})";
+
+                            if (tryTextOptimize) {
+                                OptimizeRegEx(ref R[i, j, k]);
+                            }
 
                         }
-                    } //next j
-                } //next i
-            } //next k
+                    } // next j
+                } // next i
+            } // next k
 
-            return R[D.StartState, D.AcceptedStates[0], R.GetLength(2) - 1];
-        } //end function
+            var sb = new System.Text.StringBuilder();
+            foreach (uint acs in AcceptedStates)
+                sb.Append(R[this.StartState, acs, R.GetLength(2) - 1] + "+");
+            sb = sb.Remove(sb.Length - 1, 1);
+            return sb.ToString();
+        } // end function
+
+        void OptimizeRegEx(ref string input) {
+            string output = input;
+            output = RegExText.Replace(output, @"\(\)[+*]?", ""); // empty ()
+            output = RegExText.Replace(output, @"\((\w\*?)\)", "$1"); // (w) single char (with *) in ()
+            output = RegExText.Replace(output, @"\(ε\+(\w)\)\*", "$1*"); // (e+w)* -> w*
+
+            output = RegExText.Replace(output, @"(\w)\*\(ε\+\1\)", "$1*"); // (e+w)* -> w*
+            output = RegExText.Replace(output, @"\(ε\+(\w)\)\+\1\*", "$1*"); // (e+w)* -> w*
+            output = RegExText.Replace(output, @"(\(\w\+\w\))\+(\w\*)\1", "$2$1"); // (e+w)* -> w*
+            output = RegExText.Replace(output, @"(\w)\+(\1\w\*)", "$2"); // (e+w)* -> w*
+
+            output = output.Trim('+');
+            if (input != output)
+                Utils.DebugMessage($"{input}->{output}", null, Uni.Utils.eDebugLogLevel.Verbose);
+            input = output;
+        }
 
         #endregion
 
@@ -481,7 +493,7 @@ namespace Serpen.Uni.Automat.Finite {
             } while (found);
 
             return t;
-        } //end function TableFillingAlg
+        } // end function TableFillingAlg
 
         /// <summary>
         /// Table Filling Algorithm EQ Classes
@@ -516,7 +528,7 @@ namespace Serpen.Uni.Automat.Finite {
             eqClasses.Sort((first, second) => first[0].CompareTo(second[0]));
 
             return eqClasses.ToArray();
-        } //end function TableFillingAlgEqClasses
+        } // end function TableFillingAlgEqClasses
 
     } // end class
-} //end ns
+} // end ns

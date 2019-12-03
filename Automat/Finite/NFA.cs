@@ -13,6 +13,16 @@ namespace Serpen.Uni.Automat.Finite {
             : base(states, Alphabet, Transform, StartState, acceptedStates, name) {
         }
 
+        protected override void CheckConstraints() {
+            base.CheckConstraints();
+            // basic length check
+            
+            foreach (var t in Transforms) {
+                if (!t.Key.c.HasValue)
+                    throw new Automat.DeterministicException("e-Transform not allowed in NFA");
+            }
+        }
+
         uint[] INFA.GoChar(uint[] q, char w) => GoChar(q, w);
         internal uint[] GoChar(uint[] q, char w) {
             var retQ = new List<uint>();
@@ -70,7 +80,7 @@ namespace Serpen.Uni.Automat.Finite {
                 if (translate.Contains(t2.Key.q))
                     foreach (var v in t2.Value)
                         if (translate.Contains(v))
-                            newT.AddM(translate.ArrayIndex(t2.Key.q), t2.Key.c.Value, translate.ArrayIndex(v));
+                            newT.AddM(translate.ArrayIndex(t2.Key.q), t2.Key.c, translate.ArrayIndex(v));
 
             return new NFA($"{Name}_purged", names, Alphabet, newT, translate.ArrayIndex(StartState), aStates);
 
