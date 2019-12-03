@@ -245,8 +245,11 @@ namespace Serpen.Uni.Automat {
             foreach (var a1 in automats)
                 foreach (var a2 in automats)
                     if (a1.GetType() == a2.GetType())
-                        if (!(a1 is DFA) || a1.SameAlphabet(a2))
-                            ret.Add(a1.Join(a2));
+                        if (!(a1 is DFA) || a1.SameAlphabet(a2)) {
+                            try {
+                                ret.Add(a1.Join(a2));
+                            } catch (System.NotImplementedException) { } catch (System.NotSupportedException) { } // because of SPDA
+                        }
 
             return ret.ToArray();
         }
@@ -276,7 +279,7 @@ namespace Serpen.Uni.Automat {
                         if (a1.SameAlphabet(a2))
                             try {
                                 ret.Add(a1.Union(a2));
-                            } catch (System.NotImplementedException) { }
+                            } catch (System.NotImplementedException) { } catch (System.NotSupportedException) { }
 
 
             return ret.ToArray();
@@ -367,7 +370,7 @@ namespace Serpen.Uni.Automat {
 
                         if (erg1) onceTrue++;
                         else onceFalse++;
-                        
+
                         if (erg1 != erg2)
                             throw new Automat.Exception($"{count}. word '{w}' divides Automates", A1, A2);
 
@@ -397,7 +400,7 @@ namespace Serpen.Uni.Automat {
             var words = automat.GetRandomWords(count, 0, Serpen.Uni.Utils.Sqrt(count), System.Array.Empty<string>());
 
             foreach (string w in words)
-                if (automat.AcceptWord(w1 + w) != automat.AcceptWord(w2+w)) {
+                if (automat.AcceptWord(w1 + w) != automat.AcceptWord(w2 + w)) {
                     Utils.DebugMessage($"word {w} divides {w1},{w2}", automat, Uni.Utils.eDebugLogLevel.Verbose);
                     return false;
                 }

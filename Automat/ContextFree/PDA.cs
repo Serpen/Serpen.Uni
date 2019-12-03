@@ -186,6 +186,8 @@ namespace Serpen.Uni.Automat.ContextFree {
                 throw new System.NotSupportedException();
             if (kind != JoinConcatUnionKind.Join && !(automat is StatePDA))
                 throw new System.NotSupportedException();
+            if (this is StackPDA || automat is StackPDA)
+                throw new System.NotImplementedException();
             // TODO: investigate more, State PDA is perfect Stack PDA seems complicated
 
             // TODO: what if A1 or A2 has a StackStartsymbol set, should it be transformed
