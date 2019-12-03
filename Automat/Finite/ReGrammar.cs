@@ -66,6 +66,14 @@ namespace Serpen.Uni.Automat {
 
         }
 
+        public Dictionary<string,string[]> FindMNEqClasses(int count = 100) {
+            var rndwords = GetRandomWords(count,0, Serpen.Uni.Utils.Sqrt(count), System.Array.Empty<string>());
+
+            return Serpen.Uni.Utils.EqualityClasses(rndwords, 
+                (s1,s2) => Tests.InMyhillNerodeRelation(s1, s2, this, count));
+        }
+
+
         protected readonly List<char> VarAndTerm;
 
         protected virtual void CheckConstraints() {

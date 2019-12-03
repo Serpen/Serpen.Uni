@@ -56,27 +56,31 @@ namespace Serpen.Uni {
             return array;
         }
 
-        internal static Dictionary<T, List<T>> EqualityClasses<T>(T[] array, System.Func<T, T, bool> comparer) {
+        internal static Dictionary<T, T[]> EqualityClasses<T>(T[] array, System.Func<T, T, bool> comparer) {
 
-            var ret = new Dictionary<T, List<T>>(array.Length) {
+            var ret2 = new Dictionary<T, List<T>>(array.Length) {
                 { array[0], new List<T>(new T[] { array[0] }) }
             };
 
             for (int i = 1; i < array.Length; i++) {
                 int eqIndex = -1;
-                for (int j = 0; j < ret.Keys.Count; j++) {
-                    if (comparer(array[i], ret.Keys.ElementAt(j))) {
+                for (int j = 0; j < ret2.Keys.Count; j++) {
+                    if (comparer(array[i], ret2.Keys.ElementAt(j))) {
                         eqIndex = j;
                         break;
                     }
                 }
 
                 if (eqIndex != -1) {
-                    ret.ElementAt(eqIndex).Value.Add(array[i]);
+                    ret2.ElementAt(eqIndex).Value.Add(array[i]);
                 } else {
-                    ret.Add(array[i], new List<T>(new T[] { array[i] }));
+                    ret2.Add(array[i], new List<T>(new T[] { array[i] }));
                 }
             }
+
+            var ret = new Dictionary<T,T[]>();
+            foreach (var item in ret2)
+                ret.Add(item.Key, item.Value.ToArray());
 
             return ret;
 

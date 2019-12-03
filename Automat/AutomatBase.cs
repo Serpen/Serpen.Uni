@@ -10,6 +10,8 @@ namespace Serpen.Uni.Automat {
         string[] GetRandomWords(int count, int minLen, int maxLen, string[] blocked);
         char[] Alphabet { get; }
 
+        Dictionary<string,string[]> FindMNEqClasses(int count = 100);
+
         // System.Func<string,bool> SimplifiedAcceptFunction {get; internal set;}
         //protected void CheckConstraints();
     }
@@ -110,11 +112,11 @@ namespace Serpen.Uni.Automat {
             return fromStartReachable;
         }
 
-        public Dictionary<string,List<string>> FindMNEqClasses() {
-            var rndwords = GetRandomWords(100,0, 10, System.Array.Empty<string>());
+        public Dictionary<string,string[]> FindMNEqClasses(int count = 100) {
+            var rndwords = GetRandomWords(count,0, Serpen.Uni.Utils.Sqrt(count), System.Array.Empty<string>());
 
             return Serpen.Uni.Utils.EqualityClasses(rndwords, 
-                (s1,s2) => Tests.InMyhillNerodeRelation(s1, s2, this));
+                (s1,s2) => Tests.InMyhillNerodeRelation(s1, s2, this, count));
         }
 
         protected (uint[], string[], uint[]) RemovedStateTranslateTables() {
