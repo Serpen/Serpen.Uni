@@ -36,6 +36,29 @@ namespace Serpen.Uni.Automat {
                     }
                 };
             }
+        
+        }
+        public static DFA DEA_SameCountAandB {
+            get {
+                var deaT = new DFATransform() {
+                    {0,'a',1},
+                    {0,'b',2},
+                    {1,'a',0},
+                    {1,'b',3},
+                    {2,'a',3},
+                    {2,'b',0},
+                    {3,'a',2},
+                    {3,'b',1},
+                };
+
+                return new DFA(nameof(DEA_SameCountAandB), 4, new char[] {'a','b'}, deaT, 0, 0) {
+                    SimplyfiedAcceptFunction = delegate (string s) {
+                        int c1 = s.Count((c) => c == 'a');
+                        int c0 = s.Count((c) => c == 'b');
+                        return c0 == c1;
+                    }
+                };
+            }
         }
 
         [AcceptedWordSamples("1001", "111010")]
@@ -221,7 +244,7 @@ namespace Serpen.Uni.Automat {
         }
 
         public static DFA DEA_1659_A228_T22_g_ {
-            get => Converter.Nea2TeilmengenDea(NEAe_1659_T22_A212_N3);
+            get => DFA.Nea2TeilmengenDea(NEAe_1659_T22_A212_N3);
         }
         public static DFA DEA_1659_A228_T22 {
             get {
@@ -392,7 +415,7 @@ namespace Serpen.Uni.Automat {
         }
         public static DFA DEA_1659_A210_PotAut {
             get {
-                var ret = Converter.Nea2TeilmengenDea(NEAe_1659_A27_N1);
+                var ret = DFA.Nea2TeilmengenDea(NEAe_1659_A27_N1);
                 ret.SimplyfiedAcceptFunction = w => System.Text.RegularExpressions.Regex.Match(w, @"0.*1").Success;
                 return ret;
             }

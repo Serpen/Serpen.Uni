@@ -188,13 +188,13 @@ namespace Serpen.Uni.Automat.Finite {
             if (obj1 is DFA)
                 dobj = obj1 as DFA;
             else if (obj1 is NFA)
-                dobj = Converter.Nea2TeilmengenDea(obj1 as NFA);
+                dobj = DFA.Nea2TeilmengenDea(obj1 as NFA);
             else if (obj1 is NFAe)
-                dobj = Converter.Nea2TeilmengenDea(obj1 as NFAe);
+                dobj = DFA.Nea2TeilmengenDea(obj1 as NFAe);
             else
                 return false;
 
-            DFA thisobj = Converter.Nea2TeilmengenDea(this);
+            DFA thisobj = DFA.Nea2TeilmengenDea(this);
             return thisobj.Equals(dobj);
         }
 

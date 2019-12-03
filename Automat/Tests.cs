@@ -77,7 +77,7 @@ namespace Serpen.Uni.Automat {
                 } else if (automat is NFA N) {
                     ret1Automat.Add(N);
 
-                    DFA DfromN = Converter.Nea2TeilmengenDea(N);
+                    DFA DfromN = DFA.Nea2TeilmengenDea(N);
                     ret1Automat.Add(DfromN);
 
                     NFAe NEfromD = (NFAe)DfromN;
@@ -103,7 +103,7 @@ namespace Serpen.Uni.Automat {
                 } else if (automat is NFAe Ne) {
                     ret1Automat.Add(Ne);
 
-                    DFA DfromNe = Converter.Nea2TeilmengenDea(Ne);
+                    DFA DfromNe = DFA.Nea2TeilmengenDea(Ne);
                     ret1Automat.Add(DfromNe);
 
                     // NFA NfromD = (NFAe)DfromNe;

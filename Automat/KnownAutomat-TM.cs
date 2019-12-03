@@ -58,7 +58,7 @@ namespace Serpen.Uni.Automat {
             }
         }
 
-        [AcceptedWordSamples("00")]
+        [AcceptedWordSamples("0","0000")]
         public static TuringMachineSingleBand1659 TM_1659_A414_M1 {
             get {
                 const uint qA = 1;

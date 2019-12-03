@@ -44,6 +44,8 @@ namespace Serpen.Uni.Automat {
                 return new DPDA(nameof(DPDA_EAFK_A611_wcwr_Palindrom), 3, new char[] { '0', '1', 'c' }, new char[] { '0', '1', DPDA.START }, pdadT, 0, DPDA.START, new uint[] { 2 });
             }
         }
+
+        [AcceptedWordSamples("10")]
         public static StackPDA SPDA_simple_10 {
             get {
                 var pdaT = new PDATransform {
@@ -92,6 +94,7 @@ namespace Serpen.Uni.Automat {
             }
         }
 
+        [AcceptedWordSamples("10")]
         public static StatePDA QPDA_simple_10 {
             get {
                 var pdaT = new PDATransform {
