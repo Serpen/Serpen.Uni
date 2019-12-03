@@ -5,6 +5,18 @@ using Serpen.Uni.Automat.Finite;
 namespace Serpen.Uni.Automat {
     public static partial class KnownAutomat {
 
+        public static DFA DEA_Simple_01 {
+            get {
+                var deaT = new DFATransform {
+                    {0, '0', 0},
+                    {0, '1', 1},
+                    {1, '0', 1},
+                    {1, '1', 1},
+                };
+                return new DFA(nameof(DEA_Simple_01), 2, binAlp, deaT, 0, 1);
+            }
+        }
+
         [AcceptedWordSamples("01111", "1001")]
         public static DFA DEA_StartOrEndsWith01 {
             get {

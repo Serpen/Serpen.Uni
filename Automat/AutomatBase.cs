@@ -10,7 +10,7 @@ namespace Serpen.Uni.Automat {
         string[] GetRandomWords(int count, int minLen, int maxLen, string[] blocked);
         char[] Alphabet { get; }
 
-        Dictionary<string,string[]> FindMNEqClasses(int count = 100);
+        Dictionary<string, string[]> FindMNEqClasses(int count = 100);
 
         // System.Func<string,bool> SimplifiedAcceptFunction {get; internal set;}
         //protected void CheckConstraints();
@@ -44,7 +44,7 @@ namespace Serpen.Uni.Automat {
         [System.NonSerialized()]
         internal System.Func<string, bool> SimplyfiedAcceptFunction;
 
-        protected AutomatBase(uint stateCount, char[] alphabet, uint startState, string name, uint[] acceptedStates) {
+        protected AutomatBase(string name, uint stateCount, char[] alphabet, uint startState, uint[] acceptedStates) {
             var sortAlp = alphabet.ToList();
             sortAlp.Sort();
             this.Alphabet = sortAlp.ToArray();
@@ -60,8 +60,8 @@ namespace Serpen.Uni.Automat {
 
         }
 
-        public AutomatBase(string[] states, char[] alphabet, uint startState, string name, uint[] acceptedStates)
-            : this((uint)states.Length, alphabet, startState, name, acceptedStates) {
+        public AutomatBase(string name, string[] states, char[] alphabet, uint startState, uint[] acceptedStates)
+            : this(name, (uint)states.Length, alphabet, startState, acceptedStates) {
             States = states;
         }
         protected virtual void CheckConstraints() {
@@ -112,11 +112,11 @@ namespace Serpen.Uni.Automat {
             return fromStartReachable;
         }
 
-        public Dictionary<string,string[]> FindMNEqClasses(int count = 100) {
-            var rndwords = GetRandomWords(count,0, Serpen.Uni.Utils.Sqrt(count), System.Array.Empty<string>());
+        public Dictionary<string, string[]> FindMNEqClasses(int count = 100) {
+            var rndwords = GetRandomWords(count, 0, Serpen.Uni.Utils.Sqrt(count), System.Array.Empty<string>());
 
-            return Serpen.Uni.Utils.EqualityClasses(rndwords, 
-                (s1,s2) => Tests.InMyhillNerodeRelation(s1, s2, this, count));
+            return Serpen.Uni.Utils.EqualityClasses(rndwords,
+                (s1, s2) => Tests.InMyhillNerodeRelation(s1, s2, this, count));
         }
 
         protected (uint[], string[], uint[]) RemovedStateTranslateTables() {
@@ -167,39 +167,39 @@ namespace Serpen.Uni.Automat {
 
         public abstract override string ToString();
 
-		public string[] GetRandomWords(int count, int minLen, int maxLen, string[] blocked) {
-			var words = new List<string>();
-			var rnd = Uni.Utils.RND;
+        public string[] GetRandomWords(int count, int minLen, int maxLen, string[] blocked) {
+            var words = new List<string>();
+            var rnd = Uni.Utils.RND;
 
-			int i = 0;
+            int i = 0;
 
-            if (minLen==0 && !blocked.Contains(""))
+            if (minLen == 0 && !blocked.Contains(""))
                 words.Add("");
 
-			// count shouldn't be higher than words available with maxLen
-			count = System.Math.Min(count, Alphabet.Length * maxLen * maxLen);
+            // count shouldn't be higher than words available with maxLen
+            count = System.Math.Min(count, Alphabet.Length * maxLen * maxLen);
 
-			while (words.Count < count) {
-				string w = "";
-				var wLen = rnd.Next(minLen, maxLen);
-				for (int k = 0; k < wLen; k++)
-					w = w.Insert(k, Alphabet[rnd.Next(0, Alphabet.Length)].ToString());
+            while (words.Count < count) {
+                string w = "";
+                var wLen = rnd.Next(minLen, maxLen);
+                for (int k = 0; k < wLen; k++)
+                    w = w.Insert(k, Alphabet[rnd.Next(0, Alphabet.Length)].ToString());
 
-				if (!words.Contains(w) && !blocked.Contains(w))
-					words.Add(w);
+                if (!words.Contains(w) && !blocked.Contains(w))
+                    words.Add(w);
 
-				if (i > count * 10) {
-					Utils.DebugMessage($"Unable to get enough random words {i} tries>{words.Count}>{count}", this, Uni.Utils.eDebugLogLevel.Verbose);
-					break;
-				}
-				i++;
-			}
+                if (i > count * 10) {
+                    Utils.DebugMessage($"Unable to get enough random words {i} tries>{words.Count}>{count}", this, Uni.Utils.eDebugLogLevel.Verbose);
+                    break;
+                }
+                i++;
+            }
 
-			words.Sort(delegate (string s1, string s2) {
-				if (s1.Length < s2.Length) return -1;
-				else if (s1.Length > s2.Length) return 1;
-				else return s1.CompareTo(s2);
-			});
+            words.Sort(delegate (string s1, string s2) {
+                if (s1.Length < s2.Length) return -1;
+                else if (s1.Length > s2.Length) return 1;
+                else return s1.CompareTo(s2);
+            });
 
             return words.ToArray();
         }
@@ -210,6 +210,6 @@ namespace Serpen.Uni.Automat.Finite {
     public interface INFA : IAutomat, IAlleAbgeschlossenheitseigenschaften {
         uint[] GoChar(uint[] q, char w);
 
-        TransformBase<EATuple, uint[]> Transforms {get;}
+        TransformBase<EATuple, uint[]> Transforms { get; }
     }
 }

@@ -10,11 +10,11 @@ namespace Serpen.Uni.Automat.Finite {
         public static readonly FABase Empty = new NFAe("Empty", 1, Array.Empty<char>(), new NFAeTransform(), 0, Array.Empty<uint>());
 
         public NFAe(string name, uint stateCount, char[] Alphabet, NFAeTransform transform, uint startState, params uint[] acceptedStates)
-            : base(stateCount, Alphabet, transform, startState, acceptedStates, name) {
+            : base(name, stateCount, Alphabet, transform, startState, acceptedStates) {
         }
 
         public NFAe(string name, string[] states, char[] alphabet, NFAeTransform transform, uint startState, params uint[] acceptedStates)
-            : base(states, alphabet, transform, startState, acceptedStates, name) {
+            : base(name, states, alphabet, transform, startState, acceptedStates) {
         }
 
         #region "Conversions"
@@ -177,7 +177,7 @@ namespace Serpen.Uni.Automat.Finite {
 
             return new NFAe($"NFAe_HomomorphismChar({Name})", this.StatesCount, Alp, neat, this.StartState, this.AcceptedStates);
         }
-        
+
         public override IAutomat Intersect(IIntersect A) => throw new System.NotImplementedException();
         public override IAutomat Diff(IDiff A) => throw new System.NotImplementedException();
 

@@ -9,11 +9,11 @@ namespace Serpen.Uni.Automat.Finite {
     public class DFA : FABase, IAlleAbgeschlossenheitseigenschaften { // IAbgeschlossenheitseigenschaften<FABase, NFAe> {
 
         public DFA(string name, uint stateCount, char[] alphabet, DFATransform transform, uint startState, params uint[] acceptedStates)
-            : base(stateCount, alphabet, transform, startState, acceptedStates, name) {
+            : base(name, stateCount, alphabet, transform, startState, acceptedStates) {
         }
 
         public DFA(string name, string[] states, char[] alphabet, DFATransform transform, uint startState, params uint[] acceptedStates)
-            : base(states, alphabet, transform, startState, acceptedStates, name) {
+            : base(name, states, alphabet, transform, startState, acceptedStates) {
         }
 
         protected uint[] GoChar(EATuple eat) => GoChar(eat.q, eat.c.Value);

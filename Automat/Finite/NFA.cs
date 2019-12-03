@@ -7,10 +7,10 @@ namespace Serpen.Uni.Automat.Finite {
     public class NFA : FABase, INFA {
 
         public NFA(string name, uint StateCount, char[] Alphabet, NFAeTransform Transform, uint StartState, params uint[] acceptedStates)
-            : base(StateCount, Alphabet, Transform, StartState, acceptedStates, name) {
+            : base(name, StateCount, Alphabet, Transform, StartState, acceptedStates) {
         }
         public NFA(string name, string[] states, char[] Alphabet, NFAeTransform Transform, uint StartState, params uint[] acceptedStates)
-            : base(states, Alphabet, Transform, StartState, acceptedStates, name) {
+            : base(name, states, Alphabet, Transform, StartState, acceptedStates) {
         }
 
         protected override void CheckConstraints() {

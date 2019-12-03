@@ -33,7 +33,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         /// <param name="startStackSymbol"></param>
         /// <param name="acceptedStates">Accepted Endstates</param>
         protected PDA(string name, uint statesCount, char[] inputAlphabet, char[] workalphabet, PDATransform transform, uint startState, char? startStackSymbol, uint[] acceptedStates)
-        : base(statesCount, inputAlphabet, startState, name, acceptedStates) {
+        : base(name, statesCount, inputAlphabet, startState, acceptedStates) {
             this.WorkAlphabet = workalphabet;
             if (startStackSymbol.HasValue && !workalphabet.Contains(startStackSymbol.Value))
                 this.WorkAlphabet = this.WorkAlphabet.Append(startStackSymbol.Value).ToArray();
@@ -44,7 +44,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
         public PDA(string name, string[] states, char[] inputAlphabet, char[] workalphabet, PDATransform transform, uint startState, char? startStackSymbol, uint[] acceptedStates)
-        : base(states, inputAlphabet, startState, name, acceptedStates) {
+        : base(name, states, inputAlphabet, startState, acceptedStates) {
             this.WorkAlphabet = workalphabet;
             if (startStackSymbol.HasValue && !workalphabet.Contains(startStackSymbol.Value))
                 this.WorkAlphabet = this.WorkAlphabet.Append(startStackSymbol.Value).ToArray();
@@ -192,7 +192,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             // TODO: what if A1 or A2 has a StackStartsymbol set, should it be transformed
             // to a transform or applied
-            
+
             uint offsetA1 = 0; // first state of A2
             uint offsetA2 = this.StatesCount; // first state of A2
             if (kind == JoinConcatUnionKind.Union) {
@@ -242,7 +242,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                 else
                     // Join, Union: states from A1 are normal accepted
                     accStates[i] = this.AcceptedStates[i] + offsetA1;
-                
+
             if (kind == JoinConcatUnionKind.Concat)
                 i = 0;
 

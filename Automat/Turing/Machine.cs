@@ -2,10 +2,9 @@ using System.Linq;
 
 namespace Serpen.Uni.Automat.Turing {
 
-    interface ITuringMachine : IAutomat
-    {
-        char[] BandAlphabet {get;}
-        char BlankSymbol {get;}
+    interface ITuringMachine : IAutomat {
+        char[] BandAlphabet { get; }
+        char BlankSymbol { get; }
     }
 
     [System.Serializable]
@@ -13,17 +12,17 @@ namespace Serpen.Uni.Automat.Turing {
 
         public const char BLANK = '_';
 
-		protected const int MAX_TURING_RUNS = 10000;
-		public char[] BandAlphabet {get;}
-        public char BlankSymbol {get;}
+        protected const int MAX_TURING_RUNS = 10000;
+        public char[] BandAlphabet { get; }
+        public char BlankSymbol { get; }
 
         public TuringMachineBase(string name, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, uint startState, char blankSymbol, uint[] acceptedStates)
-            : base(stateCount, inputAlphabet, startState, name, acceptedStates) {
+            : base(name, stateCount, inputAlphabet, startState, acceptedStates) {
             BandAlphabet = bandAlphabet;
             BlankSymbol = blankSymbol;
         }
         public TuringMachineBase(string name, string[] states, char[] inputAlphabet, char[] bandAlphabet, uint startState, char blankSymbol, uint[] acceptedStates)
-            : base(states, inputAlphabet, startState, name, acceptedStates) {
+            : base(name, states, inputAlphabet, startState, acceptedStates) {
             BandAlphabet = bandAlphabet;
             BlankSymbol = blankSymbol;
         }
@@ -36,7 +35,7 @@ namespace Serpen.Uni.Automat.Turing {
                 throw new Automat.AlphabetException(BlankSymbol, this);
         }
 
-        
+
 
         public abstract string GetBandOutput(string w);
 

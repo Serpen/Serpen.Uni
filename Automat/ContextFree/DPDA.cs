@@ -9,7 +9,7 @@ namespace Serpen.Uni.Automat.ContextFree {
     [System.Serializable]
     public class DPDA : AutomatBase<PDATransformKey, PDATransformValue>, IPDA {
         public DPDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, DPDATransform Transform, uint StartState, char? Startsymbol, uint[] acceptedStates)
-        : base(StatesCount, InputAlphabet, StartState, name, acceptedStates) {
+        : base(name, StatesCount, InputAlphabet, StartState, acceptedStates) {
             this.WorkAlphabet = Workalphabet;
             this.Transforms = Transform;
             this.StartSymbol = Startsymbol;
@@ -18,7 +18,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
         public DPDA(string name, string[] names, char[] InputAlphabet, char[] Workalphabet, DPDATransform Transform, uint StartState, char? Startsymbol, uint[] acceptedStates)
-        : base(names, InputAlphabet, StartState, name, acceptedStates) {
+        : base(name, names, InputAlphabet, StartState, acceptedStates) {
             this.WorkAlphabet = Workalphabet;
             this.Transforms = Transform;
             this.StartSymbol = Startsymbol;
@@ -180,7 +180,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
         public override IAutomat PurgeStates() {
-			(uint[] translate, string[] names, uint[] aStates) = base.RemovedStateTranslateTables();
+            (uint[] translate, string[] names, uint[] aStates) = base.RemovedStateTranslateTables();
 
             var newT = new DPDATransform();
             foreach (var t2 in Transforms)
