@@ -20,6 +20,16 @@ namespace Serpen.Uni.Automat.Finite {
 
         protected override void CheckConstraints() {
             base.CheckConstraints();
+            foreach (var t in Transforms) {
+                for (int i = 0; i < t.Value.Length; i++) {
+                    if (t.Key.q >= StatesCount)
+                        throw new StateException(t.Key.q, this);
+                    else if (t.Value[i] >= StatesCount)
+                        throw new StateException(t.Value[i], this);
+                    else if (t.Key.c.HasValue && !Alphabet.Contains(t.Key.c.Value))
+                        throw new AlphabetException(t.Key.c.Value, this);
+                }
+            }
         }
 
         protected abstract uint[] GoChar(uint q, char c); //maybe return only uint
@@ -38,18 +48,28 @@ namespace Serpen.Uni.Automat.Finite {
             return tcol.ToArray();
         }
 
+        [AlgorithmSource("1659_T2.5_P47")]
         public IAutomat Complement() {
-            var Dc = this.MemberwiseClone() as FABase;
+            // var Dc = this.MemberwiseClone() as FABase;
             var accStates = new List<uint>((int)StatesCount - AcceptedStates.Length);
 
             for (uint i = 0; i < this.States.Length; i++)
                 if (!this.IsAcceptedState(i))
                     accStates.Add(i);
 
-            Dc.AcceptedStates = accStates.ToArray();
-            return Dc;
+            // Dc.AcceptedStates = accStates.ToArray();
+            // return Dc;
+            if (this is DFA dfa)
+                return new DFA(this.Name + "_rev", this.States, this.Alphabet, (DFATransform)dfa.Transforms, this.StartState, accStates.ToArray());
+            else if (this is NFA nfa)
+                return new NFA(this.Name + "_rev", this.States, this.Alphabet, (NFAeTransform)nfa.Transforms, this.StartState, accStates.ToArray());
+            else if (this is NFAe nfae)
+                return new NFA(this.Name + "_rev", this.States, this.Alphabet, (NFAeTransform)nfae.Transforms, this.StartState, accStates.ToArray());
+            else
+                throw new System.NotSupportedException();
         }
 
+        [AlgorithmSource("1659_S2.9")]
         IAutomat JoinConcatUnion(IAutomat automat, JoinConcatUnionKind unionConcatJoinKind) {
             if (!(automat is FABase fa2))
                 throw new System.NotSupportedException();
@@ -124,7 +144,7 @@ namespace Serpen.Uni.Automat.Finite {
         /// Reverse all transforms, add an qε which goes to all former q ϵ F,
         /// former q0 becomes the only ϵ F
         /// </summary>
-        [AlgorithmSource("EAFK_4.2.2")]
+        [AlgorithmSource("EAFK_4.2.2","1659_T2.5_P47")]
         public IAutomat Reverse() {
             var neaET = new NFAeTransform();
 
@@ -150,6 +170,7 @@ namespace Serpen.Uni.Automat.Finite {
             return new NFAe($"NFAe_Reverse({Name})", names, this.Alphabet, neaET, 0, this.StatesCount);
         }
 
+        [AlgorithmSource("1659_S2.9_P45")]
         public IAutomat KleeneStern() {
             var neaET = new NFAeTransform
             {

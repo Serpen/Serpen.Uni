@@ -36,7 +36,7 @@ namespace Serpen.Uni.Automat {
 
     [System.Serializable]
     public class StateException : Exception {
-        public StateException(uint q, params IAutomat[] automats) : this(q, $"{q} not in States", automats) { }
+        public StateException(uint q, params IAutomat[] automats) : this(q, "not in States", automats) { }
         public StateException(uint q, string msg, params IAutomat[] automats) : base($"{q} {msg}", automats) {
             State = q;
             Uni.Utils.DebugMessage(msg, Uni.Utils.eDebugLogLevel.Always);

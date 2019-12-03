@@ -48,8 +48,10 @@ namespace Serpen.Uni.Automat.Finite {
                         throw new Automat.DeterministicException($"q={q}, c={c} is missing", this);
 
             foreach (var t in Transforms) {
-                if (t.Key.q > StatesCount | t.Value[0] > StatesCount) //to high state
+                if (t.Key.q > StatesCount) //to high state
                     throw new Automat.StateException(t.Key.q, this);
+                if (t.Value[0] > StatesCount) //to high state
+                    throw new Automat.StateException(t.Value[0], this);
                 if (!Alphabet.Contains(t.Key.c.Value)) //char not in alphabet
                     throw new Automat.AlphabetException(t.Key.c.Value, this);
             }
@@ -175,12 +177,15 @@ namespace Serpen.Uni.Automat.Finite {
         public override IAutomat Diff(IDiff A) => ProductDea(this, (DFA)A, eProductDeaMode.Diff);
 
         public enum eProductDeaMode { Union, Intersect, Diff }
+
+        [AlgorithmSource("1659_S2.8_P44")]
         public static DFA ProductDea(DFA D1, DFA D2, eProductDeaMode mode) {
 
             uint len = (D1.StatesCount * D2.StatesCount);
 
-            if (!D1.SameAlphabet(D2))
-                throw new NotImplementedException("Different Alphabets are not implemented");
+            char[] newAlphabet = D1.Alphabet.Union(D2.Alphabet).ToArray();
+            // if (!D1.SameAlphabet(D2))
+            //     throw new NotImplementedException("Different Alphabets are not implemented");
 
             var accStates = new List<uint>(D1.AcceptedStates.Length + D2.AcceptedStates.Length);
 
@@ -195,7 +200,7 @@ namespace Serpen.Uni.Automat.Finite {
                     uint index = (i * D2.StatesCount + j);
                     stateNames[index] = $"{i},{j}";
 
-                    foreach (char c in D1.Alphabet) {
+                    foreach (char c in newAlphabet) {
                         //Transform exists, out qNext
                         bool exist1 = ((DFATransform)D1.Transforms).TryGetValue(i, c, out uint qNext1);
                         bool exist2 = ((DFATransform)D2.Transforms).TryGetValue(j, c, out uint qNext2);
@@ -234,7 +239,7 @@ namespace Serpen.Uni.Automat.Finite {
                 }
             }
 
-            return new DFA($"DEA_Product{mode}({D1.Name}+{D2.Name})", stateNames, D1.Alphabet, deat, 0, accStates.Distinct().ToArray());
+            return new DFA($"DEA_Product{mode}({D1.Name}+{D2.Name})", stateNames, newAlphabet, deat, 0, accStates.Distinct().ToArray());
         }
 
         #endregion
