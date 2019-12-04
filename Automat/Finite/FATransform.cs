@@ -30,7 +30,7 @@ namespace Serpen.Uni.Automat.Finite {
 
         public override string ToString() {
             var sw = new System.Text.StringBuilder();
-            foreach (var item in this)
+            foreach (var item in this.OrderBy(a => a.Key.ToString()))
                 sw.Append($"({item.Key.q},{item.Key.c.Value})=>{item.Value[0]}; ");
             return sw.ToString();
         }

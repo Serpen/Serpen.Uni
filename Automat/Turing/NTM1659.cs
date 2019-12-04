@@ -138,7 +138,7 @@ namespace Serpen.Uni.Automat.Turing {
 
         public override string ToString() {
             var sw = new System.Text.StringBuilder();
-            foreach (var ti in this) {
+            foreach (var ti in this.OrderBy(a => a.Key.ToString())) {
                 foreach (var tv in ti.Value) {
                     sw.Append($"({ti.Key.ToString()})=>");
                     sw.Append($"({tv.ToString()}); ");

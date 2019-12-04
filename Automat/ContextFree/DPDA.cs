@@ -232,7 +232,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         public override string ToString() {
             var sw = new System.Text.StringBuilder();
-            foreach (var item in this) {
+            foreach (var item in this.OrderBy(a => a.Key.ToString())) {
                 sw.Append($"({item.Key.ToString()})=>");
                 sw.Append($"({item.Value.ToString()}); ");
                 sw.Append("); ");

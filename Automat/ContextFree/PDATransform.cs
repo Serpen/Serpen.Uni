@@ -119,9 +119,9 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         public override string ToString() {
             var sw = new System.Text.StringBuilder();
-            foreach (var item in this) {
+            foreach (var item in this.OrderBy(a => a.Key.ToString())) {
                 sw.Append($"({item.Key.ToString()})=>");
-                foreach (var v in item.Value)
+                foreach (var v in item.Value.OrderBy(a => a.ToString()))
                     sw.Append($"({v.ToString()}); ");
                 // sw.Append("); ");
             }
