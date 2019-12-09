@@ -8,6 +8,8 @@ namespace Serpen.Uni.Automat.ContextFree {
     /// </summary>
     [System.Serializable]
     public class DPDA : AutomatBase<PDATransformKey, PDATransformValue>, IPDA {
+
+        [System.Obsolete()]
         public DPDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, DPDATransform Transform, uint StartState, char? Startsymbol, uint[] acceptedStates)
         : base(name, StatesCount, InputAlphabet, StartState, acceptedStates) {
             this.WorkAlphabet = Workalphabet;
@@ -17,11 +19,27 @@ namespace Serpen.Uni.Automat.ContextFree {
             CheckConstraints();
         }
 
+        [System.Obsolete()]
         public DPDA(string name, string[] names, char[] InputAlphabet, char[] Workalphabet, DPDATransform Transform, uint StartState, char? Startsymbol, uint[] acceptedStates)
-        : base(name, names, InputAlphabet, StartState, acceptedStates) {
+                : base(name, names, InputAlphabet, StartState, acceptedStates) {
             this.WorkAlphabet = Workalphabet;
             this.Transforms = Transform;
             this.StartSymbol = Startsymbol;
+
+            CheckConstraints();
+        }
+        public DPDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, DPDATransform Transform, uint StartState, params uint[] acceptedStates)
+        : base(name, StatesCount, InputAlphabet, StartState, acceptedStates) {
+            this.WorkAlphabet = Workalphabet;
+            this.Transforms = Transform;
+
+            CheckConstraints();
+        }
+
+        public DPDA(string name, string[] names, char[] InputAlphabet, char[] Workalphabet, DPDATransform Transform, uint StartState, params uint[] acceptedStates)
+        : base(name, names, InputAlphabet, StartState, acceptedStates) {
+            this.WorkAlphabet = Workalphabet;
+            this.Transforms = Transform;
 
             CheckConstraints();
         }

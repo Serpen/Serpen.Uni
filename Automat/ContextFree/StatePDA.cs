@@ -4,12 +4,21 @@ namespace Serpen.Uni.Automat.ContextFree {
     [System.Serializable()]
     public class StatePDA : PDA, IKleeneStern {
 
+        [System.Obsolete()]
         public StatePDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char? Startstacksymbol, params uint[] AcceptedStates)
          : base(name, StatesCount, InputAlphabet, Workalphabet, Transform, StartState, Startstacksymbol, AcceptedStates) {
         }
 
+        [System.Obsolete()]
         public StatePDA(string name, string[] names, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char? Startstacksymbol, params uint[] AcceptedStates)
          : base(name, names, InputAlphabet, Workalphabet, Transform, StartState, Startstacksymbol, AcceptedStates) {
+        }
+        public StatePDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, params uint[] AcceptedStates)
+         : base(name, StatesCount, InputAlphabet, Workalphabet, Transform, StartState, AcceptedStates) {
+        }
+
+        public StatePDA(string name, string[] names, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, params uint[] AcceptedStates)
+         : base(name, names, InputAlphabet, Workalphabet, Transform, StartState, AcceptedStates) {
         }
 
         [AlgorithmSource("EAFK_A64")]
@@ -40,7 +49,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                     newVals[i] = new PDATransformValue(null, t.Value[i]);
                 pdat.Add(new PDATransformKey(t.Key.q, t.Key.c, null), newVals);
             }
-            return new StatePDA($"QPDA_({FA.Name})", FA.StatesCount, FA.Alphabet, new char[] { }, pdat, FA.StartState, null, FA.AcceptedStates);
+            return new StatePDA($"QPDA_({FA.Name})", FA.StatesCount, FA.Alphabet, new char[] { }, pdat, FA.StartState, FA.AcceptedStates);
         }
 
         [AlgorithmSource("1659_L3.1_P76")]
@@ -49,14 +58,14 @@ namespace Serpen.Uni.Automat.ContextFree {
             var t = new PDATransform();
             var names = new System.Collections.Generic.Dictionary<uint, string>();
 
-            const uint qSim = 1;
+            const uint qSim = 2;
             uint q = qSim + 1;
 
-            // added Stacksymbol in constructor!
-            // t.Add(0,null, null, PDA.START, 1);
-            // sn.Add(0, "0");
-            t.Add(0, null, null, cfg.StartSymbol, qSim);
-            names.Add(0, "start");
+            t.Add(0,null, null, START, 1);
+            names.Add(0, "0");
+
+            t.Add(1, null, null, cfg.StartSymbol, qSim);
+            names.Add(1, "start");
 
             foreach (char c in cfg.Terminals)
                 t.Add(qSim, c, c, null, qSim);
@@ -86,7 +95,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             char[] WorkAlphabet = cfg.Terminals.Union(cfg.Variables).Append(START).ToArray();
 
-            return new ContextFree.StatePDA($"QPDA_({cfg.Name})", names.Values.ToArray(), cfg.Terminals, WorkAlphabet, t, 0, START, q);
+            return new StatePDA($"QPDA_({cfg.Name})", names.Values.ToArray(), cfg.Terminals, WorkAlphabet, t, 0, q);
         }
 
         public override bool AcceptWord(string w) {
@@ -177,7 +186,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                 pdaT.Add(this.AcceptedStates[i] + 1, null, null, null, 0);
             }
 
-            return new StatePDA($"QPDA_KleeneStern({Name})", this.StatesCount + 1, this.Alphabet, this.WorkAlphabet, pdaT, 0, null, acceptedStates);
+            return new StatePDA($"QPDA_KleeneStern({Name})", this.StatesCount + 1, this.Alphabet, this.WorkAlphabet, pdaT, 0, acceptedStates);
         }
 
     }

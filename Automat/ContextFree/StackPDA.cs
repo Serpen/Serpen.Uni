@@ -14,12 +14,22 @@ namespace Serpen.Uni.Automat.ContextFree {
         /// <param name="Transform"></param>
         /// <param name="StartState">State from which to start</param>
         /// <param name="Startsymbol">Inital Stack Population</param>
+        [System.Obsolete()]
         public StackPDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char? Startsymbol)
         : base(name, StatesCount, InputAlphabet, Workalphabet, Transform, StartState, Startsymbol, new uint[] { }) {
         }
 
+        [System.Obsolete()]
         public StackPDA(string name, string[] states, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char? Startsymbol)
         : base(name, states, InputAlphabet, Workalphabet, Transform, StartState, Startsymbol, new uint[] { }) {
+        }
+
+        public StackPDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState)
+        : base(name, StatesCount, InputAlphabet, Workalphabet, Transform, StartState, new uint[] { }) {
+        }
+
+        public StackPDA(string name, string[] states, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState)
+        : base(name, states, InputAlphabet, Workalphabet, Transform, StartState, new uint[] { }) {
         }
 
         public static readonly StackPDA Empty = new StackPDA("SPDA_Empty", 1, new char[] { }, new char[] { }, new PDATransform(), 0, START);

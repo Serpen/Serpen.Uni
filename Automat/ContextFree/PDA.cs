@@ -20,7 +20,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         protected static readonly char[] EXTRASYMBOLS = new char[] { '§', '$', '%', '&' };
         public const char START = '$';
         public char[] WorkAlphabet { get; }
-        public char? StartSymbol { get; }
+        [System.Obsolete()]public char? StartSymbol { get; }
 
         /// <summary>
         /// Create a PDA which accepts when ending in Accepted States
@@ -32,6 +32,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         /// <param name="startState"></param>
         /// <param name="startStackSymbol"></param>
         /// <param name="acceptedStates">Accepted Endstates</param>
+        [System.Obsolete()]
         protected PDA(string name, uint statesCount, char[] inputAlphabet, char[] workalphabet, PDATransform transform, uint startState, char? startStackSymbol, uint[] acceptedStates)
         : base(name, statesCount, inputAlphabet, startState, acceptedStates) {
             this.WorkAlphabet = workalphabet;
@@ -43,13 +44,30 @@ namespace Serpen.Uni.Automat.ContextFree {
             CheckConstraints();
         }
 
-        public PDA(string name, string[] states, char[] inputAlphabet, char[] workalphabet, PDATransform transform, uint startState, char? startStackSymbol, uint[] acceptedStates)
+        [System.Obsolete()]
+        protected PDA(string name, string[] states, char[] inputAlphabet, char[] workalphabet, PDATransform transform, uint startState, char? startStackSymbol, uint[] acceptedStates)
         : base(name, states, inputAlphabet, startState, acceptedStates) {
             this.WorkAlphabet = workalphabet;
             if (startStackSymbol.HasValue && !workalphabet.Contains(startStackSymbol.Value))
                 this.WorkAlphabet = this.WorkAlphabet.Append(startStackSymbol.Value).ToArray();
             this.Transforms = transform;
             this.StartSymbol = startStackSymbol;
+
+            CheckConstraints();
+        }
+
+        protected PDA(string name, uint statesCount, char[] inputAlphabet, char[] workalphabet, PDATransform transform, uint startState, uint[] acceptedStates)
+        : base(name, statesCount, inputAlphabet, startState, acceptedStates) {
+            this.WorkAlphabet = workalphabet;
+            this.Transforms = transform;
+
+            CheckConstraints();
+        }
+
+        protected PDA(string name, string[] states, char[] inputAlphabet, char[] workalphabet, PDATransform transform, uint startState, uint[] acceptedStates)
+        : base(name, states, inputAlphabet, startState, acceptedStates) {
+            this.WorkAlphabet = workalphabet;
+            this.Transforms = transform;
 
             CheckConstraints();
         }
