@@ -201,6 +201,8 @@ namespace Serpen.Uni.Automat.ContextFree {
     public class DPDATransform : TransformBase<PDATransformKey, PDATransformValue> {
         public void Add(uint q, char? ci, char? cw, string cw2, uint qNext)
             => base.Add(new PDATransformKey(q, ci, cw), new PDATransformValue(cw2, qNext));
+        public void Add(uint q, char? ci, char? cw, char cw2, uint qNext)
+            => base.Add(new PDATransformKey(q, ci, cw), new PDATransformValue(cw2.ToString(), qNext));
 
         public bool TryGetValue(ref PDATransformKey initcfg, out PDATransformValue qnext) {
             bool result;

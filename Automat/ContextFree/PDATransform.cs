@@ -51,6 +51,8 @@ namespace Serpen.Uni.Automat.ContextFree {
     public class PDATransform : TransformBase<PDATransformKey, PDATransformValue[]> {
         public void Add(uint q, char? ci, char? cw, string cw2, uint qNext)
             => Add(new PDATransformKey(q, ci, cw), new PDATransformValue[] { new PDATransformValue(cw2, qNext) });
+        public void Add(uint q, char? ci, char? cw, char cw2, uint qNext)
+            => Add(new PDATransformKey(q, ci, cw), new PDATransformValue[] { new PDATransformValue(cw2.ToString(), qNext) });
 
         /// <summary>
         /// Adds Tuple + Appends if already exists
@@ -64,6 +66,9 @@ namespace Serpen.Uni.Automat.ContextFree {
             else
                 base.Add(pkey, new PDATransformValue[] { pval });
         }
+        public void AddM(uint q, char? ci, char? cw, char cw2, uint qNext) 
+            => AddM(q,ci,cw,cw2.ToString(), qNext);
+
         public bool TryGetValue(ref PDATransformKey[] initcfg, out PDATransformValue[] qnext) {
             var retVals = new List<PDATransformValue>();
             var retKeys = new List<PDATransformKey>();

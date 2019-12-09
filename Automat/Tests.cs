@@ -355,7 +355,7 @@ namespace Serpen.Uni.Automat {
 
         #endregion
 
-        public static bool TestEqualWithWords(IAutomat A1, IAutomat A2, int initialCount) {
+        public static bool TestEqualWithWords(IAcceptWord A1, IAcceptWord A2, int initialCount) {
             int onceTrue = 0, onceFalse = 0;
             int passLevel = System.Math.Min(initialCount / 10, 5);
 
@@ -420,6 +420,20 @@ namespace Serpen.Uni.Automat {
                 }
 
             }
+        }
+
+        public static void TestDFAPumpbar() {
+            var dfas = KnownAutomat.GetDFAModels();
+            foreach (var dfa in dfas) {
+                for (int i = 0; i < 10; i++) {
+                    var rnd = Serpen.Uni.Utils.RND.Next(1, 20);
+                    var pb = PumpingLemma.TestPumpbar(dfa, rnd);
+                    if (pb != PumpResult.Pumpable) {
+                        System.Console.WriteLine($"Not {rnd}-pumpbar {pb} {dfa}");
+                    }
+                }
+            }
+
         }
 
     } //end class

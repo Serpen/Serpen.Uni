@@ -77,9 +77,12 @@ namespace Serpen.Uni.Automat {
         protected readonly List<char> VarAndTerm;
 
         protected virtual void CheckConstraints() {
-            if (this.Variables.Intersect(this.Terminals).Any()) {
+            if (this.Variables.Intersect(this.Terminals).Any())
                 throw new System.ArgumentOutOfRangeException("Variables", "var intersect term");
-            }
+            
+            // if (!Rules.ContainsKey(StartSymbol))
+            //     throw new Serpen.Uni.Exception("Startsymbol not in Rules");
+
             foreach (var r in Rules) {
                 if (!Variables.Contains(r.Key)) throw new System.ArgumentOutOfRangeException("head", $"{r.Key} not in vars");
                 foreach (string body in r.Value)

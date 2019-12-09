@@ -4,11 +4,11 @@ namespace Serpen.Uni.Automat.ContextFree {
     [System.Serializable()]
     public class StatePDA : PDA, IKleeneStern {
 
-        public StatePDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char? Startstacksymbol, uint[] AcceptedStates)
+        public StatePDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char? Startstacksymbol, params uint[] AcceptedStates)
          : base(name, StatesCount, InputAlphabet, Workalphabet, Transform, StartState, Startstacksymbol, AcceptedStates) {
         }
 
-        public StatePDA(string name, string[] names, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char? Startstacksymbol, uint[] AcceptedStates)
+        public StatePDA(string name, string[] names, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char? Startstacksymbol, params uint[] AcceptedStates)
          : base(name, names, InputAlphabet, Workalphabet, Transform, StartState, Startstacksymbol, AcceptedStates) {
         }
 
@@ -18,7 +18,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             char extra_symbol = Utils.NextFreeCapitalLetter(pda.Alphabet.Concat(pda.WorkAlphabet).ToArray(), EXTRASYMBOLS[0], EXTRASYMBOLS);
 
-            newt.Add(0, null, null, extra_symbol.ToString(), 1);
+            newt.Add(0, null, null, extra_symbol, 1);
             for (int i = 0; i < pda.Transforms.Count; i++) {
                 var t = pda.Transforms.ElementAt(i);
                 for (int j = 0; j < t.Value.Length; j++) {
@@ -44,16 +44,18 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
         [AlgorithmSource("1659_L3.1_P76")]
-        public static explicit operator StatePDA(ContextFree.CFGrammer cfg) {
-            var t = new ContextFree.PDATransform();
+        [AlgorithmComplexity("O(n²)")]
+        public static explicit operator StatePDA(CFGrammer cfg) {
+            var t = new PDATransform();
             var names = new System.Collections.Generic.Dictionary<uint, string>();
 
             const uint qSim = 1;
             uint q = qSim + 1;
 
-            // t.Add(0,null, null, ContextFree.PDA.START.ToString(), 1);
+            // added Stacksymbol in constructor!
+            // t.Add(0,null, null, PDA.START, 1);
             // sn.Add(0, "0");
-            t.Add(0, null, null, cfg.StartSymbol.ToString(), qSim);
+            t.Add(0, null, null, cfg.StartSymbol, qSim);
             names.Add(0, "start");
 
             foreach (char c in cfg.Terminals)
@@ -63,33 +65,28 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             foreach (var r in cfg.Rules) {
                 foreach (string body in r.Value) {
-                    if (body.Length > 2) {
-                        t.AddM(qSim, null, r.Key, body.Substring(body.Length - 1, 1), q);
+                    if (body.Length >= 2) {
+                        t.AddM(qSim, null, r.Key, body[^1], q);
                         names.TryAdd(q, $"{q}; {r.Key}=>{body}");
                         for (int i = body.Length - 2; i > 0; i--) {
-                            t.AddM(q, null, null, body.Substring(i, 1), ++q);
+                            t.AddM(q, null, null, body[i], q+1);
+                            q++;
                             names.TryAdd(q, $"{q}; {r.Key}=>{body}");
                         }
-                        t.AddM(q, null, null, body.Substring(0, 1), qSim);
+                        t.AddM(q, null, null, body[0], qSim);
                         q++;
-                    } else if (body.Length == 2) {
-                        t.AddM(qSim, null, r.Key, body.Substring(1, 1), q);
-                        t.AddM(q, null, null, body.Substring(0, 1), qSim);
-                        names.TryAdd(q, $"{q}; {r.Key}=>{body}");
-                        q++;
-
                     } else {
                         t.AddM(qSim, null, r.Key, body, qSim);
                     }
                 }
             }
 
-            t.Add(qSim, null, ContextFree.PDA.START, null, q);
+            t.Add(qSim, null, START, null, q);
             names.Add(q, "accept");
 
             char[] WorkAlphabet = cfg.Terminals.Union(cfg.Variables).Append(START).ToArray();
 
-            return new ContextFree.StatePDA($"QPDA_({cfg.Name})", names.Values.ToArray(), cfg.Terminals, WorkAlphabet, t, 0, START, new uint[] { q });
+            return new ContextFree.StatePDA($"QPDA_({cfg.Name})", names.Values.ToArray(), cfg.Terminals, WorkAlphabet, t, 0, START, q);
         }
 
         public override bool AcceptWord(string w) {
@@ -137,7 +134,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             for (uint i = 0; i < stateCount; i++) {
                 int transformsRnd = rnd.Next(0, inputAlphabet.Length);
                 for (int j = 0; j < transformsRnd; j++)
-                    t.AddM(i, inputAlphabet.RndElement(), workAlphabet.RndElement(), workAlphabet.RndElement().ToString(), (uint)rnd.Next(0, stateCount));
+                    t.AddM(i, inputAlphabet.RndElement(), workAlphabet.RndElement(), workAlphabet.RndElement(), (uint)rnd.Next(0, stateCount));
             }
 
             var ret = new StatePDA("QPDA_Random", (uint)stateCount, inputAlphabet, workAlphabet, t, (uint)rnd.Next(0, stateCount), START, accState);

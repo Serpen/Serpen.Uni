@@ -448,7 +448,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             foreach (var r in this.Rules) {
                 newRules.Add(r.Key, r.Value);
             }
-            return new CFGrammer("$CFG_KleeneStern({Name})-", this.Variables.Append(newStart).ToArray(), this.Terminals, newRules, newStart);
+            return new CFGrammer($"CFG_KleeneStern({Name})-", this.Variables.Append(newStart).ToArray(), this.Terminals, newRules, newStart);
         }
 
         public CFGrammer Union(CFGrammer cfg) => Combine(cfg, new string[] { "{0}", "{1}" }, "union");
@@ -463,7 +463,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                 
                 newRules.Add(r.Key, newVals.ToArray());
             }
-            return new CFGrammer("CFG_Reverse({Name})", this.Variables, this.Terminals, newRules, this.StartSymbol);
+            return new CFGrammer($"CFG_Reverse({Name})", this.Variables, this.Terminals, newRules, this.StartSymbol);
 
         }
 

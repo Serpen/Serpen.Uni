@@ -5,13 +5,51 @@ namespace Serpen.Uni.Automat {
         public static PDA QPDA_1659_A33_K1_anbn {
             get {
                 var pdaT = new PDATransform {
-                    { 0, null, null, PDA.START.ToString(), 1 },
+                    { 0, null, null, PDA.START, 1 },
                     { 1, 'a', null, "a", 1 },
                     { 1, null, null, null, 2 },
                     { 2, 'b', 'a', null, 2 },
                     { 2, null, PDA.START, null, 3 }
                 };
-                return new StatePDA(nameof(QPDA_1659_A33_K1_anbn), 4, new char[] { 'a', 'b' }, new char[] { 'a', PDA.START }, pdaT, 0, null, new uint[] { 3 });
+                return new StatePDA(nameof(QPDA_1659_A33_K1_anbn), 4, new char[] { 'a', 'b' }, new char[] { 'a', PDA.START }, pdaT, 0, null, 3);
+            }
+        }
+
+        public static PDA QPDA_1659_A34_K2_anbn {
+            get {
+                var pdaT = new PDATransform {
+                    { 0, null, null, PDA.START, 1 },
+                    
+                    { 1, 'a', null, "a", 1 },
+                    { 1, 'b', null, "b", 1 },
+                    
+                    { 1, null, null, null, 2 },
+                    // { 1, 'a', null, null, 2 },
+                    // { 1, 'b', null, null, 2 },
+                    
+                    { 2, 'a', 'a', null, 2 },
+                    { 2, 'b', 'b', null, 2 },
+
+                    { 2, null, PDA.START, null, 3 }
+                };
+                pdaT.AddM(1, 'a', null, null, 2);
+                pdaT.AddM(1, 'b', null, null, 2);
+
+                return new StatePDA(nameof(QPDA_1659_A34_K2_anbn), 4, new char[] { 'a', 'b' }, new char[] { 'a', 'b', PDA.START }, pdaT, 0, null, 3);
+            }
+        }
+
+        public static PDA QPDA_1659_T31_A317_L3 {
+            get {
+                var pdaT = new PDATransform();
+                pdaT.Add(0, null, null, PDA.START, 1);
+                pdaT.Add(1, '0', null, "0", 1);
+                pdaT.AddM(1, '0', '1', null, 1);
+                pdaT.Add(1, '1', null, "1", 1);
+                pdaT.AddM(1, '1', '0', null, 1);
+                pdaT.Add(1, null, PDA.START, null, 2);
+
+                return new StatePDA(nameof(QPDA_1659_T31_A317_L3), 3, binAlp, new char[] { '0', '1', PDA.START }, pdaT, 0, null, 2);
             }
         }
 
@@ -36,7 +74,7 @@ namespace Serpen.Uni.Automat {
                     { 0, '1', null, "1", 0 },
                     { 0, 'c', '0', "0", 1 },
                     { 0, 'c', '1', "1", 1 },
-                    { 0, 'c', DPDA.START, DPDA.START.ToString(), 1 },
+                    { 0, 'c', DPDA.START, DPDA.START, 1 },
                     { 1, '0', '0', null, 1 },
                     { 1, '1', '1', null, 1 },
                     { 1, null, DPDA.START, null, 2 }

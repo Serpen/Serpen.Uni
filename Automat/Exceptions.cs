@@ -18,6 +18,8 @@ namespace Serpen.Uni.Automat {
                 } catch { }
             }
         }
+        public Exception(string message, params IAcceptWord[] automats) : base(message) {
+        }
 
         public readonly IAutomat[] Automats;
     }
