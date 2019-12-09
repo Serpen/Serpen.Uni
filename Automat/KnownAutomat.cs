@@ -56,7 +56,6 @@ namespace Serpen.Uni.Automat {
             return list.ToArray();
         }
 
-        [System.Obsolete()]
         public static Finite.NFAe[] GetNFAeModels(int randomCount = 10) {
             var list = GetTypes<Finite.NFAe>();
 

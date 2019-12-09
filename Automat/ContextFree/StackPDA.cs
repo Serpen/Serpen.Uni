@@ -14,22 +14,20 @@ namespace Serpen.Uni.Automat.ContextFree {
         /// <param name="Transform"></param>
         /// <param name="StartState">State from which to start</param>
         /// <param name="Startsymbol">Inital Stack Population</param>
-        [System.Obsolete()]
         public StackPDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char? Startsymbol)
         : base(name, StatesCount, InputAlphabet, Workalphabet, Transform, StartState, Startsymbol, new uint[] { }) {
         }
 
-        [System.Obsolete()]
         public StackPDA(string name, string[] states, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char? Startsymbol)
         : base(name, states, InputAlphabet, Workalphabet, Transform, StartState, Startsymbol, new uint[] { }) {
         }
 
         public StackPDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState)
-        : base(name, StatesCount, InputAlphabet, Workalphabet, Transform, StartState, new uint[] { }) {
+        : base(name, StatesCount, InputAlphabet, Workalphabet, Transform, StartState, null, new uint[] { }) {
         }
 
         public StackPDA(string name, string[] states, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState)
-        : base(name, states, InputAlphabet, Workalphabet, Transform, StartState, new uint[] { }) {
+        : base(name, states, InputAlphabet, Workalphabet, Transform, StartState, null, new uint[] { }) {
         }
 
         public static readonly StackPDA Empty = new StackPDA("SPDA_Empty", 1, new char[] { }, new char[] { }, new PDATransform(), 0, START);
@@ -152,50 +150,49 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
         [AlgorithmSource("1659_L3.1_P76")]
+        [AlgorithmComplexity("O(n²)")]
         public static explicit operator StackPDA(ContextFree.CFGrammer cfg) {
-            var t = new ContextFree.PDATransform();
+            var t = new PDATransform();
             var names = new System.Collections.Generic.Dictionary<uint, string>();
 
-            const uint qSim = 1;
+            const uint qSim = 2;
             uint q = qSim + 1;
 
-            // t.Add(0,null, null, ContextFree.PDA.START.ToString(), 1);
-            // sn.Add(0, "0");
-            t.Add(0, null, null, cfg.StartSymbol.ToString(), qSim);
-            names.Add(0, "start");
+            t.Add(0, null, null, START, 1);
+            names.Add(0, "0");
+
+            t.Add(1, null, null, cfg.StartSymbol, qSim);
+            names.Add(1, "start");
 
             foreach (char c in cfg.Terminals)
                 t.Add(qSim, c, c, null, qSim);
 
-            t.Add(qSim, null, ContextFree.PDA.START, null, qSim);
+            // t.Add(qSim, null, START, null, qSim);
             names.Add(qSim, "sim");
 
             foreach (var r in cfg.Rules) {
                 foreach (string body in r.Value) {
-                    if (body.Length > 2) {
-                        t.AddM(qSim, null, r.Key, body.Substring(body.Length - 1, 1), q);
+                    if (body.Length >= 2) {
+                        t.AddM(qSim, null, r.Key, body[^1], q);
                         names.TryAdd(q, $"{q}; {r.Key}=>{body}");
                         for (int i = body.Length - 2; i > 0; i--) {
-                            t.AddM(q, null, null, body.Substring(i, 1), ++q);
+                            t.AddM(q, null, null, body.Substring(i, 1), q+1);
+                            q++;
                             names.TryAdd(q, $"{q}; {r.Key}=>{body}");
                         }
-                        t.AddM(q, null, null, body.Substring(0, 1), qSim);
+                        t.AddM(q, null, null, body[0], qSim);
                         q++;
-                    } else if (body.Length == 2) {
-                        t.AddM(qSim, null, r.Key, body.Substring(1, 1), q);
-                        t.AddM(q, null, null, body.Substring(0, 1), qSim);
-                        names.TryAdd(q, $"{q}; {r.Key}=>{body}");
-                        q++;
-
                     } else
                         t.AddM(qSim, null, r.Key, body, qSim);
-
                 }
             }
 
-            char[] WorkAlphabet = cfg.Terminals.Union(cfg.Variables).ToArray(); //.Append(START)
+            t.Add(qSim, null, START, null, q);
+            names.Add(q, "accept");
 
-            return new ContextFree.StackPDA($"SPDA_({cfg.Name})", names.Values.ToArray(), cfg.Terminals, WorkAlphabet, t, 0, START);
+            char[] WorkAlphabet = cfg.Terminals.Union(cfg.Variables).Append(START).ToArray();
+
+            return new ContextFree.StackPDA($"SPDA_({cfg.Name})", names.Values.ToArray(), cfg.Terminals, WorkAlphabet, t, 0);
         }
 
         public override string ToString() => $"{Name} SPDA(|{States.Length}|={string.Join(";", States)}), {{{string.Join(',', Alphabet)}}},{{{string.Join(',', WorkAlphabet)}}}, {{{Transforms.ToString()}}}, {StartState}, {StartSymbol})".Trim();

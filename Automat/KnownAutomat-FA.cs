@@ -460,6 +460,16 @@ namespace Serpen.Uni.Automat {
             }
         }
 
+        public static ReGrammer RG_1659_G6 {
+            get {
+                var rs = new RuleSet() {
+                    {'S', new string[] {"aS","aA"}},
+                    {'A', new string[] {"bA","aS", ""}},
+                };
+                return new ReGrammer(nameof(RG_1659_G6), new char[] {'S', 'A'}, new char[] {'a','b'}, rs, 'S');
+            }
+        }
+
         public static DFA DEA_EndsWithNulls(uint count) {
             var t = new DFATransform();
             for (uint i = 0; i < count + 1; i++) {

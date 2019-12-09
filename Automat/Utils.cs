@@ -27,20 +27,22 @@ namespace Serpen.Uni.Automat {
                 return true;
         }
 
-        internal static char NextFreeCapitalLetter(ICollection<char> alphabet, char inputChar) => NextFreeCapitalLetter(alphabet, inputChar, System.Array.Empty<char>());
-        internal static char NextFreeCapitalLetter(ICollection<char> alphabet, char inputChar, char[] wishChars) {
-            if (inputChar == 'S' & !alphabet.Contains('Ŝ')) return 'Ŝ';
-            if (inputChar == 'A' & !alphabet.Contains('Â')) return 'Â';
-            if (inputChar == 'B' & !alphabet.Contains('Ɓ')) return 'Ɓ';
-            if (inputChar == 'C' & !alphabet.Contains('Ĉ')) return 'Ĉ';
-            if (inputChar == 'D' & !alphabet.Contains('Ď')) return 'Ď';
-            if (inputChar == 'R' & !alphabet.Contains('Ř')) return 'Ř';
-            if (inputChar == '0' & !alphabet.Contains('O')) return 'O';
-            if (inputChar == '1' & !alphabet.Contains('L')) return 'L';
-            if (inputChar == '+' & !alphabet.Contains('P')) return 'P';
-            if (inputChar == '*' & !alphabet.Contains('M')) return 'M';
-            if (!alphabet.Contains(inputChar.ToString().ToUpper()[0]))
-                return inputChar.ToString().ToUpper()[0];
+        internal static char NextFreeCapitalLetter(IEnumerable<char> alphabet, char? inputChar) => NextFreeCapitalLetter(alphabet, inputChar, System.Array.Empty<char>());
+        internal static char NextFreeCapitalLetter(IEnumerable<char> alphabet, char? inputChar, char[] wishChars) {
+            if (inputChar.HasValue) {
+                if (!alphabet.Contains(inputChar.ToString().ToUpper()[0]))
+                    return inputChar.ToString().ToUpper()[0];
+                if (inputChar == 'S' & !alphabet.Contains('Ŝ')) return 'Ŝ';
+                if (inputChar == 'A' & !alphabet.Contains('Â')) return 'Â';
+                if (inputChar == 'B' & !alphabet.Contains('Ɓ')) return 'Ɓ';
+                if (inputChar == 'C' & !alphabet.Contains('Ĉ')) return 'Ĉ';
+                if (inputChar == 'D' & !alphabet.Contains('Ď')) return 'Ď';
+                if (inputChar == 'R' & !alphabet.Contains('Ř')) return 'Ř';
+                if (inputChar == '0' & !alphabet.Contains('O')) return 'O';
+                if (inputChar == '1' & !alphabet.Contains('L')) return 'L';
+                if (inputChar == '+' & !alphabet.Contains('P')) return 'P';
+                if (inputChar == '*' & !alphabet.Contains('M')) return 'M';
+            }
 
             foreach (char w in wishChars) {
                 if (!alphabet.Contains(w)) return w;
@@ -53,18 +55,28 @@ namespace Serpen.Uni.Automat {
             }
 
             for (int i = (int)'Έ'; i < (int)'Ϋ' + 1; i++) {
-                if (i == 0x03a2 || i == 907 | i == 909)
+                if (!char.IsLetter((char)i))
                     continue;
                 if (!alphabet.Contains((char)i))
                     return (char)i;
             }
 
+            for (int i = (int)'À'; i < (int)'Ý' + 1; i++) {
+                if (!char.IsLetter((char)i))
+                    continue;
+                if (i == 0xd7 || i == 0xd8)
+                    continue;
+                if (!alphabet.Contains((char)i))
+                    return (char)i;
+
+            }
+
             throw new System.ArgumentOutOfRangeException();
         }
-        
+
         public static void SaveAutomatImageToTemp(this IAutomat automat)
             => Visualization.DrawAutomat(automat).Save(System.Environment.ExpandEnvironmentVariables($@"%temp%\automat\{automat.Name}.png"));
-        
+
         public static void ExportToTemp(this IAutomat automat) {
             SaveAutomatImageToTemp(automat);
             var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();

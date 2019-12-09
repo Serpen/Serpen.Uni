@@ -4,21 +4,19 @@ namespace Serpen.Uni.Automat.ContextFree {
     [System.Serializable()]
     public class StatePDA : PDA, IKleeneStern {
 
-        [System.Obsolete()]
         public StatePDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char? Startstacksymbol, params uint[] AcceptedStates)
          : base(name, StatesCount, InputAlphabet, Workalphabet, Transform, StartState, Startstacksymbol, AcceptedStates) {
         }
 
-        [System.Obsolete()]
         public StatePDA(string name, string[] names, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, char? Startstacksymbol, params uint[] AcceptedStates)
          : base(name, names, InputAlphabet, Workalphabet, Transform, StartState, Startstacksymbol, AcceptedStates) {
         }
         public StatePDA(string name, uint StatesCount, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, params uint[] AcceptedStates)
-         : base(name, StatesCount, InputAlphabet, Workalphabet, Transform, StartState, AcceptedStates) {
+         : base(name, StatesCount, InputAlphabet, Workalphabet, Transform, StartState, null, AcceptedStates) {
         }
 
         public StatePDA(string name, string[] names, char[] InputAlphabet, char[] Workalphabet, PDATransform Transform, uint StartState, params uint[] AcceptedStates)
-         : base(name, names, InputAlphabet, Workalphabet, Transform, StartState, AcceptedStates) {
+         : base(name, names, InputAlphabet, Workalphabet, Transform, StartState, null, AcceptedStates) {
         }
 
         [AlgorithmSource("EAFK_A64")]
@@ -61,7 +59,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             const uint qSim = 2;
             uint q = qSim + 1;
 
-            t.Add(0,null, null, START, 1);
+            t.Add(0, null, null, START, 1);
             names.Add(0, "0");
 
             t.Add(1, null, null, cfg.StartSymbol, qSim);

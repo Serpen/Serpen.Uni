@@ -128,7 +128,7 @@ namespace Serpen.Uni.Automat {
                 };
 
                 return new StackPDA(nameof(SPDA_EAFK_B612_T52_ArithmExp), 1, new char[] { 'a', 'b', '0', '1', '(', ')', '+', '*' },
-                    new char[] { 'a', 'b', '0', '1', '(', ')', '+', '*', 'E', 'I' }, pdaT, 'E');
+                    new char[] { 'a', 'b', '0', '1', '(', ')', '+', '*', 'E', 'I' }, pdaT, 0, 'E');
             }
         }
 
@@ -206,18 +206,6 @@ namespace Serpen.Uni.Automat {
                 //b^(2n+1)*a^m*b^(2k+1)
             }
         }
-
-        public static CFGrammer CFG_1659_P_G6_RG {
-            get {
-                var rs2 = new RuleSet {
-                    { 'S', new string[] { "aS", "aA" } },
-                    { 'A', new string[] { "bA", "aS", "" } }
-                };
-                return new CFGrammer(nameof(CFG_1659_P_G6_RG), new char[] { 'S', 'A' }, new char[] { 'a', 'b' }, rs2, 'S');
-                //b^(2n+1)*a^m*b^(2k+1)
-            }
-        }
-
 
         public static CFGrammer CFG_1659_S88 {
             get {

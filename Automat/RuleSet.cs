@@ -23,8 +23,8 @@ namespace Serpen.Uni.Automat {
         public override string ToString() {
             var sw = new System.Text.StringBuilder();
             sw.Append("{");
-            foreach (var r in this)
-                sw.Append($"({r.Key}=>({string.Join(',', r.Value)})), ");
+            foreach (var r in this.OrderBy(a => a.Key))
+                sw.Append($"({r.Key}=>({string.Join(',', r.Value.OrderBy(a => a))})), ");
             sw.Append("}");
 
             return sw.ToString();

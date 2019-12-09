@@ -60,6 +60,9 @@ namespace Serpen.Uni.Automat {
                     NFAe NEfromN = (NFAe)NfromD;
                     ret1Automat.Add(NEfromN);
 
+                    ReGrammer RGfromD = (ReGrammer)D;
+                    ret1Automat.Add((NFAe)RGfromD);
+
                     StatePDA QPDAfromNe = (StatePDA)NEfromD;
                     ret1Automat.Add(QPDAfromNe);
 
@@ -89,6 +92,9 @@ namespace Serpen.Uni.Automat {
                     StatePDA QPDAfromNe = (StatePDA)NEfromD;
                     ret1Automat.Add(QPDAfromNe);
 
+                    ReGrammer RGfromN = (ReGrammer)N;
+                    ret1Automat.Add((NFAe)RGfromN);
+
                     StackPDA SPDAFromQPDA = (StackPDA)QPDAfromNe;
                     ret1Automat.Add(SPDAFromQPDA);
 
@@ -107,6 +113,10 @@ namespace Serpen.Uni.Automat {
                     ret1Automat.Add(DfromNe);
 
                     // NFA NfromD = (NFAe)DfromNe;
+
+                    try {
+                        ReGrammer RGfromNe = (ReGrammer)Ne;
+                    } catch (System.NotImplementedException) { }
 
                     StatePDA QPDAfromNe = (StatePDA)Ne;
                     ret1Automat.Add(QPDAfromNe);
@@ -372,7 +382,7 @@ namespace Serpen.Uni.Automat {
                         else onceFalse++;
 
                         if (erg1 != erg2)
-                            throw new Automat.Exception($"{count}. word '{w}' divides Automates", A1, A2);
+                            throw new Automat.Exception($"{count}. word '{w}' divides Automates", A1 as IAutomat, A2 as IAutomat);
 
                         Utils.DebugMessage($"{count}. word '{w}' passes", Uni.Utils.eDebugLogLevel.Verbose, A1, A2);
                         count++;
