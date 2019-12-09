@@ -4,7 +4,6 @@ namespace Serpen.Uni.Automat {
     public static class PumpingLemma {
 
 
-        //should return certificate instead of true/false, cover more possible outcomes 
         /// <returns>bool empiric _guess_ if its pumpbar</returns>
         public static PumpResult TestPumpbar(IAutomat Automat, int pumpLaenge, int words = 200, int maxWordLen = 50, int exponentMax = 20, int exponentCount = 10) {
             int allAcceptedWordsPass = 0;
@@ -16,15 +15,9 @@ namespace Serpen.Uni.Automat {
             foreach (string w in Automat.GetRandomWords(words, pumpLaenge, maxWordLen, System.Array.Empty<string>())) {
                 if (Automat.AcceptWord(w)) {
                     foundAtLeastOneAcceptedWordForTest = true;
-                    bool foundAccepted = false;
                     allAcceptedWordsPass = 0;
+
                     foreach (string[] strParts in StringParts3(w)) {
-
-                        if (!(w.Length >= pumpLaenge)) {
-                            Utils.DebugMessage($"word |w={w}|>={pumpLaenge}", Automat, Uni.Utils.eDebugLogLevel.Verbose);
-                            continue; // throw new PumpingException($"|w|={w.Length}<{pumpLaenge}");
-                        }
-
                         string x = strParts[0];
                         string y = strParts[1];
                         string z = strParts[2];
@@ -39,13 +32,10 @@ namespace Serpen.Uni.Automat {
                             continue; // throw new PumpingException($"|y|=0, y={Utils.EPSILON}");
                         }
 
-
-                        for (int k = 0; k < exponentCount; k++) {
-                            int r = Uni.Utils.RND.Next(1, exponentMax);
-                            string wi = x + string.Concat(System.Linq.Enumerable.Repeat(y, r)) + z;
-                            foundAccepted = Automat.AcceptWord(wi);
-                            Utils.DebugMessage($"word {wi}: {foundAccepted}", Automat, Uni.Utils.eDebugLogLevel.Verbose);
-                            if (foundAccepted) {
+                        for (int i = 0; i < exponentCount; i++) {
+                            int k = Uni.Utils.RND.Next(1, exponentMax);
+                            string wk = x + string.Concat(System.Linq.Enumerable.Repeat(y, k)) + z;
+                            if (Automat.AcceptWord(wk)) {
                                 Utils.DebugMessage($"{w} {pumpLaenge}-pumpbar for {x}.{y}.{z}", Automat, Uni.Utils.eDebugLogLevel.Verbose);
                                 allAcceptedWordsPass++;
                             }
@@ -73,7 +63,7 @@ namespace Serpen.Uni.Automat {
             for (int i = 0; i <= w.Length; i++) {
                 for (int j = i; j <= w.Length; j++) {
                     string[] parts = new string[3];
-                    parts[0] = w.Substring(0, i);
+                    parts[0] = w[0..i];
                     parts[1] = w[i..j];
                     parts[2] = w[j..];
                     words.Add(parts);
@@ -82,6 +72,7 @@ namespace Serpen.Uni.Automat {
             return words.Distinct().ToArray();
         }
 
+        // wip
         static string[][] StringParts5(string w) {
             var words = new System.Collections.Generic.List<string[]>(w.Length * w.Length);
             for (int i = 0; i <= w.Length; i++) {
@@ -105,9 +96,5 @@ namespace Serpen.Uni.Automat {
 
     public enum PumpResult {
         Unknown, Pumpable, NotPumpable, NoAcceptedWordFound, NoAcceptedWordExists
-    }
-
-    public sealed class PumpingException : System.ApplicationException {
-        public PumpingException(string message) : base(message) { }
     }
 }

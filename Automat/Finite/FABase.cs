@@ -150,7 +150,7 @@ namespace Serpen.Uni.Automat.Finite {
 
             string[] names = new string[this.StatesCount + 1];
 
-            //array pointer old to new state            
+            // array pointer old to new state            
             uint[] newstate = new uint[this.StatesCount];
             for (uint i = 0; i < newstate.Length; i++) {
                 newstate[i] = this.StatesCount - i;
@@ -158,12 +158,12 @@ namespace Serpen.Uni.Automat.Finite {
             }
             names[0] = "new";
 
-            //turn and add each transform
+            // turn and add each transform
             foreach (var dt in this.Transforms.Reverse())
                 foreach (var dtv in dt.Value)
                     neaET.AddM(newstate[dtv], dt.Key.c, newstate[dt.Key.q]);
 
-            //start state is qe, which leads to every old accepted state
+            // start state is qe, which leads to every old accepted state
             for (int i = 0; i < this.AcceptedStates.Length; i++)
                 neaET.AddM(0, null, newstate[this.AcceptedStates[i]]);
 
