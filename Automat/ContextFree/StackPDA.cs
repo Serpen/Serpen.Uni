@@ -79,7 +79,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             int runCount = 0;
             //construct start config
-            PDAConfig[] pcfgs;
+            System.Collections.Generic.IList<PDAConfig> pcfgs;
             if (StartSymbol.HasValue)
                 pcfgs = new PDAConfig[] { new PDAConfig(StartState, w, new char[] { StartSymbol.Value }, null) };
             else
@@ -87,18 +87,31 @@ namespace Serpen.Uni.Automat.ContextFree {
 
 
             //while any pcfg exists
-            while (pcfgs.Length > 0) { //&& (pcfg.Where((a) => a.Stack.Length>0).Any())
-                foreach (var p in pcfgs)
-                    if ((p.Stack.Count() == 0 || (p.Stack[p.Stack.Count() - 1] == this.StartSymbol && p.Stack.Count() == 1)) && p.word.Length == 0)
-                        return true;
+            while (pcfgs.Any()) {
+                if (pcfgs.Where(p => p.Stack.Count() == 0 && p.word.Length == 0).Any())
+                    return true;
 
-                pcfgs = GoChar(pcfgs);
+
+                pcfgs = GoChar(pcfgs.ToArray());
+
+                // hack!
+                if (pcfgs.Count > MAX_RUNS_OR_STACK || runCount > MAX_RUNS_OR_STACK) {
+                    var pcfgsGood = new System.Collections.Generic.List<PDAConfig>();
+                    foreach (var pcfg in pcfgs)
+                        if (pcfg.word.Length < w.Length)
+                            pcfgsGood.Add(pcfg);
+
+                    if (!pcfgsGood.Any() || runCount > MAX_RUNS_OR_STACK)
+                        return false;
+                    else {
+                        Utils.DebugMessage($"overrite PCFGs #{pcfgs.Count}->{pcfgsGood.Count}", this, Uni.Utils.eDebugLogLevel.Verbose);
+                        pcfgs = pcfgsGood.ToArray();
+                        // throw new PDAStackException($"{runCount}: Stack >= {pcfgs.Length}, abort", this);
+
+                    }
+                }
 
                 runCount++;
-
-                if (pcfgs.Length > MAX_RUNS_OR_STACK || runCount > MAX_RUNS_OR_STACK) {
-                    throw new PDAStackException($"{runCount}: Stack >= {pcfgs.Length}, abort", this);
-                }
             }
 
             return false;
@@ -176,7 +189,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                         t.AddM(qSim, null, r.Key, body[^1], q);
                         names.TryAdd(q, $"{q}; {r.Key}=>{body}");
                         for (int i = body.Length - 2; i > 0; i--) {
-                            t.AddM(q, null, null, body.Substring(i, 1), q+1);
+                            t.AddM(q, null, null, body.Substring(i, 1), q + 1);
                             q++;
                             names.TryAdd(q, $"{q}; {r.Key}=>{body}");
                         }

@@ -111,7 +111,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                 }
             } //next i
 
-            if (retKeys.Count > 0) {
+            if (retKeys.Any()) {
                 initcfg = retKeys.ToArray();
                 qnext = retVals.ToArray();
                 return true;

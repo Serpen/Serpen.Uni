@@ -7,7 +7,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         char[] WorkAlphabet { get; }
         char? StartSymbol { get; }
 
-        PDAConfig[] GoChar(PDAConfig[] pcfgs);
+        IList<PDAConfig> GoChar(PDAConfig[] pcfgs);
     }
 
     /// <summary>
@@ -75,9 +75,9 @@ namespace Serpen.Uni.Automat.ContextFree {
                     throw new StateException(AcceptedStates[i], this);
         }
 
-        //nondeterministic makes it grow exponetially, maybe it is best, to do a BFS instead of DFS, follow one path to its possible end
-        public PDAConfig[] GoChar(PDAConfig[] pcfgs) {
-            var retCfgs = new HashSet<PDAConfig>(1000);
+        // nondeterministic makes it grow exponetially, maybe it is best, to do a BFS instead of DFS, follow one path to its possible end
+        public IList<PDAConfig> GoChar(PDAConfig[] pcfgs) {
+            var retCfgs = new List<PDAConfig>(pcfgs.Length*10);
 
             if (pcfgs.Length > MAX_RUNS_OR_STACK) {
                 Utils.DebugMessage($"Stack >= {pcfgs.Length} abort", this, Uni.Utils.eDebugLogLevel.Always);
@@ -137,25 +137,18 @@ namespace Serpen.Uni.Automat.ContextFree {
                             if (pcfg.word.Length > 0)
                                 newWord = pcfg.word.Substring(1);
 
-                        retCfgs.Add(new PDAConfig(qNext[j].qNext, newWord, newStack.ToArray(), pcfg));
+                        // Hack
+                        if (newStack.Count <= (newWord.Length+1)*3)
+                            retCfgs.Add(new PDAConfig(qNext[j].qNext, newWord, newStack.ToArray(), pcfg));
 
                     } //next j
 
                 } //end if tryGetValue
             } //next pcfg
 
-            //buggy, but only perf way
-            List<PDAConfig> retCfgs2;
-            if (retCfgs.Count > 100) {
-                retCfgs2 = new List<PDAConfig>();
-                foreach (var rcfg in retCfgs)
-                    if (rcfg.Stack.Length <= rcfg.word.Length * 3)
-                        retCfgs2.Add(rcfg);
+            retCfgs.Sort((a,b) => a.word.Length.CompareTo(b.word.Length));
 
-            } else
-                retCfgs2 = new List<PDAConfig>(retCfgs);
-
-            return retCfgs2.Distinct().ToArray();
+            return retCfgs.Distinct().ToList();
         }
 
         public abstract override bool AcceptWord(string w);

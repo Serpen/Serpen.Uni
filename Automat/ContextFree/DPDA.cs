@@ -86,7 +86,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         public char[] WorkAlphabet { get; }
         public char? StartSymbol { get; }
 
-        PDAConfig[] IPDA.GoChar(PDAConfig[] pcfgs) => new PDAConfig[] { GoChar(pcfgs[0]) };
+        IList<PDAConfig> IPDA.GoChar(PDAConfig[] pcfgs) => new PDAConfig[] { GoChar(pcfgs[0]) };
         public PDAConfig GoChar(PDAConfig pcfg) {
             PDATransformKey qStart;
 

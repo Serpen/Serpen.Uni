@@ -99,27 +99,27 @@ namespace Serpen.Uni.Automat.ContextFree {
         public override bool AcceptWord(string w) {
             CheckWordInAlphabet(w);
 
-            //construct start config
+            // construct start config
             int runCount = 0;
-            PDAConfig[] pcfgs;
+            System.Collections.Generic.IList<PDAConfig> pcfgs;
             if (StartSymbol.HasValue)
                 pcfgs = new PDAConfig[] { new PDAConfig(StartState, w, new char[] { StartSymbol.Value }, null) };
             else
-                pcfgs = new PDAConfig[] { new PDAConfig(StartState, w, new char[] { }, null) };
+                pcfgs = new PDAConfig[] { new PDAConfig(StartState, w, System.Array.Empty<char>(), null) };
 
-            //while any pcfg exists
-            while (pcfgs.Length > 0) { //&& (pcfg.Where((a) => a.Stack.Length>0).Any())
+            // while any pcfg exists
+            while (pcfgs.Count > 0) { //&& (pcfg.Where((a) => a.Stack.Length>0).Any())
                 Utils.DebugMessage(string.Join(',', (from a in pcfgs select a.ToString())), this, Uni.Utils.eDebugLogLevel.Verbose);
                 foreach (var p in pcfgs)
                     if (p.word.Length == 0)
                         if (IsAcceptedState(p.State))
                             return true;
 
-                pcfgs = GoChar(pcfgs);
+                pcfgs = GoChar(pcfgs.ToArray());
 
                 runCount++;
-                if (pcfgs.Length > MAX_RUNS_OR_STACK || runCount > MAX_RUNS_OR_STACK)
-                    throw new PDAStackException($"Stack >= {pcfgs.Length}, {runCount}. run abort", this);
+                if (pcfgs.Count > MAX_RUNS_OR_STACK || runCount > MAX_RUNS_OR_STACK)
+                    throw new PDAStackException($"Stack >= {pcfgs.Count}, {runCount}. run abort", this);
             }
 
             return false;
