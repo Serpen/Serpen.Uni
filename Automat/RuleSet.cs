@@ -24,7 +24,7 @@ namespace Serpen.Uni.Automat {
             var sw = new System.Text.StringBuilder();
             sw.Append("{");
             foreach (var r in this.OrderBy(a => a.Key))
-                sw.Append($"({r.Key}=>({string.Join(',', r.Value.OrderBy(a => a))})), ");
+                sw.Append($"({r.Key}=>({string.Join(',', r.Value)})), ");
             sw.Append("}");
 
             return sw.ToString();
