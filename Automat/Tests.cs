@@ -92,9 +92,6 @@ namespace Serpen.Uni.Automat {
                     StatePDA QPDAfromNe = (StatePDA)NEfromD;
                     ret1Automat.Add(QPDAfromNe);
 
-                    ReGrammer RGfromN = (ReGrammer)N;
-                    ret1Automat.Add((NFAe)RGfromN);
-
                     StackPDA SPDAFromQPDA = (StackPDA)QPDAfromNe;
                     ret1Automat.Add(SPDAFromQPDA);
 
@@ -113,10 +110,6 @@ namespace Serpen.Uni.Automat {
                     ret1Automat.Add(DfromNe);
 
                     // NFA NfromD = (NFAe)DfromNe;
-
-                    try {
-                        ReGrammer RGfromNe = (ReGrammer)Ne;
-                    } catch (System.NotImplementedException) { }
 
                     StatePDA QPDAfromNe = (StatePDA)Ne;
                     ret1Automat.Add(QPDAfromNe);
@@ -345,7 +338,7 @@ namespace Serpen.Uni.Automat {
             bool ret = true;
             foreach (var a in automats) {
                 var a2 = ((IReverse)a.Reverse()).Reverse();
-                if (!TestEqualWithWords(a, a2, 200))
+                if (!TestEqualWithWords(a, a2))
                     ret = false;
             }
             return ret;
@@ -365,7 +358,7 @@ namespace Serpen.Uni.Automat {
 
         #endregion
 
-        public static bool TestEqualWithWords(IAcceptWord A1, IAcceptWord A2, int initialCount) {
+        public static bool TestEqualWithWords(IAcceptWord A1, IAcceptWord A2, int initialCount = 100) {
             int onceTrue = 0, onceFalse = 0;
             int passLevel = System.Math.Min(initialCount / 10, 5);
 
@@ -382,9 +375,9 @@ namespace Serpen.Uni.Automat {
                         else onceFalse++;
 
                         if (erg1 != erg2)
-                            throw new Automat.Exception($"{count}. word '{w}' divides Automates", A1 as IAutomat, A2 as IAutomat);
+                            throw new Automat.Exception($"{count}. word '{w}' divides Automates", A1, A2);
 
-                        Utils.DebugMessage($"{count}. word '{w}' passes", Uni.Utils.eDebugLogLevel.Verbose, A1, A2);
+                        Utils.DebugMessage($"{count}. word '{w}' passes {erg1}", Uni.Utils.eDebugLogLevel.Verbose, A1, A2);
                         count++;
                     } catch (TuringCycleException) {
                     } catch (PDAStackException) { }
@@ -443,7 +436,11 @@ namespace Serpen.Uni.Automat {
                     }
                 }
             }
+        }
 
+        public static void AllChomskeyAlgEquals() {
+            foreach (CFGrammer cfg in KnownAutomat.GetCFGs(1000))
+                TestEqualWithWords(cfg.ToChomskyNF(AlgSourceMode.K1659), cfg.ToChomskyNF(AlgSourceMode.EAFK));
         }
 
     } //end class

@@ -62,6 +62,12 @@ namespace Serpen.Uni.Automat {
 
             }
 
+            words.Sort(delegate (string s1, string s2) {
+                if (s1.Length < s2.Length) return -1;
+                else if (s1.Length > s2.Length) return 1;
+                else return s1.CompareTo(s2);
+            });
+
             return words.ToArray();
 
         }
@@ -109,7 +115,7 @@ namespace Serpen.Uni.Automat {
                             } else {
                                 bool allContained = true;
                                 for (int i = 0; i < body.Length; i++)
-                                    if (!list.Contains(body[i])) {
+                                    if (!list.Contains(body[i]) && body[i] != r.Key) {
                                         allContained = false;
                                         break;
                                     }
@@ -163,7 +169,7 @@ namespace Serpen.Uni.Automat {
         public abstract bool AcceptWord(string w);
 
         public override string ToString()
-            => $"{{{string.Join(',', Variables)}}}, {{{string.Join(',', Terminals)}}}, {Rules.ToString()}, {StartSymbol}}}";
+            => $"{Name}_{{{string.Join(',', Variables)}}}, {{{string.Join(',', Terminals)}}}, {Rules.ToString()}, {StartSymbol}}}";
 
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Serpen.Uni.Automat.ContextFree {
+    [Serializable]
     public class CFGrammer : GrammerBase {
 
         public CFGrammer(string name, char[] variables, char[] terminals, RuleSet rules, char startSymbol)
@@ -59,18 +60,36 @@ namespace Serpen.Uni.Automat.ContextFree {
             return new CFGrammer("CFG_Random", Vars, Terms, rs, headVars.RndElement());
         }
 
+        internal GrammerBase org;
 
         public CFGrammer ToChomskyNF(AlgSourceMode mode = AlgSourceMode.EAFK) {
+
             var newVars = new List<char>(Variables);
             var newRS = Rules;
-            if (mode == AlgSourceMode.EAFK)
+
+            Utils.DebugMessage($"0.before: {newRS}", this, Uni.Utils.eDebugLogLevel.Verbose);
+
+            if (mode == AlgSourceMode.EAFK) {
                 newRS = RemoveUnusedSymbols(newRS, ref newVars);
+                Utils.DebugMessage($"0.remove: {newRS}", this, Uni.Utils.eDebugLogLevel.Verbose);
+            }
+
             newRS = Chomskey1_StartSymbol(newRS, ref newVars);
+            Utils.DebugMessage($"1.starts: {newRS}", this, Uni.Utils.eDebugLogLevel.Verbose);
+
             newRS = Chomskey2_Epsilon(newRS);
+            Utils.DebugMessage($"2.epsilo: {newRS}", this, Uni.Utils.eDebugLogLevel.Verbose);
+
             newRS = Chomskey3_UnitRules(newRS, newVars);
+            Utils.DebugMessage($"3.unitru: {newRS}", this, Uni.Utils.eDebugLogLevel.Verbose);
+
             newRS = Chomskey4_Length(newRS, ref newVars);
+            Utils.DebugMessage($"4.length: {newRS}", this, Uni.Utils.eDebugLogLevel.Verbose);
+
             newRS = Chomskey5_Terminals(newRS, ref newVars);
-            return new CFGrammer($"CCFG_({Name})", newVars.ToArray(), Terminals, newRS, StartSymbol) { IsChomskey = true };
+            Utils.DebugMessage($"5.termin: {newRS}", this, Uni.Utils.eDebugLogLevel.Verbose);
+
+            return new CFGrammer($"CCFG{mode}_({Name})", newVars.ToArray(), Terminals, newRS, StartSymbol) { IsChomskey = true, org = this };
         }
 
         /// <summary>
@@ -82,35 +101,36 @@ namespace Serpen.Uni.Automat.ContextFree {
         RuleSet Chomskey1_StartSymbol(RuleSet rs, ref List<char> newVars) {
             var newRS = new RuleSet();
 
-            char newStartSymbol = (char)0;
+            char? newStartSymbol = null;
 
             // check all rules for startbody
             foreach (var r in rs)
                 foreach (string body in r.Value) {
                     if (body.Contains(StartSymbol)) {
                         //get new Symbol, ONCE
-                        if (newStartSymbol == (char)0) {
+                        if (!newStartSymbol.HasValue) {
                             newStartSymbol = Utils.NextFreeCapitalLetter(newVars.Union(Terminals).ToArray(), StartSymbol);
-                            newVars.Add(newStartSymbol);
+                            newVars.Add(newStartSymbol.Value);
+                            break;
                         }
                     }
                 }
 
             // no symbol found, return old and exit
-            if (newStartSymbol == (char)0)
+            if (!newStartSymbol.HasValue)
                 return rs;
 
             // first add new startsymbole
-            newRS.Add(StartSymbol, new string[] { newStartSymbol.ToString() });
+            newRS.Add(StartSymbol, new string[] { newStartSymbol.Value.ToString() });
 
 
             // iterate rules and replace S->S'
             foreach (var r in rs) {
-                char newrKey = r.Key != StartSymbol ? r.Key : newStartSymbol;
+                char newrKey = r.Key != StartSymbol ? r.Key : newStartSymbol.Value;
                 var valList = new List<string>(r.Value.Length);
 
                 foreach (string body in r.Value)
-                    valList.Add(body.Replace(StartSymbol, newStartSymbol));
+                    valList.Add(body.Replace(StartSymbol, newStartSymbol.Value));
 
                 newRS.Add(newrKey, valList.ToArray());
             }
@@ -118,52 +138,46 @@ namespace Serpen.Uni.Automat.ContextFree {
             return newRS;
         }
 
-
+        /// <summary>
+        /// Move e-productions to Start
+        /// </summary>
         RuleSet Chomskey2_Epsilon(RuleSet rs) {
             RuleSet newRS = new RuleSet();
-            RuleSet workRS = null;
+            RuleSet roRS = null;
 
             var ListEpsilonHead = new Stack<char>();
             var alreadyProcessed = new List<char>();
 
             const string rChar = "";
 
-            //find all rules with and empty body, S=>e is allowed
+            // find all rules with and empty body, S=>e is allowed
             foreach (var r in rs)
                 if (r.Key != StartSymbol && r.Value.Contains(""))
                     ListEpsilonHead.Push(r.Key);
 
-            //no E rule outside S found, return old RS and exit
+            // no E rule outside S found, return old RS and exit
             if (!ListEpsilonHead.Any())
                 return rs;
 
-            var itCount = 0;
-            //as long as an Variable with Epsilon body exits
+            // as long as an Variable with Epsilon body exits
             while (ListEpsilonHead.Any()) {
-                itCount++;
-                if (itCount == 100) {
-                    Console.WriteLine($"Chomskey2_Epsilon 100th run for {this}");
-                    //{U}, {p,l,o,d}, {(U=>(UUUU,oUpUUU,loUUUU,,UUdUUUUUo,p,UUUUU,UlUUdUUl,opplU))}, U}
-                    // {J}, {b,f}, {(J=>(fJJJffJ,,f,JJfJJJJJ,JJJJJbJ,JJJ,JJJJJbfJ,fJffbJJbJ))}, J}
-                    // {J}, {v,w,c}, {(J=>(Jv,JJJc,,wvJvJ,JJJ,c))}, J}
-                }
-                if (workRS == null)
-                    workRS = rs;
+                if (roRS == null)
+                    roRS = rs;
                 else {
-                    workRS = newRS;
+                    roRS = newRS;
                     newRS = new RuleSet();
                 }
 
                 var VarEpsilonHead = ListEpsilonHead.Pop();
 
-                //iterate rules
-                foreach (var r in workRS) {
+                // iterate rules
+                foreach (var r in roRS) {
                     var newVals = new List<string>(r.Value.Length);
                     foreach (string body in r.Value) {
                         if (body.Contains(VarEpsilonHead) && !alreadyProcessed.Contains(r.Key)) { //replace Var with e-Power
                             newVals.AddRange(ReplaceStringEpsilonPowerSet(body, VarEpsilonHead));
                         } else if (body == rChar && r.Key == VarEpsilonHead) {
-                            //should be removed
+                            // should be removed
                         } else
                             newVals.Add(body);
                     }
@@ -174,7 +188,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                     newRS.Add(r.Key, newVals.Distinct().ToArray());
                 }
 
-                //search for new Epsilon Productions
+                // search for new Epsilon Productions
                 foreach (var r in newRS)
                     if (r.Key != StartSymbol && r.Value.Contains(rChar))
                         ListEpsilonHead.Push(r.Key);
@@ -184,39 +198,52 @@ namespace Serpen.Uni.Automat.ContextFree {
             return newRS;
         }
 
+        /// <summary>
+        /// Eliminate Rules Single Var->Single Var
+        /// </summary>
         RuleSet Chomskey3_UnitRules(RuleSet rs, List<char> newVars) {
             RuleSet newRS = new RuleSet();
-            RuleSet workRS = null;
+            RuleSet roRS = null;
+
             var Repl = new Stack<char>();
             string[] replaceStrings;
 
-            //find all rules with VAR->Var
+            // find all rules with VAR->Var
             foreach (var r in rs)
                 foreach (string body in r.Value)
                     if (body.Length == 1 && newVars.Contains(body[0]))
-                        Repl.Push(body[0]);
+                        if (!Repl.Contains(body[0]))
+                            Repl.Push(body[0]);
 
             if (!Repl.Any())
                 return rs;
 
             while (Repl.Any()) {
-                if (workRS == null)
-                    workRS = rs;
+                if (roRS == null)
+                    roRS = rs;
                 else {
-                    workRS = newRS;
+                    roRS = newRS;
                     newRS = new RuleSet();
                 }
-                var var = Repl.Pop();
-                replaceStrings = workRS[var];
+                var singleVar = Repl.Pop();
 
-                foreach (var r in workRS) {
+                if (roRS.ContainsKey(singleVar)) {
+                    replaceStrings = roRS[singleVar];
+                } else {
+                    replaceStrings = null;
+                    Utils.DebugMessage($"{singleVar} not a head", this, Uni.Utils.eDebugLogLevel.Always);
+                }
+
+                foreach (var r in roRS) {
                     var newVals = new List<string>(r.Value.Length);
-                    foreach (string body in r.Value) {
-                        if (body == var.ToString()) {
+                    foreach (string body in r.Value)
+                        if (replaceStrings != null && body == singleVar.ToString())
                             newVals.AddRange(replaceStrings);
-                        } else
+                        else if (body.Length == 0 || body.Length != 1 || body[0] != singleVar) // don't readd singlevar
                             newVals.Add(body);
-                    }
+                        else
+                            Utils.DebugMessage($"{singleVar} not re-added", this, Uni.Utils.eDebugLogLevel.Verbose);
+
                     if (newVals.Contains(r.Key.ToString()))
                         newVals.Remove(r.Key.ToString());
                     newRS.Add(r.Key, newVals.Distinct().ToArray());
@@ -230,37 +257,42 @@ namespace Serpen.Uni.Automat.ContextFree {
             return newRS;
         }
 
+        /// <summary>
+        /// Length <= 2, introduce new Var for all |body|>2
+        /// </summary>
         RuleSet Chomskey4_Length(RuleSet rs, ref List<char> newVars) {
             var newRs = new RuleSet();
             var translate = new Dictionary<string, char>();
 
             foreach (var r in rs) {
                 var newVals = new List<string>(r.Value.Length);
-                foreach (string body in r.Value) {
-                    string newbody = body;
-                    int replaceStartPos = 0;
+                foreach (string orgbody in r.Value) {
+                    string newbody = orgbody;
 
                     // translate every new word, with all existing translations
                     foreach (var t in translate) {
                         var oldbody = newbody;
                         if (newbody.Length > 2)
+                            // FIX: replace should start right
                             newbody = newbody.Replace(t.Key, t.Value.ToString());
                         else
                             break;
+
+                        // body gets to small, Var only
                         if (newbody.Length == 1 && newVars.Contains(newbody[0]))
                             newbody = oldbody;
                     }
 
 
                     while (newbody.Length > 2) {
-                        var replacePart = newbody.Substring(Math.Min(replaceStartPos, newbody.Length - 2), 2);
-                        replaceStartPos++;
+                        var replacePart = newbody.Substring(newbody.Length - 2, 2);
 
                         if (!translate.TryGetValue(replacePart, out char nL)) {
                             nL = Utils.NextFreeCapitalLetter(newVars.Union(Terminals).ToArray(), 'X');
                             newVars.Add(nL);
                             translate.Add(replacePart, nL);
                         }
+                        // FIX: replace should start right
                         newbody = newbody.Replace(replacePart, nL.ToString());
                     }
                     newVals.Add(newbody);
@@ -280,9 +312,9 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             foreach (var r in rs) {
                 var newVals = new List<string>(r.Value.Length);
-                foreach (string body in r.Value) {
-                    string newBody = body;
-                    if (body.Length == 2) {
+                foreach (string ibody in r.Value) {
+                    string newBody = ibody;
+                    if (ibody.Length == 2) {
 
                         var c2Replaces = new List<char>();
                         if (Terminals.Contains(newBody[0]))
@@ -367,7 +399,6 @@ namespace Serpen.Uni.Automat.ContextFree {
 
                         table[i, j] = Heads.Distinct().ToArray();
                     }
-
                 return table[0, w.Length - 1].Contains(StartSymbol);
             }
         }
@@ -460,7 +491,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                 var newVals = new List<string>(r.Value.Length);
                 foreach (string body in r.Value)
                     newVals.Add(body.Reverse().ToString());
-                
+
                 newRules.Add(r.Key, newVals.ToArray());
             }
             return new CFGrammer($"CFG_Reverse({Name})", this.Variables, this.Terminals, newRules, this.StartSymbol);
@@ -474,8 +505,8 @@ namespace Serpen.Uni.Automat.ContextFree {
         public CFGrammer Complement() => throw new NotSupportedException();
         public CFGrammer Concat(CFGrammer cfg) => Combine(cfg, new string[] { "{0}{1}" }, "concat");
         public CFGrammer Join(CFGrammer cfg) => Combine(cfg, new string[] { "{0}" }, "join");
-        
-		public CFGrammer HomomorphismChar(Dictionary<char, char> translate) => throw new NotImplementedException();
+
+        public CFGrammer HomomorphismChar(Dictionary<char, char> translate) => throw new NotImplementedException();
 
         #endregion
     } //end class

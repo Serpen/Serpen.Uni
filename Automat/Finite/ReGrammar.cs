@@ -35,34 +35,32 @@ namespace Serpen.Uni.Automat.Finite {
                 acceptable.Distinct().ToArray());
         }
 
-        public static explicit operator ReGrammer(FABase A) {
+        [AlgorithmSource("1659_3.2.3_P84")]
+        public static explicit operator ReGrammer(DFA A) {
             var rs = new RuleSet();
 
-            var stateChars = new char[A.StatesCount];
+            var stateVars = new char[A.StatesCount];
 
-            for (int i = 0; i < stateChars.Length; i++)
+            for (int i = 0; i < stateVars.Length; i++)
                 if (i != A.StartState)
-                    stateChars[i] = Utils.NextFreeCapitalLetter(stateChars.Union(A.Alphabet), null);
+                    stateVars[i] = Utils.NextFreeCapitalLetter(stateVars.Union(A.Alphabet), null);
                 else
-                    stateChars[i] = Utils.NextFreeCapitalLetter(stateChars.Union(A.Alphabet), 'S');
+                    stateVars[i] = Utils.NextFreeCapitalLetter(stateVars.Union(A.Alphabet), 'S');
 
-            for (uint q = 0; q < A.StatesCount; q++) {
+            foreach (var eat in A.Transforms) {
                 var newVals = new List<string>();
-                foreach (var eat in A.Transforms.Where(a => a.Key.q == q)) {
-                    // add all transforms cq as body
-                    foreach (var eatval in eat.Value)
-                        if (!eat.Key.c.HasValue)
-                            throw new System.NotImplementedException("dont know what to to with e-trans");
-                        else
-                            newVals.Add($"{eat.Key.c}{stateChars[eatval]}");
-                }
-                if (A.IsAcceptedState(q))
-                    newVals.Add("");
-                rs.AddM(stateChars[q], newVals.ToArray());
-
+                // add all transforms cq as body
+                foreach (var eatval in eat.Value)
+                    newVals.Add($"{eat.Key.c}{stateVars[eatval]}");
+                rs.AddM(stateVars[eat.Key.q], newVals.ToArray());
             }
 
-            return new ReGrammer($"RG({A.Name})", stateChars, A.Alphabet, rs, stateChars[A.StartState]);
+            for (uint q = 0; q < A.StatesCount; q++) {
+                if (A.IsAcceptedState(q))
+                    rs.AddM(stateVars[q], new string[] { "" });
+            }
+
+            return new ReGrammer($"RG({A.Name})", stateVars, A.Alphabet, rs, stateVars[A.StartState]);
         }
 
         protected override void CheckConstraints() {
