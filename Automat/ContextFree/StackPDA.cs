@@ -85,6 +85,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             else
                 pcfgs = new PDAConfig[] { new PDAConfig(StartState, w, new char[] { }, null) };
 
+            int HackCounter = 0;
 
             //while any pcfg exists
             while (pcfgs.Any()) {
@@ -96,10 +97,13 @@ namespace Serpen.Uni.Automat.ContextFree {
 
                 // hack!
                 if (pcfgs.Count > MAX_RUNS_OR_STACK || runCount > MAX_RUNS_OR_STACK) {
+                    
                     var pcfgsGood = new System.Collections.Generic.List<PDAConfig>();
                     foreach (var pcfg in pcfgs)
-                        if (pcfg.word.Length < w.Length)
+                        if (pcfg.word.Length < w.Length-HackCounter)
                             pcfgsGood.Add(pcfg);
+
+                    HackCounter++;
 
                     if (!pcfgsGood.Any() || runCount > MAX_RUNS_OR_STACK)
                         return false;

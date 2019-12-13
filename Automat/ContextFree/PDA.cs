@@ -80,66 +80,63 @@ namespace Serpen.Uni.Automat.ContextFree {
             var retCfgs = new List<PDAConfig>(pcfgs.Length*10);
 
             if (pcfgs.Length > MAX_RUNS_OR_STACK) {
-                Utils.DebugMessage($"Stack >= {pcfgs.Length} abort", this, Uni.Utils.eDebugLogLevel.Always);
-                return System.Array.Empty<PDAConfig>();
+                Utils.DebugMessage($"Stack >= {pcfgs.Length}", this, Uni.Utils.eDebugLogLevel.Normal);
+                //return System.Array.Empty<PDAConfig>();
             }
 
             foreach (var pcfg in pcfgs) {
                 PDATransformKey[] qStart = new PDATransformKey[1];
 
-                //if word is empty, maybe only e-Transform is needed
-                if (pcfg.word != "") {
+                // if word is empty, maybe only e-Transform is needed
+                if (!string.IsNullOrEmpty(pcfg.word)) {
                     if (pcfg.Stack.Any())
                         qStart[0] = new PDATransformKey(pcfg.State, pcfg.word[0], pcfg.Stack[0]);
                     else
                         qStart[0] = new PDATransformKey(pcfg.State, pcfg.word[0], null);
-                    // continue; //TODO: why that //maybe empty stack that is not accepted should be thrown away
 
                 } else {
                     if (pcfg.Stack.Any())
                         qStart[0] = new PDATransformKey(pcfg.State, null, pcfg.Stack[0]);
                     else
                         qStart[0] = new PDATransformKey(pcfg.State, null, null);
-                    // continue; //TODO: why that
                 }
 
-
-                //get all possible (e-)transforms
+                // get all possible (e-)transforms
                 if (((PDATransform)Transforms).TryGetValue(ref qStart, out PDATransformValue[] qNext)) {
-                    //iterate each cuple of start and next transform
+                    // iterate each cuple of start and next transform
                     for (int j = 0; j < qNext.Length; j++) {
                         var newStack = new Stack<char>(pcfg.Stack.Reverse());
                         var qNextj = qNext[j];
+                        var qStartj = qStart[j];
 
-                        if (qStart[j].cw.HasValue && qNext[j].cw2 != null) {
+                        if (qStartj.cw.HasValue && qNextj.cw2 != null) {
                             // stack symbol cw2 replaces cw
                             newStack.Pop();
                             for (int i = qNextj.cw2.Length - 1; i >= 0; i--)
                                 newStack.Push(qNextj.cw2[i]);
 
-                        } else if (qStart[j].cw.HasValue && qNext[j].cw2 == null) {
+                        } else if (qStartj.cw.HasValue && qNextj.cw2 == null) {
                             // cw was used, replace with e, so pop
                             newStack.Pop();
 
-                        } else if (!qStart[j].cw.HasValue && qNext[j].cw2 != null) {
-                            //any (e-cw) should be replaced by cw2
+                        } else if (!qStartj.cw.HasValue && qNextj.cw2 != null) {
+                            // any (e-cw) should be replaced by cw2
                             for (int i = qNextj.cw2.Length - 1; i >= 0; i--)
                                 newStack.Push(qNextj.cw2[i]);
 
-                        } else if (!qStart[j].cw.HasValue && qNext[j].cw2 == null) {
+                        } else if (!qStartj.cw.HasValue && qNextj.cw2 == null) {
                             // cw's not relevant, no stack action -> NOOP
                         } else
                             throw new System.NotSupportedException("some condition forgotten??");
 
-                        //transform was because of i, then remove words first letter
+                        // transform was because of ci, then remove words first letter
                         string newWord = pcfg.word;
-                        if (qStart[j].ci.HasValue)
-                            if (pcfg.word.Length > 0)
-                                newWord = pcfg.word.Substring(1);
+                        if (qStartj.ci.HasValue && pcfg.word.Length > 0)
+                            newWord = pcfg.word.Substring(1);
 
                         // Hack
                         if (newStack.Count <= (newWord.Length+1)*3)
-                            retCfgs.Add(new PDAConfig(qNext[j].qNext, newWord, newStack.ToArray(), pcfg));
+                            retCfgs.Add(new PDAConfig(qNextj.qNext, newWord, newStack.ToArray(), pcfg));
 
                     } //next j
 

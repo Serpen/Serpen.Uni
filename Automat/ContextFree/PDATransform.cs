@@ -116,7 +116,8 @@ namespace Serpen.Uni.Automat.ContextFree {
                 qnext = retVals.ToArray();
                 return true;
             } else {
-                qnext = retVals.ToArray();
+                // qnext = retVals.ToArray();
+                qnext = null;
                 return false;
             }
 
