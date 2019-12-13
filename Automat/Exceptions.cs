@@ -8,7 +8,7 @@ namespace Serpen.Uni.Automat {
 
     [System.Serializable]
     public class Exception : Serpen.Uni.Exception {
-        public Exception(string message, params IAutomat[] automats) : base(message) {
+        public Exception(string message, params IAcceptWord[] automats) : base(message) {
             Automats = automats;
             foreach (var automat in automats) {
                 try {
@@ -19,7 +19,7 @@ namespace Serpen.Uni.Automat {
             }
         }
 
-        public readonly IAutomat[] Automats;
+        public readonly IAcceptWord[] Automats;
     }
 
     [System.Serializable]

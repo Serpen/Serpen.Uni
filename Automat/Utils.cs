@@ -7,9 +7,11 @@ namespace Serpen.Uni.Automat {
 
         public const char EPSILON = 'ε';
 
-        internal static void AcceptWordConsoleLine(this IAcceptWord A, string w) {
+        internal static void AcceptWordConsoleLine(this IAcceptWord A, string w, bool onlytrue = false) {
             try {
-                System.Console.WriteLine($"{A.Name} accepts |{w.Length}| '{w}': {A.AcceptWord(w)}");
+                bool accepts = A.AcceptWord(w);
+                if (accepts || !onlytrue)
+                    System.Console.WriteLine($"{A.Name} accepts |{w.Length}| '{w}': {accepts}");
             } catch (Turing.TuringCycleException e) {
                 System.Console.WriteLine($"{A.Name} {e.Message}");
             } catch (ContextFree.PDAStackException e) {
@@ -77,12 +79,21 @@ namespace Serpen.Uni.Automat {
         public static void SaveAutomatImageToTemp(this IAutomat automat)
             => Visualization.DrawAutomat(automat).Save(System.Environment.ExpandEnvironmentVariables($@"%temp%\automat\{automat.Name}.png"));
 
-        public static void ExportToTemp(this IAutomat automat) {
-            SaveAutomatImageToTemp(automat);
+        public static void ExportToTemp(this IAcceptWord automat) {
+            if (automat is IAutomat a2)
+                SaveAutomatImageToTemp(a2);
             var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
             var stream = new System.IO.FileStream(System.Environment.ExpandEnvironmentVariables($@"%temp%\automat\{automat.Name}.bin"), System.IO.FileMode.Create, System.IO.FileAccess.Write);
             formatter.Serialize(stream, automat);
             stream.Close();
+        }
+
+        internal static T ImportFromTemp<T>(string file) where T : class, IAcceptWord {
+            var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+            var stream = new System.IO.FileStream(System.Environment.ExpandEnvironmentVariables($@"%temp%\automat\{file}"), System.IO.FileMode.Open);
+            var obj = formatter.Deserialize(stream);
+            stream.Close();
+            return obj as T;
         }
 
         internal static void DebugMessage(string message, IAcceptWord a, Serpen.Uni.Utils.eDebugLogLevel level) {

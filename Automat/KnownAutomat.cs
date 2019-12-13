@@ -5,6 +5,7 @@ namespace Serpen.Uni.Automat {
     public static partial class KnownAutomat {
 
         public static readonly char[] binAlp = new char[] { '0', '1' };
+        private const int RND_AUTOMAT_COUNT = 20;
 
 
         internal static List<T> GetTypes<T>() where T : IAcceptWord {
@@ -20,7 +21,7 @@ namespace Serpen.Uni.Automat {
         /// Returns a list of all KnowAutomat DEA_ Fields, current not dyn methods
         /// </summary>
         /// <returns></returns>
-        public static Finite.DFA[] GetDFAModels(int randomCount = 10) {
+        public static Finite.DFA[] GetDFAModels(int randomCount = RND_AUTOMAT_COUNT) {
             var list = GetTypes<Finite.DFA>();
 
             list.Add(KnownAutomat.DEA_BinFreq(3, 5));
@@ -32,7 +33,8 @@ namespace Serpen.Uni.Automat {
             return list.ToArray();
         }
 
-        public static ContextFree.CFGrammer[] GetCFGs(int randomCount = 10) {
+
+        public static ContextFree.CFGrammer[] GetCFGs(int randomCount = RND_AUTOMAT_COUNT) {
             var list = GetTypes<ContextFree.CFGrammer>();
 
             for (int i = 0; i < randomCount; i++)
@@ -45,7 +47,7 @@ namespace Serpen.Uni.Automat {
         /// Returns a list of all KnowAutomat NEA_ Fields, current not dyn methods
         /// </summary>
         /// <returns></returns>
-        public static Finite.NFA[] GetNFAModels(int randomCount = 10) {
+        public static Finite.NFA[] GetNFAModels(int randomCount = RND_AUTOMAT_COUNT) {
             var list = GetTypes<Finite.NFA>();
 
             list.Add(KnownAutomat.NEA_XlastIsOne(5));
@@ -56,7 +58,7 @@ namespace Serpen.Uni.Automat {
             return list.ToArray();
         }
 
-        public static Finite.NFAe[] GetNFAeModels(int randomCount = 10) {
+        public static Finite.NFAe[] GetNFAeModels(int randomCount = RND_AUTOMAT_COUNT) {
             var list = GetTypes<Finite.NFAe>();
 
             for (int i = 0; i < randomCount; i++)
@@ -89,7 +91,7 @@ namespace Serpen.Uni.Automat {
             AList.AddRange(GetTypes<Turing.TuringMachineSingleBand1659>());
             AList.AddRange(GetTypes<Turing.TuringMachineMultiTrack>());
             AList.AddRange(GetTypes<Turing.NTM1659>());
-            AList.AddRange(Tests.GenerateRandomAutomats(50));
+            AList.AddRange(Tests.GenerateRandomAutomats(RND_AUTOMAT_COUNT));
             return AList.ToArray();
         }
 

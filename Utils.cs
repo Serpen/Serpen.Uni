@@ -123,7 +123,10 @@ namespace Serpen.Uni {
             var sb = new System.Text.StringBuilder();
             for (int r = 0; r < array.GetLength(0); r++) {
                 for (int c = 0; c < array.GetLength(1); c++)
-                    sb.Append($"{array[r, c].ToString().PadLeft(2) }, ");
+                    if (array[r, c] != null)
+                        sb.Append($"{array[r, c].ToString().PadLeft(2) }, ");
+                    else
+                        sb.Append("".ToString().PadLeft(2));
                 sb.AppendLine();
             }
             return sb.ToString();
