@@ -8,7 +8,7 @@ namespace Serpen.Uni.Automat {
     public static class Tests {
 
         public static void RunAllTests() {
-            var allAutomats1 = new List<IAutomat>();
+            var allAutomats1 = new List<IAcceptWord>();
 
             allAutomats1.AddRange(GenerateComplements());
             allAutomats1.AddRange(GenerateConcats());
@@ -27,10 +27,11 @@ namespace Serpen.Uni.Automat {
                 try {
                     PurgeEquality(allAutomats[i], 20);
                 } catch (ContextFree.PDAStackException) { } catch (Turing.TuringCycleException) { }
+
                 for (int j = 0; j < allAutomats[i].GetLength(0); j++) {
                     if (!TestEqualWithWords(allAutomats[i][0], allAutomats[i][j], 20)) {
                         try {
-                            throw new Automat.Exception("Automats not equal", new IAutomat[] { allAutomats[i][0], allAutomats[i][j] });
+                            throw new Automat.Exception("Automats not equal", new IAcceptWord[] { allAutomats[i][0], allAutomats[i][j] });
                             // throw new Automat.Exception("Automats not equal", allAutomats[i]);
                         } catch (System.Exception) {
 
@@ -42,12 +43,12 @@ namespace Serpen.Uni.Automat {
             TestMinimizedDeaIsMHCount();
         }
 
-        public static IAutomat[][] CastToEveryPossibility() => CastToEveryPossibility(KnownAutomat.GetAllAutomats());
-        public static IAutomat[][] CastToEveryPossibility(IEnumerable<IAutomat> automats) {
-            var retAutomats = new List<IAutomat[]>();
+        public static IAcceptWord[][] CastToEveryPossibility() => CastToEveryPossibility(KnownAutomat.GetAllAutomats());
+        public static IAcceptWord[][] CastToEveryPossibility(IEnumerable<IAcceptWord> automats) {
+            var retAutomats = new List<IAcceptWord[]>();
 
-            foreach (IAutomat automat in automats) {
-                var ret1Automat = new List<IAutomat>();
+            foreach (IAcceptWord automat in automats) {
+                var ret1Automat = new List<IAcceptWord>();
                 if (automat is DFA D) {
                     ret1Automat.Add(D);
 
@@ -179,8 +180,8 @@ namespace Serpen.Uni.Automat {
             return retAut.ToArray();
         }
 
-        public static void PurgeEquality(IAutomat[] automats, int words = 100) {
-            foreach (IAutomat a in automats) {
+        public static void PurgeEquality(IAcceptWord[] automats, int words = 100) {
+            foreach (IAutomat a in automats.Where(b => b is IAutomat).Cast<IAutomat>()) {
                 var a_removed = a.PurgeStates();
                 string[] rwords = a.GetRandomWords(words, 1, words, System.Array.Empty<string>());
                 for (int i = 0; i < rwords.Length; i++) {

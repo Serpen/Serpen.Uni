@@ -207,7 +207,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             return new DPDA($"{Name}_purged", (uint)names.Length, Alphabet, WorkAlphabet, newT, translate.ArrayIndex(StartState), StartSymbol, aStates);
         }
 
-        public virtual IAutomat Reverse() => ((StatePDA)this).Reverse();
+        public virtual IAcceptWord Reverse() => ((StatePDA)this).Reverse();
 
         public override string ToString() => $"{Name} DPDA(|{States.Length}|={string.Join(";", States)}), {{{string.Join(',', Alphabet)}}},{{{string.Join(',', WorkAlphabet)}}}, {{{Transforms.ToString()}}}, {StartState}, {StartSymbol} {{{string.Join(',', AcceptedStates)}}})".Trim();
 

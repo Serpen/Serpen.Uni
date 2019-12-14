@@ -145,7 +145,7 @@ namespace Serpen.Uni.Automat.Finite {
         /// former q0 becomes the only ϵ F
         /// </summary>
         [AlgorithmSource("EAFK_4.2.2", "1659_T2.5_P47")]
-        public IAutomat Reverse() {
+        public IAcceptWord Reverse() {
             var neaET = new NFAeTransform();
 
             string[] names = new string[this.StatesCount + 1];

@@ -247,7 +247,7 @@ namespace Serpen.Uni.Automat.ContextFree {
                 throw new System.NotImplementedException();
         }
 
-        public IAutomat Reverse() {
+        public IAcceptWord Reverse() {
             var pdat = new PDATransform();
 
             string[] names = new string[this.StatesCount + 1];

@@ -4,7 +4,7 @@ using System.Linq;
 namespace Serpen.Uni.Automat {
 
     [System.Serializable]
-    public abstract class GrammerBase : IAcceptWord {
+    public abstract class GrammerBase : IAcceptWord, IReverse {
         protected GrammerBase(string name, char[] variables, char[] terminals, RuleSet rules, char startSymbol) {
             this.Variables = variables;
             this.Terminals = terminals;
@@ -101,6 +101,7 @@ namespace Serpen.Uni.Automat {
 
         protected char[] GetGeneratingAndReachableSymbols() {
             var list = new List<char>(Terminals);
+            // list.Add(StartSymbol);
 
             bool foundNew = true;
             while (foundNew) {
@@ -164,6 +165,23 @@ namespace Serpen.Uni.Automat {
 
             return newRS;
         }
+
+        #region Abgeschlossenheiteseigenschaften
+
+            [AlgorithmSource("EAFK_7.3.3")]
+            public IAcceptWord Reverse() {
+                var rs = new RuleSet();
+                foreach (var r in this.Rules)
+                {
+                    var bodys = new string[r.Value.Length];
+                    for (int i = 0; i < r.Value.Length; i++)
+                        bodys[i] = string.Join("", r.Value[i].Reverse());
+                    rs.Add(r.Key, bodys);
+                }
+
+                return new ContextFree.CFGrammer($"Rev_({this.Name}", this.Variables, this.Terminals, rs, this.StartSymbol);
+            }    
+        #endregion
 
 
         public abstract bool AcceptWord(string w);
