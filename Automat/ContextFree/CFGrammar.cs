@@ -60,6 +60,56 @@ namespace Serpen.Uni.Automat.ContextFree {
             return new CFGrammer("CFG_Random", Vars, Terms, rs, headVars.RndElement());
         }
 
+
+        [AlgorithmSource("EAFK_S6.14_P253")]
+        public static explicit operator CFGrammer(StackPDA spda) {
+            var vars = new List<char>();
+            char startSymbol;
+            var translate = new Dictionary<string, char>(Uni.Utils.Pow((int)spda.StatesCount, 2));
+            if (spda.StartSymbol.HasValue)
+                startSymbol = spda.StartSymbol.Value;
+            else { }
+            startSymbol = Utils.NextFreeCapitalLetter(spda.WorkAlphabet, null);
+
+
+            vars.Add(startSymbol);
+
+            for (int i = 0; i < spda.StatesCount; i++)
+                for (int j = 0; j < spda.StatesCount; j++) {
+                    foreach (char c in spda.WorkAlphabet.Append(startSymbol).Distinct()) {
+                        char l = Utils.NextFreeCapitalLetter(vars, null);
+                        vars.Add(l);
+                        translate.Add($"{i}{c}{j}", l);
+                    }
+                    char le = Utils.NextFreeCapitalLetter(vars, null);
+                    vars.Add(le);
+                    translate.Add($"{i}{j}", le);
+                }
+
+            var rs = new RuleSet();
+
+            var sbody = new List<string>();
+            for (int i = 0; i < spda.StatesCount; i++)
+                sbody.Add(translate[$"{spda.StartState}{startSymbol}{i}"].ToString());
+
+            rs.Add(startSymbol, sbody.ToArray());
+
+            foreach (var t in spda.Transforms) {
+                var bodys = new List<string>(t.Value.Length);
+                foreach (var v in t.Value) {
+                    if (v.cw2 != "")
+                        for (int i = 0; i < spda.StatesCount; i++)
+                            for (int j = 0; j < spda.StatesCount; j++)
+                                bodys.Add($"{t.Key.ci}{translate[$"{i}{startSymbol}{j}"]}{translate[$"{i}{startSymbol}{j}"]}");
+                    else
+                        bodys.Add("");
+                    rs.AddM(translate[$"{t.Key.q}{t.Key.cw}{v.qNext}"], bodys.Distinct().ToArray());
+                }
+            }
+
+            return new CFGrammer($"CFG_({spda.Name})", vars.ToArray(), spda.Alphabet, rs, startSymbol);
+        }
+
         internal GrammerBase org;
 
         public CFGrammer ToChomskyNF(AlgSourceMode mode = AlgSourceMode.EAFK) {
@@ -483,21 +533,6 @@ namespace Serpen.Uni.Automat.ContextFree {
         }
 
         public CFGrammer Union(CFGrammer cfg) => Combine(cfg, new string[] { "{0}", "{1}" }, "union");
-
-        public CFGrammer Reverse() {
-            var newRules = new RuleSet();
-
-            foreach (var r in this.Rules) {
-                var newVals = new List<string>(r.Value.Length);
-                foreach (string body in r.Value)
-                    newVals.Add(body.Reverse().ToString());
-
-                newRules.Add(r.Key, newVals.ToArray());
-            }
-            return new CFGrammer($"CFG_Reverse({Name})", this.Variables, this.Terminals, newRules, this.StartSymbol);
-
-        }
-
         public CFGrammer Diff(CFGrammer cfg) => throw new NotSupportedException();
         public CFGrammer Diff(Finite.FABase A) => throw new NotImplementedException();
         public CFGrammer Intersect(CFGrammer cfg) => throw new NotSupportedException();
