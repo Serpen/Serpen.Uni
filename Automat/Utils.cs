@@ -29,7 +29,21 @@ namespace Serpen.Uni.Automat {
                 return true;
         }
 
+
+        internal static char NextFreeLowerLetter(IEnumerable<char> alphabet) {
+            for (int i = (int)'a'; i < (int)'z' + 1; i++)
+                if (!alphabet.Contains((char)i))
+                    return (char)i;
+
+            for (int i = (int)'ß'; i < (int)'ÿ' + 1; i++)
+                if (char.IsLetter((char)i) && !alphabet.Contains((char)i))
+                    return (char)i;
+
+            throw new System.ArgumentOutOfRangeException();
+
+        }
         internal static char NextFreeCapitalLetter(IEnumerable<char> alphabet, char? inputChar) => NextFreeCapitalLetter(alphabet, inputChar, System.Array.Empty<char>());
+
         internal static char NextFreeCapitalLetter(IEnumerable<char> alphabet, char? inputChar, char[] wishChars) {
             if (inputChar.HasValue) {
                 if (!alphabet.Contains(inputChar.ToString().ToUpper()[0]))

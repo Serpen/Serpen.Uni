@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Serpen.Uni.Automat.ContextFree {
     [Serializable]
-    public class CFGrammer : GrammerBase {
+    public class CFGrammer : GrammerBase, IUnion {
 
         public CFGrammer(string name, char[] variables, char[] terminals, RuleSet rules, char startSymbol)
             : base(name, variables, terminals, rules, startSymbol) {
@@ -459,40 +459,47 @@ namespace Serpen.Uni.Automat.ContextFree {
         #region Abgeschlossenheitseigenschaften
 
 
-        CFGrammer Combine(CFGrammer cfg, string[] startBodysFormat, string nameExt) {
+        CFGrammer Combine(IAcceptWord ia, string[] startBodysFormat, string nameExt) {
+            if (!(ia is CFGrammer cfg2))
+                throw new System.NotSupportedException();
+
             var newRules = new RuleSet();
 
-            List<char> bothVarAndTerm = this.VarAndTerm.Union(cfg.VarAndTerm).ToList();
             List<char> finalVars = this.Variables.ToList();
             List<char> finalTerms = this.Terminals.ToList();
-            char newStart = Utils.NextFreeCapitalLetter(bothVarAndTerm, this.StartSymbol);
+            char newStart = Utils.NextFreeCapitalLetter(this.VarAndTerm.Union(cfg2.VarAndTerm), this.StartSymbol);
 
-            bothVarAndTerm.Add(newStart);
             finalVars.Add(newStart);
 
-            var translate = new Dictionary<char, char>(cfg.VarAndTerm.Count);
-            foreach (char c in cfg.Variables) {
-                if (!finalVars.Contains(c)) {
-                    translate.Add(c, c);
+            var translate = new Dictionary<char, char>(cfg2.VarAndTerm.Count);
+            foreach (char V in cfg2.Variables) {
+                if (!finalVars.Contains(V)) {
+                    finalVars.Add(V);
+                    translate.Add(V, V);
                 } else {
-                    char newChar = Utils.NextFreeCapitalLetter(finalVars, c);
-                    translate.Add(c, newChar);
+                    char newChar = Utils.NextFreeCapitalLetter(finalTerms.Union(finalVars), V);
+                    translate.Add(V, newChar);
                     finalVars.Add(newChar);
                 }
             }
-            foreach (char c in cfg.Terminals) {
-                if (!finalTerms.Contains(c)) {
-                    translate.Add(c, c);
-                } else {
-                    char newChar = Utils.NextFreeCapitalLetter(finalTerms, c); //against convention!
-                    translate.Add(c, newChar);
-                    finalTerms.Add(newChar);
+
+            // assume char as terminal is equal when its equal
+            foreach (char t in cfg2.Terminals) {
+                if (!finalTerms.Contains(t)) {
+                    finalTerms.Add(t);
                 }
+                // else {
+                //     char newChar = Utils.NextFreeLowerLetter(finalTerms.Union(finalVars)); //against convention!
+                //     translate.Add(t, newChar);
+                //     finalTerms.Add(newChar);
+                // }
+                if (!translate.ContainsKey(t))
+                    translate.Add(t, t);
             }
 
 
             for (int i = 0; i < startBodysFormat.Length; i++)
-                startBodysFormat[i] = string.Format(startBodysFormat[i], this.StartSymbol, cfg.StartSymbol, newStart);
+                startBodysFormat[i] = string.Format(startBodysFormat[i], this.StartSymbol, cfg2.StartSymbol, newStart);
 
             //New Start Rule, build 
             newRules.Add(newStart, startBodysFormat);
@@ -503,13 +510,13 @@ namespace Serpen.Uni.Automat.ContextFree {
             }
 
 
-            foreach (var r in cfg.Rules) {
+            foreach (var r in cfg2.Rules) {
                 var newVals = new List<string>(r.Value.Length);
                 foreach (string body in r.Value) {
                     var sw = new System.Text.StringBuilder();
-                    foreach (char c in body) {
+                    foreach (char c in body) 
                         sw.Append(translate[c]);
-                    }
+                    
                     newVals.Add(sw.ToString());
                 }
                 newRules.Add(translate[r.Key], newVals.ToArray());
@@ -532,14 +539,14 @@ namespace Serpen.Uni.Automat.ContextFree {
             return new CFGrammer($"CFG_KleeneStern({Name})-", this.Variables.Append(newStart).ToArray(), this.Terminals, newRules, newStart);
         }
 
-        public CFGrammer Union(CFGrammer cfg) => Combine(cfg, new string[] { "{0}", "{1}" }, "union");
+        public IAcceptWord Union(IUnion cfg) => Combine(cfg, new string[] { "{0}", "{1}" }, "union");
         public CFGrammer Diff(CFGrammer cfg) => throw new NotSupportedException();
         public CFGrammer Diff(Finite.FABase A) => throw new NotImplementedException();
         public CFGrammer Intersect(CFGrammer cfg) => throw new NotSupportedException();
         public CFGrammer Intersect(Finite.FABase A) => throw new NotImplementedException();
         public CFGrammer Complement() => throw new NotSupportedException();
-        public CFGrammer Concat(CFGrammer cfg) => Combine(cfg, new string[] { "{0}{1}" }, "concat");
-        public CFGrammer Join(CFGrammer cfg) => Combine(cfg, new string[] { "{0}" }, "join");
+        public IAcceptWord Concat(IConcat cfg) => Combine(cfg, new string[] { "{0}{1}" }, "concat");
+        public IAcceptWord Join(IJoin cfg) => Combine(cfg, new string[] { "{0}" }, "join");
 
         public CFGrammer HomomorphismChar(Dictionary<char, char> translate) => throw new NotImplementedException();
 

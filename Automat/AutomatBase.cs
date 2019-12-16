@@ -10,7 +10,9 @@ namespace Serpen.Uni.Automat {
         string[] GetRandomWords(int count, int minLen, int maxLen, string[] blocked);
         char[] Alphabet { get; }
 
-        Dictionary<string, string[]> FindMNEqClasses(int count = 100);
+        Dictionary<System.Tuple<string, bool>, System.Tuple<string, bool>[]> FindMNEqClasses(int count = 100);
+
+        bool SameAlphabet(IAcceptWord A2);
 
         // System.Func<string,bool> SimplifiedAcceptFunction {get; internal set;}
         //protected void CheckConstraints();
@@ -24,8 +26,6 @@ namespace Serpen.Uni.Automat {
         bool IsAcceptedState(uint q);
 
         IAutomat PurgeStates();
-
-        bool SameAlphabet(IAutomat A2);
 
         VisualizationTuple[] VisualizationLines();
     }
@@ -75,7 +75,7 @@ namespace Serpen.Uni.Automat {
             }
         }
 
-        public bool SameAlphabet(IAutomat A2) {
+        public bool SameAlphabet(IAcceptWord A2) {
             if (this.Alphabet.Length != A2.Alphabet.Length) return false;
             for (int i = 0; i < this.Alphabet.Length; i++)
                 if (this.Alphabet[i] != A2.Alphabet[i])
@@ -112,11 +112,20 @@ namespace Serpen.Uni.Automat {
             return fromStartReachable;
         }
 
-        public Dictionary<string, string[]> FindMNEqClasses(int count = 100) {
-            var rndwords = GetRandomWords(count, 0, Serpen.Uni.Utils.Sqrt(count), System.Array.Empty<string>());
+        public Dictionary<System.Tuple<string, bool>, System.Tuple<string, bool>[]> FindMNEqClasses(int count = 100) {
+            var rndwords = GetRandomWords(count, 0, Serpen.Uni.Utils.Sqrt(count) * System.Math.Max(1, 2 / this.Alphabet.Length), System.Array.Empty<string>());
 
-            return Serpen.Uni.Utils.EqualityClasses(rndwords,
-                (s1, s2) => Tests.InMyhillNerodeRelation(s1, s2, this, count));
+            System.Tuple<string, bool>[] mhRndTuples = new System.Tuple<string, bool>[rndwords.Length];
+            for (int i = 0; i < rndwords.Length; i++) {
+                bool acceptWord = false;
+                try {
+                    acceptWord = this.AcceptWord(rndwords[i]);
+                } catch (Turing.TuringCycleException) { } catch (ContextFree.PDAStackException) { }
+                mhRndTuples[i] = new System.Tuple<string, bool>(rndwords[i], acceptWord);
+            }
+
+            return Serpen.Uni.Utils.EqualityClasses(mhRndTuples,
+                (s1, s2) => Tests.InMyhillNerodeRelation(s1.Item1, s2.Item1, this, count));
         }
 
         protected (uint[], string[], uint[]) RemovedStateTranslateTables() {

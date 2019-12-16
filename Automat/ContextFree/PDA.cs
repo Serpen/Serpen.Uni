@@ -166,11 +166,11 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         #region "Operations"
 
-        public IAutomat Join(IJoin automat) => JoinConcatUnion(automat, JoinConcatUnionKind.Join);
-        public IAutomat Concat(IConcat automat) => JoinConcatUnion(automat, JoinConcatUnionKind.Concat);
-        public IAutomat Union(IUnion automat) => JoinConcatUnion(automat, JoinConcatUnionKind.Union);
+        public IAcceptWord Join(IJoin automat) => JoinConcatUnion(automat, JoinConcatUnionKind.Join);
+        public IAcceptWord Concat(IConcat automat) => JoinConcatUnion(automat, JoinConcatUnionKind.Concat);
+        public IAcceptWord Union(IUnion automat) => JoinConcatUnion(automat, JoinConcatUnionKind.Union);
 
-        IAutomat JoinConcatUnion(IAutomat automat, JoinConcatUnionKind kind) {
+        IAcceptWord JoinConcatUnion(IAcceptWord automat, JoinConcatUnionKind kind) {
             if (!(automat is PDA pda2))
                 throw new System.NotSupportedException();
             if (kind != JoinConcatUnionKind.Join && !(automat is StatePDA))

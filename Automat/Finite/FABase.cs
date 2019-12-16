@@ -70,7 +70,7 @@ namespace Serpen.Uni.Automat.Finite {
         }
 
         [AlgorithmSource("1659_S2.9")]
-        IAutomat JoinConcatUnion(IAutomat automat, JoinConcatUnionKind unionConcatJoinKind) {
+        IAcceptWord JoinConcatUnion(IAcceptWord automat, JoinConcatUnionKind unionConcatJoinKind) {
             if (!(automat is FABase fa2))
                 throw new System.NotSupportedException();
 
@@ -134,9 +134,9 @@ namespace Serpen.Uni.Automat.Finite {
             return new NFAe($"NEAe{unionConcatJoinKind.ToString()}({Name}+{fa2.Name})", this.StatesCount + fa2.StatesCount + offsetA1, inputAlphabet, neaeT, startState, accStates);
         }
 
-        public virtual IAutomat Join(IJoin automat) => JoinConcatUnion(automat, JoinConcatUnionKind.Join);
-        public virtual IAutomat Concat(IConcat automat) => JoinConcatUnion(automat, JoinConcatUnionKind.Concat);
-        public virtual IAutomat Union(IUnion automat) => JoinConcatUnion(automat, JoinConcatUnionKind.Union);
+        public virtual IAcceptWord Join(IJoin automat) => JoinConcatUnion(automat, JoinConcatUnionKind.Join);
+        public virtual IAcceptWord Concat(IConcat automat) => JoinConcatUnion(automat, JoinConcatUnionKind.Concat);
+        public virtual IAcceptWord Union(IUnion automat) => JoinConcatUnion(automat, JoinConcatUnionKind.Union);
         public abstract IAutomat Intersect(IIntersect a);
         public abstract IAutomat Diff(IDiff a);
 

@@ -30,12 +30,8 @@ namespace Serpen.Uni.Automat {
 
                 for (int j = 0; j < allAutomats[i].GetLength(0); j++) {
                     if (!TestEqualWithWords(allAutomats[i][0], allAutomats[i][j], 20)) {
-                        try {
-                            throw new Automat.Exception("Automats not equal", new IAcceptWord[] { allAutomats[i][0], allAutomats[i][j] });
-                            // throw new Automat.Exception("Automats not equal", allAutomats[i]);
-                        } catch (System.Exception) {
-
-                        }
+                        throw new Automat.Exception("Automats not equal", new IAcceptWord[] { allAutomats[i][0], allAutomats[i][j] });
+                        // throw new Automat.Exception("Automats not equal", allAutomats[i]);
 
                     }
                 }
@@ -62,7 +58,11 @@ namespace Serpen.Uni.Automat {
                     ret1Automat.Add(NEfromN);
 
                     ReGrammer RGfromD = (ReGrammer)D;
-                    ret1Automat.Add((NFAe)RGfromD);
+                    // ret1Automat.Add((NFAe)RGfromD);
+
+                    CFGrammer CFGfromD = (CFGrammer)RGfromD;
+                    CFGrammer CFGCNF = (CFGrammer)RGfromD;
+                    // ret1Automat.Add(CFGCNF);
 
                     StatePDA QPDAfromNe = (StatePDA)NEfromD;
                     ret1Automat.Add(QPDAfromNe);
@@ -242,14 +242,14 @@ namespace Serpen.Uni.Automat {
         }
 
         #region  "Operations"
-        public static IAutomat[] GenerateJoins() {
+        public static IAcceptWord[] GenerateJoins() {
             var automats = KnownAutomat.GetTypes<IJoin>();
-            var ret = new List<IAutomat>(automats.Count * automats.Count);
+            var ret = new List<IAcceptWord>(automats.Count * automats.Count);
 
             foreach (var a1 in automats)
                 foreach (var a2 in automats)
                     if (a1.GetType() == a2.GetType())
-                        if (!(a1 is DFA) || a1.SameAlphabet(a2)) {
+                        if (!(a1 is DFA d) || a1.SameAlphabet(a2)) {
                             try {
                                 ret.Add(a1.Join(a2));
                             } catch (System.NotImplementedException) { } catch (System.NotSupportedException) { } // because of SPDA
@@ -273,9 +273,9 @@ namespace Serpen.Uni.Automat {
             return ret.ToArray();
         }
 
-        public static IAutomat[] GenerateUnions() {
+        public static IAcceptWord[] GenerateUnions() {
             var automats = KnownAutomat.GetTypes<IUnion>();
-            var ret = new List<IAutomat>(automats.Count() * automats.Count());
+            var ret = new List<IAcceptWord>(automats.Count() * automats.Count());
 
             foreach (var a1 in automats)
                 foreach (var a2 in automats)
@@ -345,9 +345,9 @@ namespace Serpen.Uni.Automat {
             return ret;
         }
 
-        public static IAutomat[] GenerateConcats() {
+        public static IAcceptWord[] GenerateConcats() {
             var automats = KnownAutomat.GetTypes<IConcat>();
-            var ret = new List<IAutomat>(automats.Count * automats.Count);
+            var ret = new List<IAcceptWord>(automats.Count * automats.Count);
 
             foreach (var a1 in automats)
                 foreach (var a2 in automats)
@@ -365,6 +365,10 @@ namespace Serpen.Uni.Automat {
 
             string[] words = System.Array.Empty<string>();
             int count = 0;
+
+            if (A1 is CFGrammer cfg1) A1 = cfg1.ToChomskyNF();
+            if (A2 is CFGrammer cfg2) A2 = cfg2.ToChomskyNF();
+
             while ((onceTrue < passLevel | onceFalse < passLevel) && count < initialCount * 2) {
                 words = A1.GetRandomWords(initialCount / 2, 1, Serpen.Uni.Utils.Sqrt(initialCount), words);
                 foreach (string w in words) {
@@ -403,12 +407,23 @@ namespace Serpen.Uni.Automat {
         public static bool InMyhillNerodeRelation(string w1, string w2, IAcceptWord automat, int count = 50) {
             var words = automat.GetRandomWords(count, 0, Serpen.Uni.Utils.Sqrt(count), System.Array.Empty<string>());
 
-            foreach (string w in words)
-                if (automat.AcceptWord(w1 + w) != automat.AcceptWord(w2 + w)) {
+            foreach (string w in words) {
+                bool? erg1 = null, erg2 = null;
+
+                try {
+                    erg1 = automat.AcceptWord(w1 + w);
+                } catch (Turing.TuringCycleException) {
+                } catch (ContextFree.PDAStackException) { }
+                try {
+                    erg2 = automat.AcceptWord(w2 + w);
+                } catch (Turing.TuringCycleException) {
+                } catch (ContextFree.PDAStackException) { }
+
+                if (erg1 != erg2) {
                     Utils.DebugMessage($"word {w} divides {w1},{w2}", automat, Uni.Utils.eDebugLogLevel.Verbose);
                     return false;
                 }
-
+            }
             return true;
         }
 

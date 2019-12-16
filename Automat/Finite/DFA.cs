@@ -143,10 +143,11 @@ namespace Serpen.Uni.Automat.Finite {
             return new DFA($"DFA_HomomorphismChar({Name})", this.StatesCount, Alp, deat, this.StartState, this.AcceptedStates);
         }
 
-        public override IAutomat Join(IJoin A) {
+        public override IAcceptWord Join(IJoin A) {
             if (!(A is DFA D2))
                 throw new NotSupportedException();
-            if (!this.SameAlphabet(A))
+
+            if (!this.SameAlphabet(D2))
                 throw new NotImplementedException("Different Alphabets are not implemented");
 
             var deat = new DFATransform();
@@ -168,8 +169,8 @@ namespace Serpen.Uni.Automat.Finite {
             return new DFA($"DFA_Join({Name}+{A.Name})", (D2.StatesCount + sc), this.Alphabet, deat, this.StartState, accStates.ToArray());
         }
 
-        public override IAutomat Union(IUnion A) => ProductDea(this, (DFA)A, eProductDeaMode.Union);
-        public IAutomat UnionNea(IUnion A) => base.Union(A);
+        public override IAcceptWord Union(IUnion A) => ProductDea(this, (DFA)A, eProductDeaMode.Union);
+        public IAcceptWord UnionNea(IUnion A) => base.Union(A);
         public override IAutomat Intersect(IIntersect A) => ProductDea(this, (DFA)A, eProductDeaMode.Intersect);
         public override IAutomat Diff(IDiff A) => ProductDea(this, (DFA)A, eProductDeaMode.Diff);
 

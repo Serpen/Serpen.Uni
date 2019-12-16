@@ -27,6 +27,14 @@ namespace Serpen.Uni.Automat {
 
         char[] IAcceptWord.Alphabet => Terminals;
 
+        public bool SameAlphabet(IAcceptWord A2) {
+            if (this.Terminals.Length != A2.Alphabet.Length) return false;
+            for (int i = 0; i < this.Terminals.Length; i++)
+                if (this.Terminals[i] != A2.Alphabet[i])
+                    return false;
+            return true;
+        }
+
         public string GetRandomWord() {
             var rnd = Uni.Utils.RND;
             var wLen = rnd.Next(0, 10);
@@ -72,11 +80,16 @@ namespace Serpen.Uni.Automat {
 
         }
 
-        public Dictionary<string, string[]> FindMNEqClasses(int count = 100) {
+        public Dictionary<System.Tuple<string, bool>, System.Tuple<string, bool>[]>
+            FindMNEqClasses(int count = 100) {
             var rndwords = GetRandomWords(count, 0, Serpen.Uni.Utils.Sqrt(count), System.Array.Empty<string>());
 
-            return Serpen.Uni.Utils.EqualityClasses(rndwords,
-                (s1, s2) => Tests.InMyhillNerodeRelation(s1, s2, this, count));
+            System.Tuple<string, bool>[] mhRndTuples = new System.Tuple<string, bool>[rndwords.Length];
+            for (int i = 0; i < rndwords.Length; i++)
+                mhRndTuples[i] = new System.Tuple<string, bool>(rndwords[i], AcceptWord(rndwords[i]));
+
+            return Serpen.Uni.Utils.EqualityClasses(mhRndTuples,
+                (s1, s2) => Tests.InMyhillNerodeRelation(s1.Item1, s2.Item1, this, count));
         }
 
 
@@ -168,19 +181,19 @@ namespace Serpen.Uni.Automat {
 
         #region Abgeschlossenheiteseigenschaften
 
-            [AlgorithmSource("EAFK_7.3.3")]
-            public IAcceptWord Reverse() {
-                var rs = new RuleSet();
-                foreach (var r in this.Rules)
-                {
-                    var bodys = new string[r.Value.Length];
-                    for (int i = 0; i < r.Value.Length; i++)
-                        bodys[i] = string.Join("", r.Value[i].Reverse());
-                    rs.Add(r.Key, bodys);
-                }
+        [AlgorithmSource("EAFK_7.3.3")]
+        public IAcceptWord Reverse() {
+            var rs = new RuleSet();
+            foreach (var r in this.Rules) {
+                var bodys = new string[r.Value.Length];
+                for (int i = 0; i < r.Value.Length; i++)
+                    bodys[i] = string.Join("", r.Value[i].Reverse());
+                rs.Add(r.Key, bodys);
+            }
 
-                return new ContextFree.CFGrammer($"Rev_({this.Name}", this.Variables, this.Terminals, rs, this.StartSymbol);
-            }    
+            return new ContextFree.CFGrammer($"Rev_({this.Name}", this.Variables, this.Terminals, rs, this.StartSymbol);
+        }
+
         #endregion
 
 

@@ -1,11 +1,11 @@
 namespace Serpen.Uni.Automat {
 
-    public interface IUnion : IAutomat, IConcat, IJoin { IAutomat Union(IUnion A); }
+    public interface IUnion : IAcceptWord, IConcat, IJoin { IAcceptWord Union(IUnion A); }
     public interface IIntersect : IAutomat { IAutomat Intersect(IIntersect A); }
     public interface IComplement : IAutomat { IAutomat Complement(); }
     public interface IDiff : IAutomat { IAutomat Diff(IDiff A); }
-    public interface IConcat : IAutomat { IAutomat Concat(IConcat A); }
-    public interface IJoin : IAutomat { IAutomat Join(IJoin A); }
+    public interface IConcat : IAcceptWord { IAcceptWord Concat(IConcat A); }
+    public interface IJoin : IAcceptWord { IAcceptWord Join(IJoin A); }
     public interface IReverse : IAcceptWord { IAcceptWord Reverse(); }
     public interface IKleeneStern : IAutomat { IAutomat KleeneStern(); }
     public interface IHomomorphismChar : IAutomat { IAutomat HomomorphismChar(System.Collections.Generic.Dictionary<char, char> Translate); }
