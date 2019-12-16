@@ -31,8 +31,8 @@ namespace Serpen.Uni.Automat {
             }
         }
 
-        [AcceptedWordSamples("0011", "010101")]
-        public static DFA DEA_SameCount0And1 {
+        [AcceptedWordSamples("0011", "10101010")]
+        public static DFA DEA_Even0And1 {
             get {
                 var deaT = new DFATransform();
                 deaT.AddBinTuple(0, 1, 2);
@@ -40,39 +40,16 @@ namespace Serpen.Uni.Automat {
                 deaT.AddBinTuple(2, 3, 0);
                 deaT.AddBinTuple(3, 2, 1);
 
-                return new DFA(nameof(DEA_SameCount0And1), 4, binAlp, deaT, 0, 0) {
+                return new DFA(nameof(DEA_Even0And1), 4, binAlp, deaT, 0, 0) {
                     SimplyfiedAcceptFunction = delegate (string s) {
-                        int c1 = s.Count((c) => c == '1');
-                        int c0 = s.Count((c) => c == '0');
-                        return c0 == c1;
+                        int c1 = s.Count((c) => c == '1') % 2;
+                        int c0 = s.Count((c) => c == '0') % 2;
+                        return c0 == c1 && c1 == 0;
                     }
                 };
             }
         
         }
-        public static DFA DEA_SameCountAandB {
-            get {
-                var deaT = new DFATransform() {
-                    {0,'a',1},
-                    {0,'b',2},
-                    {1,'a',0},
-                    {1,'b',3},
-                    {2,'a',3},
-                    {2,'b',0},
-                    {3,'a',2},
-                    {3,'b',1},
-                };
-
-                return new DFA(nameof(DEA_SameCountAandB), 4, new char[] {'a','b'}, deaT, 0, 0) {
-                    SimplyfiedAcceptFunction = delegate (string s) {
-                        int c1 = s.Count((c) => c == 'a');
-                        int c0 = s.Count((c) => c == 'b');
-                        return c0 == c1;
-                    }
-                };
-            }
-        }
-
         [AcceptedWordSamples("1001", "111010")]
         public static DFA DEA_1659_M1_A22_0even {
             get {

@@ -132,6 +132,16 @@ namespace Serpen.Uni.Automat {
             }
         }
 
+        public static StackPDA SPDA_EAFK_B610_A65_P243_if {
+            get {
+                var pdaT = new PDATransform {
+                    {0, 'i', 'Z', "ZZ", 0},
+                    {0, 'e', 'Z', "", 0},
+                };
+                return new StackPDA(nameof(SPDA_EAFK_B610_A65_P243_if), 1, new char[] {'i','e'}, new char[] {'Z'}, pdaT, 0, 'Z');
+            }
+        }
+
         [AcceptedWordSamples("10")]
         public static StatePDA QPDA_simple_10 {
             get {
