@@ -6,7 +6,7 @@ namespace Serpen.Uni.Automat {
         const char BLK = TuringMachineSingleBand1659.BLANK;
 
         [AcceptedWordSamples("aba")]
-        public static TuringMachineSingleBand TM_1659_A44_M1 {
+        public static TuringMachineSingleBand1659 TM_1659_A44_M1 {
             get {
                 var t = new TuringTransformSingleBand {
                     { 0, 'a', 0, 'b', TMDirection.Right },
@@ -20,7 +20,7 @@ namespace Serpen.Uni.Automat {
 
                 char[] inputAlphabet = new char[] { 'a', 'b' };
                 char[] bandAlphabet = new char[] { 'a', 'b', BLK };
-                return new TuringMachineSingleBand(nameof(TM_1659_A44_M1), 5, inputAlphabet, bandAlphabet, t, 0, BLK, new uint[] { 3 });
+                return new TuringMachineSingleBand1659(nameof(TM_1659_A44_M1), 5, inputAlphabet, bandAlphabet, t, 0, BLK, 3, 4);
             }
         }
 
@@ -51,7 +51,7 @@ namespace Serpen.Uni.Automat {
                     { 4, 's', 1, 's', TMDirection.Right }
                 };
 
-                char[] inputAlphabet = new char[] { 'a', 'x', 's' };
+                char[] inputAlphabet = new char[] { 'a' };
                 char[] bandAlphabet = new char[] { 'a', 'x', 's', BLK };
 
                 return new TuringMachineSingleBand1659(nameof(TM_1659_A46_M2_a2n), 7, inputAlphabet, bandAlphabet, t, 0, BLK, qA, qD);
