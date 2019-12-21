@@ -102,10 +102,10 @@ namespace Serpen.Uni.Automat {
             g.DrawString(A.Name, headFont, Brushes.Black, 20, 20);
 
             //Draw full declaration to bottom
-            var FullDesc = A.ToString().Replace(A.Name, "").Trim();
-            // try {
-            //     FullDesc = FullDesc.Replace(A.Name, "").Trim();
-            // } catch { }
+            string FullDesc = A.ToString();
+            try {
+                FullDesc = FullDesc.Replace(A.Name, "").Trim();
+            } catch { }
 
             const int MARGIN = 10;
 

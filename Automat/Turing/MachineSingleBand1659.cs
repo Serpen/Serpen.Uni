@@ -66,6 +66,128 @@ namespace Serpen.Uni.Automat.Turing {
             return lastBand.Trim(BlankSymbol);
         }
 
+        public string ToBinString() {
+            var sb = new System.Text.StringBuilder();
+
+            var stateTranslate = new System.Collections.Generic.Dictionary<uint, uint>();
+            for (uint i = 0; i < StatesCount; i++)
+                stateTranslate.Add(i, i);
+
+            if (stateTranslate[0] != StartState)
+                (
+                stateTranslate[0],
+                stateTranslate[StartState]
+                ) = (StartState, 0);
+
+            if (stateTranslate[1] != AcceptedState)
+                (
+                stateTranslate[1],
+                stateTranslate[AcceptedState]
+                ) = (AcceptedState, 1);
+
+            if (stateTranslate[2] != DiscardState)
+                (
+                stateTranslate[2],
+                stateTranslate[DiscardState]
+                ) = (DiscardState, 2);
+
+            foreach (var t in Transforms) {
+                sb.Append(
+                    new string('1', (int)stateTranslate[t.Key.q] + 1) + '0' +
+                    new string('1', (int)BandAlphabet.ArrayIndex(t.Key.c) + 1) + '0' +
+                    new string('1', (int)stateTranslate[t.Value.qNext] + 1) + '0' +
+                    new string('1', (int)BandAlphabet.ArrayIndex(t.Value.c2) + 1) + '0' +
+                    new string('1', (int)t.Value.Direction-1) +
+                    "00"
+                );
+            }
+
+            sb.Remove(sb.Length - 2, 2);
+
+            return sb.ToString();
+        }
+
+        public static TuringMachineSingleBand1659 FromBinString(string binString) {
+            var transform = new TuringTransformSingleBand();
+            int curPos = 0;
+
+            uint cmax = 0;
+            uint qmax = 0;
+
+            const char SC = '0';
+
+            while (curPos < binString.Length) {
+                uint q = 0;
+                char c = SC;
+
+                while (binString[curPos] == '1') {
+                    q++;
+                    curPos++;
+                }
+                if (binString[curPos] != '0')
+                    throw new Serpen.Uni.Automat.Exception("Format", null);
+                else
+                    curPos++;
+
+                while (binString[curPos] == '1') {
+                    c++;
+                    curPos++;
+                }
+                if (binString[curPos] != '0')
+                    throw new Serpen.Uni.Automat.Exception("Format", null);
+                else
+                    curPos++;
+
+                if (cmax < c) cmax = c;
+                if (qmax < q) qmax = q;
+                var tmkey = new TuringKey(q-1, --c);
+
+                uint qnext = 0;
+                char c2 = SC;
+                uint dir = 0;
+
+                while (binString[curPos] == '1') {
+                    qnext++;
+                    curPos++;
+                }
+                if (binString[curPos] != '0')
+                    throw new Serpen.Uni.Automat.Exception("Format", null);
+                else
+                    curPos++;
+
+                while (binString[curPos] == '1') {
+                    c2++;
+                    curPos++;
+                }
+                if (binString[curPos] != '0')
+                    throw new Serpen.Uni.Automat.Exception("Format", null);
+                else
+                    curPos++;
+
+                while (curPos < binString.Length && binString[curPos] == '1') {
+                    dir++;
+                    curPos++;
+                }
+
+                if (curPos < binString.Length && binString.Substring(curPos, 2) != "00")
+                    throw new Serpen.Uni.Automat.Exception("Format", null);
+                else
+                    curPos += 2;
+
+                if (cmax < c2) cmax = c2;
+                if (qmax < qnext) qmax = qnext;
+                var tmval = new TuringVal(qnext-1, --c2, (TMDirection)(++dir));
+
+                transform.Add(tmkey, tmval);
+            }
+
+            var alp = new char[cmax - SC];
+            for (int i = 0; i < alp.Length; i++)
+                alp[i] = (char)(SC + i);
+
+            return new TuringMachineSingleBand1659("", qmax, alp.SkipLast(1).ToArray(), alp, transform, 0, alp[^1], 1, 2);
+        }
+
         public static TuringMachineSingleBand1659 GenerateRandom() {
             const byte MAX_STATES = 20;
             const byte MAX_CHAR = 7;

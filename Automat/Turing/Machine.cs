@@ -37,6 +37,6 @@ namespace Serpen.Uni.Automat.Turing {
 
     }
 
-    public enum TMDirection { Left, Right, Halt }
+    public enum TMDirection { Halt, Left, Right }
 
 }
