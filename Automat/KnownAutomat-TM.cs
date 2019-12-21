@@ -58,6 +58,49 @@ namespace Serpen.Uni.Automat {
             }
         }
 
+        public static TuringMachineSingleBand1659 TM_1659_T42_A416_u_u {
+            get {
+                const uint D = 8;
+                const uint F = 7;
+
+                var t = new TuringTransformSingleBand {
+                    {0, 'x', 0, 'x', TMDirection.Right},
+                    {0, 'a', 1, 'x', TMDirection.Right},
+                    {0, 'b', 2, 'x', TMDirection.Right},
+                    {0, BLK, D, BLK, TMDirection.Right},
+                    {0, '$', 6, '$', TMDirection.Right},
+
+                    {1, 'a', 1, 'a', TMDirection.Right},
+                    {1, 'b', 1, 'b', TMDirection.Right},
+                    {1, '$', 3, '$', TMDirection.Right},
+
+                    {3, 'x', 3, 'x', TMDirection.Right},
+                    {3, 'a', 5, 'x', TMDirection.Left},
+                    {3, 'b', D, 'b', TMDirection.Right},
+
+                    {2, 'a', 2, 'a', TMDirection.Right},
+                    {2, 'b', 2, 'b', TMDirection.Right},
+                    {2, '$', 4, '$', TMDirection.Right},
+
+                    {4, 'x', 4, 'x', TMDirection.Right},
+                    {4, 'a', D, 'a', TMDirection.Right},
+                    {4, 'b', 5, 'x', TMDirection.Left},
+
+                    {5, 'a', 5, 'a', TMDirection.Left},
+                    {5, 'b', 5, 'b', TMDirection.Left},
+                    {5, 'x', 5, 'x', TMDirection.Left},
+                    {5, '$', 5, '$', TMDirection.Left},
+                    {5, BLK, 0, BLK, TMDirection.Right},
+
+                    {6, BLK, F, BLK, TMDirection.Right},
+                    {6, 'x', 6, 'X', TMDirection.Right},
+                };
+
+                return new TuringMachineSingleBand1659(nameof(TM_1659_T42_A416_u_u), 9, 
+                new char[] {'a', 'b', '$'}, new char[] {'a', 'b', 'x', '$', BLK}, t, 0, BLK, 7, 8);
+            }
+        }
+
         [AcceptedWordSamples("0","0000")]
         public static TuringMachineSingleBand1659 TM_1659_A414_M1 {
             get {
