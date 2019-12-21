@@ -262,7 +262,7 @@ namespace Serpen.Uni.Automat.Finite {
             }
 
             var ret = new DFA("DFA_Random", (uint)stateCount, alphabet, t, (uint)rnd.Next(0, stateCount), accState);
-            ret.Name = $"DFA_Random_{ret.GetHashCode()}";
+            ret.Name = $"DFA_Random_q{stateCount}_a{alphabet.Length}_{ret.GetHashCode()}";
             return ret;
         }
 

@@ -31,7 +31,7 @@ namespace Serpen.Uni {
                 ret[i] = HasBitSet((byte)integer, i);
             return ret;
         }
-        public enum eDebugLogLevel { Always, Normal, Verbose }
+        internal enum eDebugLogLevel { Always, Normal, Verbose }
         internal static eDebugLogLevel DebugLogLevel = eDebugLogLevel.Normal;
 
         internal static void DebugMessage(string message, eDebugLogLevel level) {
