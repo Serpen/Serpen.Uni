@@ -3,7 +3,7 @@ using System.Linq;
 namespace Serpen.Uni.Automat.Turing {
 
     [System.Serializable]
-    public class NTM1659 : TuringMachineBase<TuringKey, TuringVal[]>, ITuringMachine {
+    public class NTM1659 : TuringMachineBase<TuringKey, TuringVal[]> {
 
         public NTM1659(string name, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, NTM1659Transform transform, uint startState, char blankSymbol, uint acceptedState, uint discardState)
             : base(name, stateCount, inputAlphabet, bandAlphabet, startState, blankSymbol, new uint[] { acceptedState }) {

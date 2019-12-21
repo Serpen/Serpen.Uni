@@ -3,7 +3,7 @@ using System.Linq;
 namespace Serpen.Uni.Automat.Turing {
 
     [System.Serializable]
-    public class TuringMachineSingleBand1659 : TuringMachineBase<TuringKey, TuringVal> {
+    public class TuringMachineSingleBand1659 : TuringMachineBase<TuringKey, TuringVal>, IComplement {
 
         public TuringMachineSingleBand1659(string name, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, TuringTransformSingleBand transform, uint startState, char blankSymbol, uint acceptedState, uint discardState)
             : base(name, stateCount, inputAlphabet, bandAlphabet, startState, blankSymbol, new uint[] { acceptedState }) {
@@ -120,5 +120,9 @@ namespace Serpen.Uni.Automat.Turing {
         public override string ToString()
             => $"{Name} TM(|{States.Length}|={string.Join(";", States)}), {{{string.Join(',', Alphabet)}}},{{{string.Join(',', BandAlphabet)}}}, {{{Transforms.ToString()}}}, {StartState}, {BlankSymbol}, {AcceptedState}, {DiscardState})".Trim();
 
+        [AlgorithmSource("1659_S4.1")]
+        public IAutomat Complement() {
+            return new TuringMachineSingleBand1659($"co-{this.Name}", this.States, this.Alphabet, this.BandAlphabet, (TuringTransformSingleBand)this.Transforms, this.StartState, this.BlankSymbol, this.DiscardState, this.AcceptedState);
+        }
     }
 }

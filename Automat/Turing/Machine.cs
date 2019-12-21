@@ -2,13 +2,8 @@ using System.Linq;
 
 namespace Serpen.Uni.Automat.Turing {
 
-    interface ITuringMachine : IAutomat {
-        char[] BandAlphabet { get; }
-        char BlankSymbol { get; }
-    }
-
     [System.Serializable]
-    public abstract class TuringMachineBase<TKey, TVal> : AutomatBase<TKey, TVal>, ITuringMachine where TKey : ITransformKey { //where TConfig : ITuringConfig {
+    public abstract class TuringMachineBase<TKey, TVal> : AutomatBase<TKey, TVal> where TKey : ITransformKey { //where TConfig : ITuringConfig {
 
         public const char BLANK = '_';
 
