@@ -9,11 +9,23 @@ namespace Serpen.Uni.Automat.Turing {
             : base(name, stateCount, inputAlphabet, bandAlphabet, startState, blankSymbol, new uint[] { acceptedState }) {
             Transforms = transform;
             DiscardState = discardState;
+            CheckConstraints();
         }
         public TuringMachineSingleBand1659(string name, string[] states, char[] inputAlphabet, char[] bandAlphabet, TuringTransformSingleBand transform, uint startState, char blankSymbol, uint acceptedState, uint discardState)
             : base(name, states, inputAlphabet, bandAlphabet, startState, blankSymbol, new uint[] { acceptedState }) {
             Transforms = transform;
             DiscardState = discardState;
+            CheckConstraints();
+        }
+
+        protected override void CheckConstraints() {
+            base.CheckConstraints();
+            foreach (var t in Transforms) {
+                if (t.Value.qNext >= StatesCount)
+                    throw new StateException(t.Value.qNext, this);
+                if (!BandAlphabet.Contains(t.Value.c2))
+                    throw new AlphabetException(t.Value.c2, this);
+            }
         }
 
         public uint AcceptedState => base.AcceptedStates[0];
@@ -97,7 +109,7 @@ namespace Serpen.Uni.Automat.Turing {
                     new string('1', (int)BandAlphabet.ArrayIndex(t.Key.c) + 1) + '0' +
                     new string('1', (int)stateTranslate[t.Value.qNext] + 1) + '0' +
                     new string('1', (int)BandAlphabet.ArrayIndex(t.Value.c2) + 1) + '0' +
-                    new string('1', (int)t.Value.Direction-1) +
+                    new string('1', (int)t.Value.Direction - 1) +
                     "00"
                 );
             }
@@ -109,12 +121,14 @@ namespace Serpen.Uni.Automat.Turing {
 
         public static TuringMachineSingleBand1659 FromBinString(string binString) {
             var transform = new TuringTransformSingleBand();
-            int curPos = 0;
-
-            uint cmax = 0;
-            uint qmax = 0;
 
             const char SC = '0';
+
+            int curPos = 0;
+
+            char cmax = SC;
+            uint qmax = 0;
+
 
             while (curPos < binString.Length) {
                 uint q = 0;
@@ -140,7 +154,7 @@ namespace Serpen.Uni.Automat.Turing {
 
                 if (cmax < c) cmax = c;
                 if (qmax < q) qmax = q;
-                var tmkey = new TuringKey(q-1, --c);
+                var tmkey = new TuringKey(q - 1, --c);
 
                 uint qnext = 0;
                 char c2 = SC;
@@ -176,7 +190,7 @@ namespace Serpen.Uni.Automat.Turing {
 
                 if (cmax < c2) cmax = c2;
                 if (qmax < qnext) qmax = qnext;
-                var tmval = new TuringVal(qnext-1, --c2, (TMDirection)(++dir));
+                var tmval = new TuringVal(qnext - 1, --c2, (TMDirection)(++dir));
 
                 transform.Add(tmkey, tmval);
             }
@@ -185,7 +199,7 @@ namespace Serpen.Uni.Automat.Turing {
             for (int i = 0; i < alp.Length; i++)
                 alp[i] = (char)(SC + i);
 
-            return new TuringMachineSingleBand1659("", qmax, alp.SkipLast(1).ToArray(), alp, transform, 0, alp[^1], 1, 2);
+            return new TuringMachineSingleBand1659("uTM", qmax, alp.SkipLast(1).ToArray(), alp, transform, 0, alp[^1], 1, 2);
         }
 
         public static TuringMachineSingleBand1659 GenerateRandom() {

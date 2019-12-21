@@ -25,9 +25,18 @@ namespace Serpen.Uni.Automat.Turing {
         protected override void CheckConstraints() {
             base.CheckConstraints();
             if (base.Alphabet.Intersect(BandAlphabet).Count() != base.Alphabet.Length)
-                throw new Uni.Automat.AlphabetException("Inputalphabet not in Bandalphabet", this);
+                throw new AlphabetException("Inputalphabet not in Bandalphabet", this);
             if (!BandAlphabet.Contains(BlankSymbol))
-                throw new Automat.AlphabetException(BlankSymbol, this);
+                throw new AlphabetException(BlankSymbol, this);
+        
+            foreach (var item in Transforms) {
+                if (item.Key.q >= StatesCount)
+                    throw new StateException(item.Key.q, this);
+                foreach (char c in item.Key.c) {
+                    if (!BandAlphabet.Contains(c))
+                        throw new AlphabetException(c, this);
+                }
+            }
         }
 
 

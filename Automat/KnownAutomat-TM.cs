@@ -93,7 +93,7 @@ namespace Serpen.Uni.Automat {
                     {5, BLK, 0, BLK, TMDirection.Right},
 
                     {6, BLK, F, BLK, TMDirection.Right},
-                    {6, 'x', 6, 'X', TMDirection.Right},
+                    {6, 'x', 6, 'x', TMDirection.Right},
                 };
 
                 return new TuringMachineSingleBand1659(nameof(TM_1659_T42_A416_u_u), 9, 
