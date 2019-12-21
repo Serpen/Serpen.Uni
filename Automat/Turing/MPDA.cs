@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Serpen.Uni.Automat.ContextFree {
+namespace Serpen.Uni.Automat.Turing {
 
     [AlgorithmSource("EFAK_8.5.2")]
     public class MultiPDA : AutomatBase<MultiPDA.MPDATransformKey, MultiPDA.MPDATransformValue[]> {
