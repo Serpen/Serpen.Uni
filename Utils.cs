@@ -14,7 +14,7 @@ namespace Serpen.Uni {
             if (bit > 31)
                 throw new System.ArgumentOutOfRangeException(nameof(bit));
             return (num & (1 << bit)) != 0;
-        } 
+        }
 
         public static bool[,] GetPowerSet(int bitscount, int additionalCols = 0) {
             var ret = new bool[Pow2(bitscount), bitscount + additionalCols];
@@ -56,6 +56,14 @@ namespace Serpen.Uni {
             return array;
         }
 
+        public static (int, int) CantorIndexToIndex(int i) {
+            int j = (int)System.Math.Floor(System.Math.Sqrt(0.25 + 2 * i) - 0.5);
+            int y = i - j * (j + 1) / 2;
+            return (j - y, y);
+        }
+
+        public static int IndexToCantorIndex(int r, int c) => (r+c)*(r+c+1)/2 + c;
+
         internal static Dictionary<T, T[]> EqualityClasses<T>(T[] array, System.Func<T, T, bool> comparer) {
 
             var ret2 = new Dictionary<T, List<T>>(array.Length) {
@@ -78,7 +86,7 @@ namespace Serpen.Uni {
                 }
             }
 
-            var ret = new Dictionary<T,T[]>();
+            var ret = new Dictionary<T, T[]>();
             foreach (var item in ret2)
                 ret.Add(item.Key, item.Value.ToArray());
 
