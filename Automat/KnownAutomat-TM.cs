@@ -119,6 +119,18 @@ namespace Serpen.Uni.Automat {
             }
         }
 
+        public static TuringMachineSingleBand1659 TM_1659_46_M0_D {
+            get {
+                var t = new TuringTransformSingleBand {
+                    {0, '0', 2, BLK, TMDirection.Right},
+                    {0, '1', 2, BLK, TMDirection.Right},
+                    {0, BLK, 2, BLK, TMDirection.Right}
+                };
+                char[] bandAlphabet = new char[] { '0', '1', BLK };
+                return new TuringMachineSingleBand1659(nameof(TM_1659_46_M0_D), 3, binAlp, bandAlphabet, t, 0, BLK, 1, 2);
+            }
+        }
+
         [AcceptedWordSamples("aaba")]
         public static NTM1659 NTM_1659_A411_N1 {
             get {

@@ -5,13 +5,13 @@ namespace Serpen.Uni.Automat.Turing {
     [System.Serializable]
     public class TuringMachineSingleBand : TuringMachineBase<TuringKey, TuringVal> {
 
-        public TuringMachineSingleBand(string name, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, TuringTransformSingleBand transform, uint startState, char blankSymbol, uint[] acceptedStates)
+        public TuringMachineSingleBand(string name, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, TuringTransformSingleBand transform, uint startState, char blankSymbol, params uint[] acceptedStates)
             : base(name, stateCount, inputAlphabet, bandAlphabet, startState, blankSymbol, acceptedStates) {
             Transforms = transform;
 
             CheckConstraints();
         }
-        public TuringMachineSingleBand(string name, string[] states, char[] inputAlphabet, char[] bandAlphabet, TuringTransformSingleBand transform, uint startState, char blankSymbol, uint[] acceptedStates)
+        public TuringMachineSingleBand(string name, string[] states, char[] inputAlphabet, char[] bandAlphabet, TuringTransformSingleBand transform, uint startState, char blankSymbol, params uint[] acceptedStates)
             : base(name, states, inputAlphabet, bandAlphabet, startState, blankSymbol, acceptedStates) {
             Transforms = transform;
 
@@ -157,6 +157,136 @@ namespace Serpen.Uni.Automat.Turing {
                     }
 
             return new TuringMachineSingleBand($"{Name}_purged", (uint)names.Length, Alphabet, BandAlphabet, newT, translate.ArrayIndex(StartState), BlankSymbol, aStates) {DefaultAcceptance = this.DefaultAcceptance};
+        }
+
+        
+        [AlgorithmSource("EAFK_9.1.2_P379")]
+        public string ToBinString() {
+            if (AcceptedStates.Length != 1)
+                throw new System.NotImplementedException("only supported with one accepted state");
+
+            var sb = new System.Text.StringBuilder();
+
+            const char S = '1'; // Separator
+            const char C = '0'; // Counter
+
+            var stateTranslate = new System.Collections.Generic.Dictionary<uint, uint>();
+            for (uint i = 0; i < StatesCount; i++)
+                stateTranslate.Add(i, i);
+
+            if (stateTranslate[0] != StartState)
+                (
+                stateTranslate[0],
+                stateTranslate[StartState]
+                ) = (StartState, 0);
+
+            if (stateTranslate[1] != AcceptedStates[0])
+                (
+                stateTranslate[1],
+                stateTranslate[AcceptedStates[0]]
+                ) = (AcceptedStates[0], 1);
+
+            foreach (var t in Transforms) {
+                sb.Append(
+                    new string(C, (int)stateTranslate[t.Key.q] + 1) + S +
+                    new string(C, (int)BandAlphabet.ArrayIndex(t.Key.c) + 1) + S +
+                    new string(C, (int)stateTranslate[t.Value.qNext] + 1) + S +
+                    new string(C, (int)BandAlphabet.ArrayIndex(t.Value.c2) + 1) + S +
+                    new string(C, (int)t.Value.Direction - 1) +
+                    S + S
+                );
+            }
+
+            sb.Remove(sb.Length - 2, 2);
+
+            return sb.ToString();
+        }
+
+        [AlgorithmSource("EAFK_9.1.2_P379")]
+        public static TuringMachineSingleBand FromBinString(string binString) {
+            var transform = new TuringTransformSingleBand();
+
+            const char S = '1'; // Separator
+            const char C = '0'; // Counter
+
+            const char SC = '0';
+
+            int curPos = 0;
+
+            char cmax = SC;
+            uint qmax = 0;
+
+
+            while (curPos < binString.Length) {
+                uint q = 0;
+                char c = SC;
+
+                while (binString[curPos] == C) {
+                    q++;
+                    curPos++;
+                }
+                if (binString[curPos] != S)
+                    throw new Serpen.Uni.Automat.Exception("Format", null);
+                else
+                    curPos++;
+
+                while (binString[curPos] == C) {
+                    c++;
+                    curPos++;
+                }
+                if (binString[curPos] != S)
+                    throw new Serpen.Uni.Automat.Exception("Format", null);
+                else
+                    curPos++;
+
+                if (cmax < c) cmax = c;
+                if (qmax < q) qmax = q;
+                var tmkey = new TuringKey(q - 1, --c);
+
+                uint qnext = 0;
+                char c2 = SC;
+                uint dir = 0;
+
+                while (binString[curPos] == C) {
+                    qnext++;
+                    curPos++;
+                }
+                if (binString[curPos] != S)
+                    throw new Serpen.Uni.Automat.Exception("Format", null);
+                else
+                    curPos++;
+
+                while (binString[curPos] == C) {
+                    c2++;
+                    curPos++;
+                }
+                if (binString[curPos] != S)
+                    throw new Serpen.Uni.Automat.Exception("Format", null);
+                else
+                    curPos++;
+
+                while (curPos < binString.Length && binString[curPos] == C) {
+                    dir++;
+                    curPos++;
+                }
+
+                if (curPos < binString.Length && binString.Substring(curPos, 2) != new string(S,2))
+                    throw new Serpen.Uni.Automat.Exception("Format", null);
+                else
+                    curPos += 2;
+
+                if (cmax < c2) cmax = c2;
+                if (qmax < qnext) qmax = qnext;
+                var tmval = new TuringVal(qnext - 1, --c2, (TMDirection)(++dir));
+
+                transform.Add(tmkey, tmval);
+            }
+
+            var alp = new char[cmax - SC];
+            for (int i = 0; i < alp.Length; i++)
+                alp[i] = (char)(SC + i);
+
+            return new TuringMachineSingleBand("uTM", qmax, alp.SkipLast(1).ToArray(), alp, transform, 0, alp[^1], 1);
         }
     }
 }

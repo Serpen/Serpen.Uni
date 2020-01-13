@@ -5,6 +5,11 @@ namespace Serpen.Uni.Automat.Turing {
     [System.Serializable]
     public class TuringMachineSingleBand1659 : TuringMachineBase<TuringKey, TuringVal>, IComplement {
 
+        public static TuringMachineSingleBand1659 EMPTY = 
+            new TuringMachineSingleBand1659("Empty", 1, KnownAutomat.binAlp, 
+            KnownAutomat.binAlp.Append(BLANK).ToArray(), 
+            new TuringTransformSingleBand(), 1, BLANK, 0, 0);
+            
         public TuringMachineSingleBand1659(string name, uint stateCount, char[] inputAlphabet, char[] bandAlphabet, TuringTransformSingleBand transform, uint startState, char blankSymbol, uint acceptedState, uint discardState)
             : base(name, stateCount, inputAlphabet, bandAlphabet, startState, blankSymbol, new uint[] { acceptedState }) {
             Transforms = transform;
@@ -78,8 +83,12 @@ namespace Serpen.Uni.Automat.Turing {
             return lastBand.Trim(BlankSymbol);
         }
 
+        [AlgorithmSource("1659_4.6.1_P129")]
         public string ToBinString() {
             var sb = new System.Text.StringBuilder();
+
+            const char S = '0'; // Separator
+            const char C = '1'; // Counter
 
             var stateTranslate = new System.Collections.Generic.Dictionary<uint, uint>();
             for (uint i = 0; i < StatesCount; i++)
@@ -105,12 +114,12 @@ namespace Serpen.Uni.Automat.Turing {
 
             foreach (var t in Transforms) {
                 sb.Append(
-                    new string('1', (int)stateTranslate[t.Key.q] + 1) + '0' +
-                    new string('1', (int)BandAlphabet.ArrayIndex(t.Key.c) + 1) + '0' +
-                    new string('1', (int)stateTranslate[t.Value.qNext] + 1) + '0' +
-                    new string('1', (int)BandAlphabet.ArrayIndex(t.Value.c2) + 1) + '0' +
-                    new string('1', (int)t.Value.Direction - 1) +
-                    "00"
+                    new string(C, (int)stateTranslate[t.Key.q] + 1) + S +
+                    new string(C, (int)BandAlphabet.ArrayIndex(t.Key.c) + 1) + S +
+                    new string(C, (int)stateTranslate[t.Value.qNext] + 1) + S +
+                    new string(C, (int)BandAlphabet.ArrayIndex(t.Value.c2) + 1) + S +
+                    new string(C, (int)t.Value.Direction - 1) +
+                    S + S
                 );
             }
 
@@ -119,8 +128,12 @@ namespace Serpen.Uni.Automat.Turing {
             return sb.ToString();
         }
 
+        [AlgorithmSource("1659_4.6.1_P129")]
         public static TuringMachineSingleBand1659 FromBinString(string binString) {
             var transform = new TuringTransformSingleBand();
+
+            const char S = '0'; // Separator
+            const char C = '1'; // Counter
 
             const char SC = '0';
 
@@ -134,20 +147,20 @@ namespace Serpen.Uni.Automat.Turing {
                 uint q = 0;
                 char c = SC;
 
-                while (binString[curPos] == '1') {
+                while (binString[curPos] == C) {
                     q++;
                     curPos++;
                 }
-                if (binString[curPos] != '0')
+                if (binString[curPos] != S)
                     throw new Serpen.Uni.Automat.Exception("Format", null);
                 else
                     curPos++;
 
-                while (binString[curPos] == '1') {
+                while (binString[curPos] == C) {
                     c++;
                     curPos++;
                 }
-                if (binString[curPos] != '0')
+                if (binString[curPos] != S)
                     throw new Serpen.Uni.Automat.Exception("Format", null);
                 else
                     curPos++;
@@ -160,30 +173,30 @@ namespace Serpen.Uni.Automat.Turing {
                 char c2 = SC;
                 uint dir = 0;
 
-                while (binString[curPos] == '1') {
+                while (binString[curPos] == C) {
                     qnext++;
                     curPos++;
                 }
-                if (binString[curPos] != '0')
+                if (binString[curPos] != S)
                     throw new Serpen.Uni.Automat.Exception("Format", null);
                 else
                     curPos++;
 
-                while (binString[curPos] == '1') {
+                while (binString[curPos] == C) {
                     c2++;
                     curPos++;
                 }
-                if (binString[curPos] != '0')
+                if (binString[curPos] != S)
                     throw new Serpen.Uni.Automat.Exception("Format", null);
                 else
                     curPos++;
 
-                while (curPos < binString.Length && binString[curPos] == '1') {
+                while (curPos < binString.Length && binString[curPos] == C) {
                     dir++;
                     curPos++;
                 }
 
-                if (curPos < binString.Length && binString.Substring(curPos, 2) != "00")
+                if (curPos < binString.Length && binString.Substring(curPos, 2) != new string(S,2))
                     throw new Serpen.Uni.Automat.Exception("Format", null);
                 else
                     curPos += 2;
