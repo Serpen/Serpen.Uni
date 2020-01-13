@@ -83,9 +83,12 @@ namespace Serpen.Uni.Automat {
             return true;
         }
 
-        public bool[] ReachableStates() {
+        public bool[] ReachableStates(params uint[] keepStates) {
             bool[] fromStartReachable = new bool[StatesCount];
             fromStartReachable[StartState] = true;
+            for (int i = 0; i < keepStates.Length; i++)
+                fromStartReachable[i] = true;
+            
             bool foundnew = true;
             while (foundnew) {
                 foundnew = false;
@@ -128,8 +131,8 @@ namespace Serpen.Uni.Automat {
                 (s1, s2) => Tests.InMyhillNerodeRelation(s1.Item1, s2.Item1, this, count));
         }
 
-        protected (uint[], string[], uint[]) RemovedStateTranslateTables() {
-            bool[] fromStartReachable = ReachableStates();
+        protected (uint[], string[], uint[]) RemovedStateTranslateTables(params uint[] keepStates) {
+            bool[] fromStartReachable = ReachableStates(keepStates);
 
             uint[] translate = new uint[fromStartReachable.Count((b) => b)];
             for (uint i = 0; i < translate.Length; i++) {

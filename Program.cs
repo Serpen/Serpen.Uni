@@ -5,6 +5,7 @@
 namespace Serpen.Uni {
     static class Program {
         static void Main() {
+            Tests.ExportAllAutomatBitmaps();
             Tests.RunAllTests();
         }
     }

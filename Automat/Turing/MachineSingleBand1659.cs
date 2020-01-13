@@ -35,7 +35,7 @@ namespace Serpen.Uni.Automat.Turing {
 
         public uint AcceptedState => base.AcceptedStates[0];
 
-        public readonly uint DiscardState;
+        public uint DiscardState {get;}
 
         TuringConfigSingleBand GoChar(TuringConfigSingleBand tcfg) {
             if (Transforms.TryGetValue(new TuringKey(tcfg.State, tcfg.CurSymbol), out TuringVal tva)) {
@@ -229,7 +229,7 @@ namespace Serpen.Uni.Automat.Turing {
 
             for (uint i = 0; i < stateCount; i++) {
                 int transformsRnd = rnd.Next(0, inputAlphabet.Length);
-                for (uint j = 0; j < transformsRnd; j++) {
+                for (uint j = 0; j < stateCount; j++) {
                     var tk = new TuringKey(i, bandAlphabet.RndElement());
                     var tv = new TuringVal(j, bandAlphabet.RndElement(), TMDirection.Right);
                     t.TryAdd(tk, tv);
@@ -242,7 +242,7 @@ namespace Serpen.Uni.Automat.Turing {
         }
 
         public override IAutomat PurgeStates() {
-            (uint[] translate, string[] names, _) = base.RemovedStateTranslateTables();
+            (uint[] translate, string[] names, _) = base.RemovedStateTranslateTables(AcceptedState, DiscardState); //BUG: dont remove ac, dis State
 
             var newT = new TuringTransformSingleBand();
             foreach (var t2 in Transforms)
