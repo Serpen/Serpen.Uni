@@ -19,10 +19,10 @@ namespace Serpen.Uni.Automat {
             get {
                 var pdaT = new PDATransform {
                     { 0, null, null, PDA.START, 1 },
-                    
+
                     { 1, 'a', null, "a", 1 },
                     { 1, 'b', null, "b", 1 },
-                    
+
                     { 1, null, null, null, 2 },
                     // { 1, 'a', null, null, 2 },
                     // { 1, 'b', null, null, 2 },
@@ -138,7 +138,7 @@ namespace Serpen.Uni.Automat {
                     {0, 'i', 'Z', "ZZ", 0},
                     {0, 'e', 'Z', "", 0},
                 };
-                return new StackPDA(nameof(SPDA_EAFK_B610_A65_P243_if), 1, new char[] {'i','e'}, new char[] {'Z'}, pdaT, 0, 'Z');
+                return new StackPDA(nameof(SPDA_EAFK_B610_A65_P243_if), 1, new char[] { 'i', 'e' }, new char[] { 'Z' }, pdaT, 0, 'Z');
             }
         }
 
@@ -304,6 +304,18 @@ namespace Serpen.Uni.Automat {
                     // { 'R', new string[] { "RRaRRRR", "o", "RRRRotRR", "R", "" } }
                 };
                 return new CFGrammer(nameof(CFG_MY_Circular), new char[] { 'R' }, new char[] { 'a', 'o', 't' }, rs, 'R');
+            }
+        }
+
+        public static CFGrammer CFG_1659_EA34 {
+            get {
+                return new CFGrammer(nameof(CFG_1659_EA34), new char[] { 'S', 'A', 'B', 'C' }, new char[] { 'a', 'b' },
+                new RuleSet {
+                    { 'S', new string[] { "CA", "AB" } },
+                    { 'A', new string[] { "BB", "a" } },
+                    { 'B', new string[] { "CA", "b" } },
+                    { 'C', new string[] { "AC", "b" } },
+                }, 'S') {IsChomskey = true};
             }
         }
     }

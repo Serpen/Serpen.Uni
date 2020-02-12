@@ -221,15 +221,15 @@ namespace Serpen.Uni.Automat.Finite {
                             throw new ApplicationException();
 
                         if (mode == eProductDeaMode.Intersect) {
-                            // add to accStates if one dea state ist acc
+                            // add to accStates if both dea state ist acc
                             if (D1.IsAcceptedState(i) & D2.IsAcceptedState(j))
                                 accStates.Add(index);
                         } else if (mode == eProductDeaMode.Union) {
-                            // add to accStates if both dea state ist acc
+                            // add to accStates if one dea state ist acc
                             if (D1.IsAcceptedState(i) | D2.IsAcceptedState(j))
                                 accStates.Add(index);
                         } else if (mode == eProductDeaMode.Diff) {
-                            // add to accStates if both dea state ist acc
+                            // add to accStates if first and not second accepted
                             if (D1.IsAcceptedState(i) & !D2.IsAcceptedState(j))
                                 accStates.Add(index);
                         }
