@@ -30,22 +30,14 @@ namespace Serpen.Uni.Security {
             return false;
         }
 
-        public static bool mrt(int n, int a) { // n ungerade, 1 < a < n-1
-            int m = n - 1;
-            int d = m >> 1, e = 1;
-            while ((d & 1) == 0) {d >>= 1; ++e;}
-            int p = a, q = a;
-            while ((d >>= 1) != 0) { // potenziere modular: p = a^d mod n
-                q *= q; q %= n; // quadriere modular: q = q^2 mod n
-                if ((d & 1) != 0) {p *= q; p %= n;} // multipliziere modular: p = (p * q) mod n
+        public static bool MillerRabinTests(int number) {
+            int[] rndnums = Serpen.Uni.Utils.PseudoRandoms(10, number-2, 2);
+            for (int i = 0; i < 10; i++) {
+                if (!MillerRabinTest(number, rndnums[i]))
+                    return false;
+
             }
-            if (p == 1 || p == m) return true; // n ist wahrscheinlich prim
-            while (--e != 0) {
-                p *= p; p %= n;
-                if (p == m) return true;
-                if (p <= 1) break;
-            }
-            return false; // n ist nicht prim
+            return true;
         }
 
     }

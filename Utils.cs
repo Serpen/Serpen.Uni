@@ -6,6 +6,26 @@ namespace Serpen.Uni {
     public static class Utils {
 
         public static readonly System.Random RND = new System.Random();
+
+        public static int[] PseudoRandoms(int count, int maxval = int.MaxValue, int minval = 0) {
+            var rndgen = System.Security.Cryptography.RandomNumberGenerator.Create();
+            byte[] bytes = new byte[4 * count];
+            int[] nums = new int[count];
+
+            rndgen.GetBytes(bytes);
+            for (int i = 0; i < count; i++) {
+                nums[i] = System.BitConverter.ToInt32(bytes, i * 4);
+                if (minval >= 0 && nums[i] < 0)
+                    nums[i] *= -1;
+                while (nums[i] > maxval)
+                    nums[i] >>= 1;
+                while (nums[i] < minval)
+                    nums[i] <<= 1;
+            }
+
+            return nums;
+        }
+
         public static int Pow(int bas, int exp) => (int)System.Math.Pow(bas, exp);
         public static int Pow2(int exp) => (int)System.Math.Pow(2, exp);
         public static int Sqrt(int exp) => (int)System.Math.Sqrt(exp);
@@ -62,7 +82,7 @@ namespace Serpen.Uni {
             return (j - y, y);
         }
 
-        public static int IndexToCantorIndex(int r, int c) => (r+c)*(r+c+1)/2 + c;
+        public static int IndexToCantorIndex(int r, int c) => (r + c) * (r + c + 1) / 2 + c;
 
         internal static Dictionary<T, T[]> EqualityClasses<T>(T[] array, System.Func<T, T, bool> comparer) {
 
