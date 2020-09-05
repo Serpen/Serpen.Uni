@@ -30,7 +30,8 @@ namespace Serpen.Uni.Security {
             return false;
         }
 
-        public static bool MillerRabinTests(long number, int randoms = 4) {
+        public static bool MillerRabinTests(long number, int randoms = 10) {
+            if (number == 2) return true;
             long[] rndnums = Serpen.Uni.Utils.PseudoRandoms(randoms, number - 2, 2);
             for (int i = 0; i < rndnums.Length; i++) {
                 if (!MillerRabinTest(number, rndnums[i]))
@@ -50,6 +51,25 @@ namespace Serpen.Uni.Security {
                     return false;
 
             return true;
+        }
+
+        public static long[] generatePrimes(byte count, int maxValue = ushort.MaxValue) {
+            var rnds = new System.Collections.Generic.List<long>();
+            var p = new long[count];
+            byte found = 0;
+
+            while (found < count) {
+                rnds.AddRange(Utils.PseudoRandoms(100, maxValue));
+                foreach (var num in rnds)
+                {
+                    if (found < count && PrimeTests.MillerRabinTests(num)) {
+                        p[found] = num;
+                        found++;
+                    }
+                }
+                rnds.Clear();
+            }
+            return p;
         }
     }
 }
