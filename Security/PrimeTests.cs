@@ -18,21 +18,21 @@ namespace Serpen.Uni.Security {
                 n1 /= 2;
             }
 
-            int d = (int)(number - 1) / Serpen.Uni.Utils.Pow2(j);
+            long d = (number - 1) / Serpen.Uni.Utils.Pow2(j);
 
             if (BigInteger.ModPow(a, d, number) == 1)
                 return true;
 
-            for (int r = j; r >= 0; r--)
+            for (int r = j; r > 0; r--)
                 if (BigInteger.ModPow(a, d * Serpen.Uni.Utils.Pow2(r), number) == 1)
                     return true;
 
             return false;
         }
 
-        public static bool MillerRabinTests(int number) {
-            int[] rndnums = Serpen.Uni.Utils.PseudoRandoms(10, number-2, 2);
-            for (int i = 0; i < 10; i++) {
+        public static bool MillerRabinTests(long number, int randoms = 4) {
+            long[] rndnums = Serpen.Uni.Utils.PseudoRandoms(randoms, number - 2, 2);
+            for (int i = 0; i < rndnums.Length; i++) {
                 if (!MillerRabinTest(number, rndnums[i]))
                     return false;
 
@@ -40,5 +40,16 @@ namespace Serpen.Uni.Security {
             return true;
         }
 
+        public static bool NaiveSimplePrimeTest(long number) {
+            long max = (long)System.Math.Sqrt(number);
+            if (number % 2 == 0)
+                return false;
+
+            for (int i = 3; i <= max; i += 2) // *5 not needed
+                if (number % i == 0)
+                    return false;
+
+            return true;
+        }
     }
 }

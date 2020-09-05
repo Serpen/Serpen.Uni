@@ -7,14 +7,31 @@ namespace Serpen.Uni {
 
         public static readonly System.Random RND = new System.Random();
 
-        public static int[] PseudoRandoms(int count, int maxval = int.MaxValue, int minval = 0) {
+        public static long[] PseudoRandoms(int count, long maxval = System.Int64.MaxValue, long minval = 0) {
             var rndgen = System.Security.Cryptography.RandomNumberGenerator.Create();
-            byte[] bytes = new byte[4 * count];
-            int[] nums = new int[count];
+            byte[] bytes;
+
+            System.Func<int, long> convertfunc;
+            if (maxval <= System.Byte.MaxValue) {
+                bytes = new byte[count];
+                convertfunc = (i) => bytes[i];
+            } else if (maxval <= System.Int16.MaxValue) {
+                bytes = new byte[2 * count];
+                convertfunc = (i) => System.BitConverter.ToInt16(bytes, i * 2);
+            } else if (maxval <= System.Int32.MaxValue) {
+                bytes = new byte[4 * count];
+                convertfunc = (i) => System.BitConverter.ToInt32(bytes, i * 4);
+            } else {
+                bytes = new byte[8 * count];
+                convertfunc = (i) => System.BitConverter.ToInt64(bytes, i * 8);
+            }
+            
+            long[] nums = new long[count];
 
             rndgen.GetBytes(bytes);
             for (int i = 0; i < count; i++) {
-                nums[i] = System.BitConverter.ToInt32(bytes, i * 4);
+                nums[i] = convertfunc(i);
+
                 if (minval >= 0 && nums[i] < 0)
                     nums[i] *= -1;
                 while (nums[i] > maxval)
