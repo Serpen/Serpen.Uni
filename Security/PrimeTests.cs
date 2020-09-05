@@ -5,6 +5,9 @@ namespace Serpen.Uni.Security {
         public static bool MillerRabinTest(long number, long a) {
             if (number % 2 == 0)
                 return false;
+            if (number == 2 || number == 3 || number == 5) return true;
+            if (number == 0 || number == 1) return false;
+
             if (a < 2 || a > number - 2)
                 throw new System.ArgumentOutOfRangeException(nameof(a));
             if (number < 5)
@@ -31,7 +34,8 @@ namespace Serpen.Uni.Security {
         }
 
         public static bool MillerRabinTests(long number, int randoms = 10) {
-            if (number == 2) return true;
+            if (number == 2 || number == 3) return true;
+            if (number == 0 || number == 1) return false;
             long[] rndnums = Serpen.Uni.Utils.PseudoRandoms(randoms, number - 2, 2);
             for (int i = 0; i < rndnums.Length; i++) {
                 if (!MillerRabinTest(number, rndnums[i]))
@@ -57,6 +61,9 @@ namespace Serpen.Uni.Security {
             var rnds = new System.Collections.Generic.List<long>();
             var p = new long[count];
             byte found = 0;
+
+            if (maxValue / count < System.Math.Log(maxValue))
+                throw new System.ArgumentOutOfRangeException();
 
             while (found < count) {
                 rnds.AddRange(Utils.PseudoRandoms(100, maxValue));

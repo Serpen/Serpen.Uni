@@ -7,7 +7,7 @@ namespace Serpen.Uni {
 
         public static readonly System.Random RND = new System.Random();
 
-        public static long[] PseudoRandoms(int count, long maxValue = System.Int64.MaxValue, long minval = 0) {
+        public static long[] PseudoRandoms(int count, long maxValue = System.Int64.MaxValue, long minValue = 0) {
             var rndgen = System.Security.Cryptography.RandomNumberGenerator.Create();
             byte[] bytes;
 
@@ -31,12 +31,13 @@ namespace Serpen.Uni {
             rndgen.GetBytes(bytes);
             for (int i = 0; i < count; i++) {
                 nums[i] = convertfunc(i);
+                if (nums[i] == 0) nums[i] = minValue; //dirty fix
 
-                if (minval >= 0 && nums[i] < 0)
+                if (minValue >= 0 && nums[i] < 0)
                     nums[i] *= -1;
                 while (nums[i] > maxValue) //fix 0, -1
                     nums[i] >>= 1;
-                while (nums[i] < minval)
+                while (nums[i] < minValue)
                     nums[i] <<= 1;
             }
 
