@@ -47,7 +47,7 @@ namespace Serpen.Uni {
         public static int Pow(int bas, int exp) => (int)System.Math.Pow(bas, exp);
         public static int Pow2(int exp) => (int)System.Math.Pow(2, exp);
         public static int Sqrt(int exp) => (int)System.Math.Sqrt(exp);
-        public static int Log2(int z) => (int)System.Math.Log2(z);
+        public static int Log2(int z) => (int)(System.Math.Log2(z)+.5);
         public static bool HasBitSet(this int num, byte bit) {
             if (bit > 31)
                 throw new System.ArgumentOutOfRangeException(nameof(bit));
@@ -64,7 +64,7 @@ namespace Serpen.Uni {
         }
 
         public static bool[] ToBoolArray(this int integer, int minLen) {
-            bool[] ret = new bool[System.Math.Max(Log2(integer) + 1, minLen)];
+            bool[] ret = new bool[System.Math.Max(Log2(integer), minLen)];
             for (byte i = 0; i < ret.Length; i++)
                 ret[i] = HasBitSet((byte)integer, i);
             return ret;
@@ -176,6 +176,17 @@ namespace Serpen.Uni {
                 sb.AppendLine();
             }
             return sb.ToString();
+        }
+
+        [AlgorithmSource("HD FEdS P117 D221")]
+        public static byte HammingDistance(long val1, long val2) {
+            byte ret = 0;
+            for (byte i = 0; i < 64; i++) {
+                long shift = 1L << i;
+                if ((val1 & shift) != (val2 & shift))
+                    ret++;
+            }
+            return ret;
         }
 
     } //end class Utils 

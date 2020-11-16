@@ -110,5 +110,17 @@ namespace Serpen.Uni.Automat {
                     return objPropertyInfo.PropertyType == objSearchType | objSearchType.IsAssignableFrom(objPropertyInfo.PropertyType);
             return false;
         }
+
+        public static Finite.NFAe HammingGraph(byte count) {
+            var transform = new Finite.NFAeTransform();
+            for (uint v1 = 0; v1 < count; v1++)
+                for (uint v2 = 0; v2 < count; v2++)
+                    if (Serpen.Uni.Utils.HammingDistance(v1, v2) == 1)
+                        transform.AddM(v1,'1', v2);
+            var ret = new Finite.NFAe("Hamming-" + count, count, new char[] {'1'}, transform, 0, new uint[] {});
+            for (int v = 0; v < count; v++)
+                ret.States[v] = System.Convert.ToString(v,2).PadLeft(Uni.Utils.Log2(count),'0');
+            return ret;
+        }
     }
 }
