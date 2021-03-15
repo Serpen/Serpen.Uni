@@ -40,7 +40,7 @@ namespace Serpen.Uni.CompSys {
                 }
 
             if (differentRow != INVALID_ROW) {
-                Utils.DebugMessage($"only {differentRow}. row different in {this} and {other}", Utils.eDebugLogLevel.Verbose);
+                Utils.DebugMessage($"-{differentRow}.col diff {this} and {other}", Utils.eDebugLogLevel.Verbose);
                 var newRow = new QuineMcCluskeyRow() {
                     Index = $"{this.Index},{other.Index}",
                     Row = new sbyte[this.Row.Length],
@@ -66,7 +66,7 @@ namespace Serpen.Uni.CompSys {
 
         public override bool Equals(object obj) => obj is QuineMcCluskeyRow && obj.GetHashCode() == this.GetHashCode();
 
-        public override string ToString() => $"{Index.PadLeft(5)} {string.Join(',', Row)} {CountOnes} {Processed}";
+        public override string ToString() => $"{Index.PadLeft(5)} {string.Join(',', Row)} G:{CountOnes} C:{Processed.ToString().PadLeft(5)}";
 
         // sort CountOnes, Index.Lenght, Index
         public int CompareTo(QuineMcCluskeyRow other) =>
@@ -93,6 +93,7 @@ namespace Serpen.Uni.CompSys {
 
         [AlgorithmSource("~1608 2.2.3")]
         internal static bool Step2(ref QuineMcCluskeyRow[] qmcRows) {
+            Utils.DebugMessage("Step2:", Utils.eDebugLogLevel.Verbose);
             var newTerms = new HashSet<QuineMcCluskeyRow>();
 
             // iterate each row x each follow row
@@ -193,7 +194,7 @@ namespace Serpen.Uni.CompSys {
                             if (table[r, c] == 1)
                                 Kernimplikanten.Add(r);
 
-                Utils.DebugMessage($"found implikanten: {string.Join(',', Kernimplikanten)}", Utils.eDebugLogLevel.Verbose);
+                Utils.DebugMessage($"union implikanten: {string.Join(',', Kernimplikanten)}", Utils.eDebugLogLevel.Verbose);
 
                 var sb = new System.Text.StringBuilder();
                 int i;
@@ -226,9 +227,9 @@ namespace Serpen.Uni.CompSys {
                     sb.Append(" & ");
 
                 if (qmcRow.Row[c] == 1)
-                    sb.Append($"x{rowLen - c}");
+                    sb.Append($"x{c+1}");
                 else if (qmcRow.Row[c] == 0)
-                    sb.Append($"-x{rowLen - c}");
+                    sb.Append($"-x{c+1}");
                 // else {} // -1 = IRRELEVANT = -
             } //next c
             return sb.ToString();
