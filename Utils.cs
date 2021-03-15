@@ -25,7 +25,7 @@ namespace Serpen.Uni {
                 bytes = new byte[8 * count];
                 convertfunc = (i) => System.BitConverter.ToInt64(bytes, i * 8);
             }
-            
+
             long[] nums = new long[count];
 
             rndgen.GetBytes(bytes);
@@ -44,14 +44,26 @@ namespace Serpen.Uni {
             return nums;
         }
 
-        public static int Pow(int bas, int exp) => (int)System.Math.Pow(bas, exp);
-        public static int Pow2(int exp) => (int)System.Math.Pow(2, exp);
-        public static int Sqrt(int exp) => (int)System.Math.Sqrt(exp);
-        public static int Log2(int z) => (int)(System.Math.Log2(z)+.5);
+        public static int Pow(this int bas, int exp) => (int)System.Math.Pow(bas, exp);
+        public static int Pow2(this int exp) => Pow(2, exp);
+        public static int Sqrt(this int exp) => (int)(System.Math.Sqrt(exp));
+        public static int Log(this int z, int bas) => (int)(System.Math.Log(z, bas) + .5);
+        public static int Log2(this int z) => Log(z, 2);
+
         public static bool HasBitSet(this int num, byte bit) {
             if (bit > 31)
                 throw new System.ArgumentOutOfRangeException(nameof(bit));
             return (num & (1 << bit)) != 0;
+        }
+        public static int SetBit(this int num, byte bit) {
+            if (bit > 31)
+                throw new System.ArgumentOutOfRangeException(nameof(bit));
+            return num | (1 << bit);
+        }
+        public static int UnSetBit(this int num, byte bit) {
+            if (bit > 31)
+                throw new System.ArgumentOutOfRangeException(nameof(bit));
+            return num | (~(1 << bit));
         }
 
         public static bool[,] GetPowerSet(int bitscount, int additionalCols = 0) {
@@ -72,6 +84,7 @@ namespace Serpen.Uni {
         internal enum eDebugLogLevel { Always, Normal, Verbose }
         internal static eDebugLogLevel DebugLogLevel = eDebugLogLevel.Normal;
 
+        [System.Diagnostics.DebuggerStepThrough()]
         internal static void DebugMessage(string message, eDebugLogLevel level) {
             if (DebugLogLevel >= level && System.Diagnostics.Debugger.IsAttached) {
                 var stack = new System.Diagnostics.StackTrace(true);
@@ -187,6 +200,25 @@ namespace Serpen.Uni {
                     ret++;
             }
             return ret;
+        }
+
+        public static string asHex(this long num, bool dots = true, int fillup = 0, bool withPrefix = true) {
+            var s = num.ToString("X").PadLeft(fillup, '0');;
+            if (dots)
+                for (int i = s.Length - 1; i >= 0; i -= 4)
+                    s = s.Insert(i, ".");
+            
+            return (withPrefix ? "0x" : "") + s;
+        }
+
+        public static string asBin(this long num, bool dots = true, int fillup = 0, bool withPrefix = true) {
+            var s = System.Convert.ToString(num, 2).PadLeft(fillup, '0');
+
+            if (dots)
+                for (int i = s.Length - 1; i >= 0; i -= 4)
+                    s = s.Insert(i, ".");
+
+            return (withPrefix ? "0b" : "") + s;
         }
 
     } //end class Utils 
