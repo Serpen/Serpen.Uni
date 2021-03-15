@@ -23,6 +23,12 @@ namespace Serpen.Uni.CompSys {
             VarCount = vars;
 
         }
+
+        /// <summary>
+        /// Truthtable from positive Rows
+        /// </summary>
+        /// <param name="vars">#Vars</param>
+        /// <param name="array">Only positive Rownums</param>
         public WerteTabelle(int vars, params int[] array) {
             Array = Utils.GetPowerSet(vars, 1);
             for (int i = 0; i < array.GetLength(0); i++)
@@ -74,7 +80,7 @@ namespace Serpen.Uni.CompSys {
         public override string ToString() {
             var sb = new System.Text.StringBuilder();
 
-            int countlen = (int)System.Math.Log10(Array.GetLength(0)) + 2;
+            int countlen = Utils.Log(Array.GetLength(0),10) + 2;
 
             // write head
             sb.Append(new string('#', countlen));
@@ -101,6 +107,14 @@ namespace Serpen.Uni.CompSys {
         public static WerteTabelle VT_wikide_qmcc => new WerteTabelle(4,
             0, 1, 4, 5, 6, 7, 8, 9, 11, 15
         );
+
+        public static WerteTabelle VT_HDFEdS_f1_P113 => new WerteTabelle(4, new int[] {
+            0,1,2,3,7,15
+        });
+
+        public static WerteTabelle VT_HDFEdS_f2_P113 => new WerteTabelle(3, new int[] {
+            1,2,3,4,5,6
+        });
 
     }
 }
