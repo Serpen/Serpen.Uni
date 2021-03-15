@@ -25,6 +25,10 @@ namespace Serpen.Uni {
             return nextList.ToArray();
         }
 
+        static void Swap<T>(this T[] array, int i, int j) {
+            (array[i], array[j]) = (array[j], array[i]);
+        }
+
         [AlgorithmComplexity("O²")]
         public static T[] SelectionSort<T>(T[] array) where T : struct, System.IComparable {
             T[] nextList = (T[])array.Clone();
@@ -35,6 +39,7 @@ namespace Serpen.Uni {
                     if (nextList[j].CompareTo(nextList[lowestIndex]) < 0)
                         lowestIndex = j;
                 }
+                nextList.Swap(lowestIndex, i);
                 (nextList[lowestIndex], nextList[i]) = (nextList[i], nextList[lowestIndex]);
 
             }
@@ -53,8 +58,8 @@ namespace Serpen.Uni {
             }
             return nextList;
         }
-        public static T[] MergeSort<T>(T[] array) where T : System.IComparable  => throw new System.NotImplementedException();
-        public static T[] QuickSort<T>(T[] array) where T : System.IComparable  => throw new System.NotImplementedException();
+        public static T[] MergeSort<T>(T[] array) where T : System.IComparable => throw new System.NotImplementedException();
+        public static T[] QuickSort<T>(T[] array) where T : System.IComparable => throw new System.NotImplementedException();
 
         [AlgorithmComplexity("n*log(n)")]
         public static T[] HeapSort<T>(in T[] array) where T : System.IComparable {
@@ -65,7 +70,7 @@ namespace Serpen.Uni {
                 Reheap<T>(ref array2, i, n);
 
             for (int i = n; i >= 2; i--) {
-                (array2[0], array2[i - 1]) = (array2[i - 1], array2[0]);
+                array2.Swap(0, i - 1);
                 Reheap<T>(ref array2, 1, i - 1);
             }
             return array2;
@@ -75,27 +80,30 @@ namespace Serpen.Uni {
             int j = i;
             int son = 0;
             bool endLoop = false;
+            const int ARSH = 1; // array index 0, not 1
 
             do {
-                if (2 * j > k)
-                    break;
+                if (2 * j > k) // has no childs
+                    endLoop = true;
                 else {
-                    if (2 * j + 1 <= k)
-                        if (array[2 * j - 1].CompareTo(array[2 * j]) < 0)
-                            son = 2 * j;
+                    // choose son for compare
+                    if (2 * j + 1 <= k) // has two childs?
+                        if (array[2 * j - ARSH].CompareTo(array[2 * j + 1 - ARSH]) < 0) // left < right child
+                            son = 2 * j; // left
                         else
-                            son = 2 * j + 1;
-                    else
+                            son = 2 * j + 1; // right
+                    else // choose only (left) child
                         son = 2 * j;
 
-                    if (array[son - 1].CompareTo(array[j - 1]) < 0) {
-                        (array[j - 1], array[son - 1]) = (array[son - 1], array[j - 1]);
+                    // son < parent
+                    if (array[son - ARSH].CompareTo(array[j - ARSH]) < 0) {
+                        array.Swap(j - ARSH, son - ARSH);
                         j = son;
                     } else
                         endLoop = true;
                 }
             } while (!endLoop);
-            Utils.DebugMessage(System.String.Join(',', array), Utils.eDebugLogLevel.Verbose);
+            Utils.DebugMessage(System.String.Join(',', array), Utils.eDebugLogLevel.Always);
         }
     }
 }
