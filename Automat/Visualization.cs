@@ -20,29 +20,25 @@ namespace Serpen.Uni.Automat {
             CompoundArray = new float[] { 0.0f, 0.4f, 0.6f, 1f }
         };
 
-        static Pen PEN_ARROW {
-            get {
-                var tmpen = new Pen(Color.Black);
-                var hPath = new System.Drawing.Drawing2D.GraphicsPath();
-                hPath.AddLine(new Point(0, 0), new Point(-ARROW_WIDTH, -ARROW_WIDTH));
-                hPath.AddLine(new Point(0, 0), new Point(ARROW_WIDTH, -ARROW_WIDTH));
-                var HookCap = new System.Drawing.Drawing2D.CustomLineCap(null, hPath);
-                tmpen.CustomEndCap = HookCap;
-                return tmpen;
-            }
+        static readonly Pen PEN_ARROW = PenArrow();
+        static Pen PenArrow() {
+            var tmpPen = new Pen(Color.Black);
+            var hPath = new System.Drawing.Drawing2D.GraphicsPath();
+            hPath.AddLine(new Point(0, 0), new Point(-ARROW_WIDTH, -ARROW_WIDTH));
+            hPath.AddLine(new Point(0, 0), new Point(ARROW_WIDTH, -ARROW_WIDTH));
+            tmpPen.CustomEndCap = new System.Drawing.Drawing2D.CustomLineCap(null, hPath);
+            return tmpPen;
         }
 
-        static Pen PEN_START_ARROW {
-            get {
-                const int WIDTH = 2;
-                var tmpen = new Pen(Color.Black, WIDTH);
-                var hPath = new System.Drawing.Drawing2D.GraphicsPath();
-                hPath.AddLine(new Point(0, 0), new Point(-ARROW_WIDTH / WIDTH, -ARROW_WIDTH / WIDTH));
-                hPath.AddLine(new Point(0, 0), new Point(ARROW_WIDTH / WIDTH, -ARROW_WIDTH / WIDTH));
-                var HookCap = new System.Drawing.Drawing2D.CustomLineCap(null, hPath);
-                tmpen.CustomEndCap = HookCap;
-                return tmpen;
-            }
+        static readonly Pen PEN_START_ARROW = PenStartArrow();
+        static Pen PenStartArrow() {
+            const int PEN_START_WIDTH = 2;
+            var tmpPen = new Pen(Color.Black, PEN_START_WIDTH);
+            var hPath = new System.Drawing.Drawing2D.GraphicsPath();
+            hPath.AddLine(new Point(0, 0), new Point(-ARROW_WIDTH / PEN_START_WIDTH, -ARROW_WIDTH / PEN_START_WIDTH));
+            hPath.AddLine(new Point(0, 0), new Point(ARROW_WIDTH / PEN_START_WIDTH, -ARROW_WIDTH / PEN_START_WIDTH));
+            tmpPen.CustomEndCap = new System.Drawing.Drawing2D.CustomLineCap(null, hPath);
+            return tmpPen;
         }
         static readonly Font CourierNewFont = new Font("Courier New", 14);
 
@@ -52,28 +48,9 @@ namespace Serpen.Uni.Automat {
         static int qPos(int q) => (int)IMAGE_SPACE + q * STATE_DIAMETER + q * IMAGE_SPACE;
         static int qPos(uint q) => (int)IMAGE_SPACE + (int)q * STATE_DIAMETER + (int)q * IMAGE_SPACE;
 
-        class AlreadyDrawnClass : System.Collections.Generic.Dictionary<System.Tuple<int, int>, float> {
-            public void AddOrInc(int q1, int q2, float Height) {
-                var t = new System.Tuple<int, int>(q1, q2);
-                if (base.TryGetValue(t, out _)) {
-                    base[t] += Height;
-                } else {
-                    base.Add(t, Height);
-                }
-            }
-
-            public float this[int q1, int q2] {
-                get {
-                    if (base.TryGetValue(new System.Tuple<int, int>(q1, q2), out float val))
-                        return val;
-                    else
-                        return 0;
-                }
-            }
-        }
         public static Bitmap DrawAutomat(IAutomat A, uint? highlightState = null) {
 
-            var alreadyDrawn = new AlreadyDrawnClass();
+            var alreadyDrawn = new IncDictionary<int>();
 
             int lastCurveHeigth = 3 * CURVE_BONUS;
 
@@ -81,15 +58,15 @@ namespace Serpen.Uni.Automat {
 
             var vls = A.VisualizationLines();
 
-            if (vls.Length > A.StatesCount*3) {
-                relFactor *= vls.Length/(A.StatesCount*3);
+            if (vls.Length > A.StatesCount * 3) {
+                relFactor *= vls.Length / (A.StatesCount * 3);
                 Utils.DebugMessage($"corrected bmpRelFactor to {relFactor} by transform count", A, Uni.Utils.eDebugLogLevel.Verbose);
-            } else if (A.Alphabet.Length > A.StatesCount*4) {
-                relFactor *= A.Alphabet.Length/(A.StatesCount*4);
+            } else if (A.Alphabet.Length > A.StatesCount * 4) {
+                relFactor *= A.Alphabet.Length / (A.StatesCount * 4);
                 Utils.DebugMessage($"corrected bmpRelFactor to {relFactor} by alphabet count", A, Uni.Utils.eDebugLogLevel.Verbose);
             }
 
-            int bmpwidth = Math.Max(500, (int)(IMAGE_SPACE + (A.StatesCount) * (STATE_DIAMETER + IMAGE_SPACE)*relFactor));
+            int bmpwidth = Math.Max(500, (int)(IMAGE_SPACE + (A.StatesCount) * (STATE_DIAMETER + IMAGE_SPACE) * relFactor));
             var bmp = new Bitmap(bmpwidth, (int)(bmpwidth / 1.5));
 
             Graphics g = Graphics.FromImage(bmp);
@@ -110,14 +87,14 @@ namespace Serpen.Uni.Automat {
             const int MARGIN = 10;
 
             var FullDescSize = g.MeasureString(FullDesc, CourierNewFont);
-            if (FullDescSize.Width < bmpwidth - MARGIN*2)
+            if (FullDescSize.Width < bmpwidth - MARGIN * 2)
                 g.DrawString(FullDesc, CourierNewFont, Brushes.Black, 15f, bmp.Height - FullDescSize.Height * 1.5f);
             else {
-                int DescPartCount = (int)Math.Ceiling(FullDescSize.Width / (bmpwidth - MARGIN*2));
+                int DescPartCount = (int)Math.Ceiling(FullDescSize.Width / (bmpwidth - MARGIN * 2));
                 int toStringSplitFactor = (int)Math.Ceiling((float)FullDesc.Length / DescPartCount);
                 for (int i = 0; i < DescPartCount; i++) {
-                    string rowString = FullDesc.Substring(i * toStringSplitFactor, Math.Min(toStringSplitFactor, FullDesc.Length-i*toStringSplitFactor));
-                    g.DrawString(rowString, CourierNewFont, Brushes.Black, 15, 
+                    string rowString = FullDesc.Substring(i * toStringSplitFactor, Math.Min(toStringSplitFactor, FullDesc.Length - i * toStringSplitFactor));
+                    g.DrawString(rowString, CourierNewFont, Brushes.Black, 15,
                         bmp.Height - (DescPartCount - i + 1) * (FullDescSize.Height));
                 }
             }
@@ -133,7 +110,7 @@ namespace Serpen.Uni.Automat {
                     ellipsePen = PEN_DOUBLE;
                 if (iq == highlightState)
                     ellipsePen = Pens.Red;
-                
+
                 g.DrawEllipse(ellipsePen, qPos(iq), vCenter - STATE_DIAMETER / 2, STATE_DIAMETER, STATE_DIAMETER);
             }
 
@@ -151,7 +128,7 @@ namespace Serpen.Uni.Automat {
             return bmp;
         }
 
-        static void DrawTransformLine(ref Graphics g, int qStart, int qEnd, string desc, int vCenter, ref int lastCurveHeigth, ref AlreadyDrawnClass alreadyDrawn) {
+        static void DrawTransformLine(ref Graphics g, int qStart, int qEnd, string desc, int vCenter, ref int lastCurveHeigth, ref IncDictionary<int> alreadyDrawn) {
             var descSize = g.MeasureString(desc, CourierNewFont);
 
             var penArrow = PEN_ARROW;
