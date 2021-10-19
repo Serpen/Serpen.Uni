@@ -31,8 +31,8 @@ namespace Serpen.Uni.Automat.ContextFree {
             for (int i = 0; i < Terms.Length; i++)
                 Terms[i] = (char)(rnd.Next((int)'a', (int)'z'));
 
-            Vars = Vars.Distinct().ToArray();
-            Terms = Terms.Distinct().ToArray();
+            Vars = Vars.Distinct().OrderBy(s => s).ToArray();
+            Terms = Terms.Distinct().OrderBy(s => s).ToArray();
 
             int rulesCount = rnd.Next(1, MAX_RUL);
 
@@ -114,32 +114,32 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         public CFGrammer ToChomskyNF(AlgSourceMode mode = AlgSourceMode.EAFK) {
 
-            var newVars = new List<char>(Variables);
+            var finalVars = new List<char>(Variables);
             var newRS = Rules;
 
             Utils.DebugMessage($"0.before: {newRS}", this, Uni.Utils.eDebugLogLevel.Verbose);
 
             if (mode == AlgSourceMode.EAFK) {
-                newRS = RemoveUnusedSymbols(newRS, ref newVars);
+                newRS = newRS.RemoveUnusedSymbols(finalVars, Terminals);
                 Utils.DebugMessage($"0.remove: {newRS}", this, Uni.Utils.eDebugLogLevel.Verbose);
             }
 
-            newRS = Chomskey1_StartSymbol(newRS, ref newVars);
+            newRS = Chomskey1_StartSymbol(newRS, finalVars);
             Utils.DebugMessage($"1.starts: {newRS}", this, Uni.Utils.eDebugLogLevel.Verbose);
 
             newRS = Chomskey2_Epsilon(newRS);
             Utils.DebugMessage($"2.epsilo: {newRS}", this, Uni.Utils.eDebugLogLevel.Verbose);
 
-            newRS = Chomskey3_UnitRules(newRS, newVars);
+            newRS = Chomskey3_UnitRules(newRS, finalVars);
             Utils.DebugMessage($"3.unitru: {newRS}", this, Uni.Utils.eDebugLogLevel.Verbose);
 
-            newRS = Chomskey4_Length(newRS, ref newVars);
+            newRS = Chomskey4_Length(newRS, finalVars);
             Utils.DebugMessage($"4.length: {newRS}", this, Uni.Utils.eDebugLogLevel.Verbose);
 
-            newRS = Chomskey5_Terminals(newRS, ref newVars);
+            newRS = Chomskey5_Terminals(newRS, finalVars);
             Utils.DebugMessage($"5.termin: {newRS}", this, Uni.Utils.eDebugLogLevel.Verbose);
 
-            return new CFGrammer($"CCFG{mode}_({Name})", newVars.ToArray(), Terminals, newRS, StartSymbol) { IsChomskey = true, org = this };
+            return new CFGrammer($"CCFG{mode}_({Name})", finalVars.ToArray(), Terminals, newRS, StartSymbol) { IsChomskey = true, org = this };
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         /// <param name="rs">Old RuleSet</param>
         /// <param name="newVars">Reference to new Variables</param>
         /// <returns>CNF Step 1</returns>
-        RuleSet Chomskey1_StartSymbol(RuleSet rs, ref List<char> newVars) {
+        RuleSet Chomskey1_StartSymbol(RuleSet rs, List<char> newVars) {
             var newRS = new RuleSet();
 
             char? newStartSymbol = null;
@@ -310,7 +310,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         /// <summary>
         /// Length <= 2, introduce new Var for all |body|>2
         /// </summary>
-        RuleSet Chomskey4_Length(RuleSet rs, ref List<char> newVars) {
+        RuleSet Chomskey4_Length(RuleSet rs, List<char> newVars) {
             var newRs = new RuleSet();
             var translate = new Dictionary<string, char>();
 
@@ -356,7 +356,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             return newRs;
         }
 
-        RuleSet Chomskey5_Terminals(RuleSet rs, ref List<char> newVars) {
+        RuleSet Chomskey5_Terminals(RuleSet rs, List<char> newVars) {
             var newRs = new RuleSet();
             var translate = new Dictionary<char, char>();
 

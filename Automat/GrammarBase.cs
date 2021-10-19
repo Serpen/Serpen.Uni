@@ -80,8 +80,7 @@ namespace Serpen.Uni.Automat {
 
         }
 
-        public Dictionary<System.Tuple<string, bool>, System.Tuple<string, bool>[]>
-            FindMNEqClasses(int count = 100) {
+        public Dictionary<System.Tuple<string, bool>, System.Tuple<string, bool>[]> FindMNEqClasses(int count = 100) {
             var rndwords = GetRandomWords(count, 0, Serpen.Uni.Utils.Sqrt(count), System.Array.Empty<string>());
 
             System.Tuple<string, bool>[] mhRndTuples = new System.Tuple<string, bool>[rndwords.Length];
@@ -107,77 +106,12 @@ namespace Serpen.Uni.Automat {
                 foreach (string body in r.Value)
                     for (int i = 0; i < body.Length; i++)
                         if (!VarAndTerm.Contains(body[i]))
-                            throw new System.ArgumentOutOfRangeException("body", $"{body[i]}[{i}] not in Var/Term");
+                            throw new System.ArgumentOutOfRangeException("body", $"{body[i]} not in Var/Term {string.Join(',', VarAndTerm)}");
             }
         }
 
 
-        protected char[] GetGeneratingAndReachableSymbols() {
-            var list = new List<char>(Terminals);
-            // list.Add(StartSymbol);
-
-            bool foundNew = true;
-            while (foundNew) {
-                foundNew = false;
-
-                foreach (var r in Rules) {
-                    foreach (string body in r.Value) {
-                        if (!list.Contains(r.Key)) {
-                            if (body.Length == 1 && list.Contains(body[0]) || body == "") {
-                                list.Add(r.Key);
-                                foundNew = true;
-                            } else {
-                                bool allContained = true;
-                                for (int i = 0; i < body.Length; i++)
-                                    if (!list.Contains(body[i]) && body[i] != r.Key) {
-                                        allContained = false;
-                                        break;
-                                    }
-                                if (allContained) {
-                                    list.Add(r.Key);
-                                    foundNew = true;
-                                }
-                            }
-                        } //end if
-                    } //next body
-                } //next r
-            } //end while
-
-
-            return list.ToArray();
-        }
-
-        protected RuleSet RemoveUnusedSymbols(RuleSet rs, ref List<char> newVars) {
-            var newRS = new RuleSet();
-
-            char[] usedSymbols = GetGeneratingAndReachableSymbols();
-
-            foreach (var r in Rules) {
-                if (usedSymbols.Contains(r.Key)) {
-                    var newVals = new List<string>(r.Value.Length);
-                    foreach (string body in r.Value) {
-                        bool dontAdd = false;
-                        if (body == r.Key.ToString())
-                            dontAdd = true;
-                        foreach (char c in body) {
-                            if (!usedSymbols.Contains(c)) {
-                                dontAdd = true;
-                                if (newVars.Contains(c))
-                                    newVars.Remove(c);
-                            }
-                        }
-                        if (!dontAdd) {
-                            newVals.Add(body);
-                        }
-                    }
-                    newRS.Add(r.Key, newVals.Distinct().ToArray());
-                } else {
-                    // Key isnt usefull
-                }
-            }
-
-            return newRS;
-        }
+        
 
         #region Abgeschlossenheiteseigenschaften
 

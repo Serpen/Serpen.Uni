@@ -83,7 +83,7 @@ namespace Serpen.Uni.Automat.Finite {
 
             var headVars = (from r in rs select r.Key).Distinct().ToArray();
             var varList = new List<char>(Vars);
-            // rs.RemoveUnusedSymbols(varList, Terms);
+            rs = rs.RemoveUnusedSymbols(varList, Terms);
             return new ReGrammer("RG_Random", varList.ToArray(), Terms, rs, headVars.RndElement());
         }
 
