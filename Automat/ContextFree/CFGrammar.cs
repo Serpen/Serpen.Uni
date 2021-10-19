@@ -14,7 +14,7 @@ namespace Serpen.Uni.Automat.ContextFree {
 
         public bool IsChomskey { get; internal set; }
 
-        public static CFGrammer GenerateRandom() {
+        public static CFGrammer GenerateRandom(bool removeUnused = true) {
             var rnd = Uni.Utils.RND;
             const byte MAX_CHAR = 10;
             const byte MAX_VAR = 5;
@@ -24,10 +24,10 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             var rs = new RuleSet();
             var Vars = new char[rnd.Next(1, MAX_VAR)];
-            var Terms = new char[rnd.Next(1, MAX_CHAR)];
             for (int i = 0; i < Vars.Length; i++)
                 Vars[i] = (char)(rnd.Next((int)'A', (int)'Z'));
 
+            var Terms = new char[rnd.Next(1, MAX_CHAR)];
             for (int i = 0; i < Terms.Length; i++)
                 Terms[i] = (char)(rnd.Next((int)'a', (int)'z'));
 
@@ -38,26 +38,32 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             for (int i = 0; i < Math.Min(rulesCount, Vars.Length); i++) {
                 char rKey = Vars[rnd.Next(0, Vars.Length)];
-                if (!rs.ContainsKey(rKey)) {
-                    var Vals = new string[rnd.Next(1, MAX_BODY)];
-                    for (int j = 0; j < Vals.Length; j++) {
-                        string w = "";
-                        var wLen = rnd.Next(0, MAX_WLEN);
-                        for (int k = 0; k < wLen; k++) {
-                            if (rnd.NextDouble() > 0.7)
-                                w = w.Insert(k, Terms.RndElement().ToString());
-                            else
-                                w = w.Insert(k, Vars.RndElement().ToString());
-                        }
-                        Vals[j] = w;
+                var Vals = new string[rnd.Next(1, MAX_BODY)];
+                for (int j = 0; j < Vals.Length; j++) {
+                    string w = "";
+                    var wLen = rnd.Next(0, MAX_WLEN);
+                    for (int k = 0; k < wLen; k++) {
+                        if (rnd.NextDouble() > 0.7)
+                            w = w.Insert(k, Terms.RndElement().ToString());
+                        else
+                            w = w.Insert(k, Vars.RndElement().ToString());
                     }
-                    rs.Add(rKey, Vals.Distinct().ToArray());
+                    Vals[j] = w;
                 }
+
+                if (!rs.ContainsKey(rKey))
+                    rs.Add(rKey, Vals.Distinct().OrderBy(s => s).ToArray());
+                else
+                    rs[rKey] = Enumerable.Concat(rs[rKey], Vals).Distinct().OrderBy(s => s).ToArray();
             }
 
             var headVars = (from r in rs select r.Key).Distinct().ToArray();
 
-            return new CFGrammer("CFG_Random", Vars, Terms, rs, headVars.RndElement());
+            var varList = new List<char>(Vars);
+            if (removeUnused)
+                rs = rs.RemoveUnusedSymbols(varList, Terms);
+
+            return new CFGrammer("CFG_Random", varList.ToArray(), Terms, rs, headVars.RndElement());
         }
 
 
@@ -514,9 +520,9 @@ namespace Serpen.Uni.Automat.ContextFree {
                 var newVals = new List<string>(r.Value.Length);
                 foreach (string body in r.Value) {
                     var sw = new System.Text.StringBuilder();
-                    foreach (char c in body) 
+                    foreach (char c in body)
                         sw.Append(translate[c]);
-                    
+
                     newVals.Add(sw.ToString());
                 }
                 newRules.Add(translate[r.Key], newVals.ToArray());
