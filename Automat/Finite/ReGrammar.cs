@@ -7,13 +7,16 @@ namespace Serpen.Uni.Automat.Finite {
         : base(name, variables, terminals, rules, startSymbol) { }
 
         [AlgorithmSource("?1659_3.2.3")]
-        public override bool AcceptWord(string w) => throw new System.NotImplementedException();
+        public override bool AcceptWord(string w) {
+            var nfa = (NFAe)this;
+            return nfa.AcceptWord(w);
+        }
 
         public static explicit operator ContextFree.CFGrammer(ReGrammer grammar) {
             return new ContextFree.CFGrammer(grammar.Name, grammar.Variables, grammar.Terminals, grammar.Rules, grammar.StartSymbol);
         }
 
-        [AlgorithmSource("1659_D3.6_P83")]
+        [AlgorithmSource("1659_P83")]
         public static explicit operator NFAe(ReGrammer grammar) {
             var neat = new NFAeTransform();
             var acceptable = new List<uint>();
@@ -33,6 +36,55 @@ namespace Serpen.Uni.Automat.Finite {
                 grammar.Terminals, neat,
                 grammar.Variables.ArrayIndex(grammar.StartSymbol),
                 acceptable.Distinct().ToArray());
+        }
+
+        public static ReGrammer GenerateRandom() {
+            var rnd = Uni.Utils.RND;
+            const byte MAX_CHAR = 10;
+            const byte MAX_VAR = 5;
+            const byte MAX_RUL = 5;
+            const byte MAX_WLEN = 3;
+            const byte MAX_BODY = 5;
+
+            var rs = new RuleSet();
+            var Vars = new char[rnd.Next(1, MAX_VAR)];
+            for (int i = 0; i < Vars.Length; i++)
+                Vars[i] = (char)(rnd.Next((int)'A', (int)'Z'));
+
+            var Terms = new char[rnd.Next(1, MAX_CHAR)];
+            for (int i = 0; i < Terms.Length; i++)
+                Terms[i] = (char)(rnd.Next((int)'a', (int)'z'));
+
+            Vars = Vars.Distinct().OrderBy(s => s).ToArray();
+            Terms = Terms.Distinct().OrderBy(s => s).ToArray();
+
+            int rulesCount = rnd.Next(1, MAX_RUL);
+
+            for (int i = 0; i < System.Math.Min(rulesCount, Vars.Length); i++) {
+                char rKey = Vars[rnd.Next(0, Vars.Length)];
+                var Vals = new string[rnd.Next(1, MAX_BODY)];
+                for (int j = 0; j < Vals.Length; j++) {
+                    string w = "";
+                    var wLen = rnd.Next(0, MAX_WLEN);
+                    if (wLen >= 1)
+                        w = Terms.RndElement().ToString();
+                    if (wLen == 2) {
+                        w = w.Insert(1, Vars.RndElement().ToString());
+                    }
+                    Vals[j] = w;
+                }
+
+                if (!rs.ContainsKey(rKey))
+                    rs.Add(rKey, Vals.Distinct().OrderBy(s => s).ToArray());
+                else
+                    rs[rKey] = Enumerable.Concat(rs[rKey], Vals).Distinct().OrderBy(s => s).ToArray();
+
+            }
+
+            var headVars = (from r in rs select r.Key).Distinct().ToArray();
+            var varList = new List<char>(Vars);
+            // rs.RemoveUnusedSymbols(varList, Terms);
+            return new ReGrammer("RG_Random", varList.ToArray(), Terms, rs, headVars.RndElement());
         }
 
         [AlgorithmSource("1659_3.2.3_P84")]
@@ -76,10 +128,10 @@ namespace Serpen.Uni.Automat.Finite {
                         if (Variables.Contains(body[0]))
                             throw new GrammerException($"only body {body} is Var");
                     } else {
-                        if (Variables.Contains(body[0]))
-                            throw new GrammerException($"first char in {body} isn't var");
+                        if (!Terminals.Contains(body[0]))
+                            throw new GrammerException($"first char in {body} is no Terminal {string.Join(',', Terminals)}");
                         if (!Variables.Contains(body[1]))
-                            throw new GrammerException($"second char in {body} isn't terminal");
+                            throw new GrammerException($"second char in {body} is no Variables {string.Join(',', Variables)}");
                     }
                 }
             }
