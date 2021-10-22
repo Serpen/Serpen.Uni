@@ -111,7 +111,7 @@ namespace Serpen.Uni.Automat {
         }
 
 
-        
+
 
         #region Abgeschlossenheiteseigenschaften
 
@@ -129,6 +129,116 @@ namespace Serpen.Uni.Automat {
         }
 
         #endregion
+
+        [AlgorithmSource("HHU_4")]
+        public char[] Nullable() {
+            var nullable = new Dictionary<char, bool>(VarAndTerm.Count);
+            foreach (var symbol in VarAndTerm)
+                nullable[symbol] = false;
+
+            bool changed = false;
+
+            do {
+                changed = false;
+                foreach (var r in Rules) {
+                    if (!nullable[r.Key])
+                        foreach (var prod in r.Value) {
+                            bool allNullable = true;
+                            for (int i = 0; i < prod.Length; i++) {
+                                if (!nullable[prod[i]]) {
+                                    allNullable = false;
+                                    break;
+                                }
+                            }
+                            if (allNullable) {
+                                nullable[r.Key] = true;
+                                changed = true;
+                            }
+                        }
+                }
+            } while (changed);
+            return (from n in nullable where n.Value select n.Key).ToArray();
+        }
+
+        [AlgorithmSource("1810_A3.14_P61")]
+        public string[] FirstSet(char Var) {
+            if (Terminals.Contains(Var))
+                return new String[] {Var.ToString()};
+
+            var first = new Dictionary<char, List<string>>();
+
+            foreach (var v in Variables)
+                first.Add(v, new List<string>());
+            foreach (var t in Terminals) {
+                first.Add(t, new List<string> { t.ToString() });
+            }
+
+            var Prods = Rules[Var];
+            var D = new List<string>[Prods.Length];
+
+            for (int i = 0; i < Prods.Length; i++) {
+                var prod = Prods[i];
+
+                if (prod == string.Empty) {
+                    D[i] = new List<string>();
+                    D[i].Add("");
+                } else {
+                    D[i] = new List<string>(FirstSet(prod[0]).Where(s => s != ""));
+                    int j = 1;
+                    while (Prods[i].Length > j && (FirstSet(Prods[i][j])).Contains("") && j < Prods[i].Length) {
+                        j++;
+                        D[i] = D[i].Union((FirstSet(Prods[i][j]).Where(s => s != ""))).ToList();
+                    }
+                    if (j == Prods[i].Length && FirstSet(prod[prod.Length-1]).Contains(""))
+                        D[i].Add("");
+                }
+                first[Var].AddRange(D[i]);
+            }
+            return first[Var].ToArray();
+        }
+
+        [AlgorithmSource("HHU_4")]
+        public char[] FirstSet_HHU(char Var) {
+            var first = new Dictionary<char, List<char>>(VarAndTerm.Count);
+
+            foreach (var t in Terminals)
+                first[t] = new List<char>(new char[] { t });
+            foreach (var v in Variables)
+                first[v] = new List<char>();
+
+            bool changed = false;
+            int runs = 0;
+            do {
+                runs++;
+                changed = false;
+                foreach (var r in Rules) {
+                    var prod = r.Value[0];
+                    for (int i = 0; i < prod.Length; i++) {
+                        first[r.Key].AddRange(first[prod[i]]);
+                        changed = true;
+                    }
+                    for (int i = 1; i < r.Value.Length; i++) {
+                        for (int j = 0; j < r.Value[i].Length; j++) {
+                            if (Nullable().Contains(r.Value[i][j])) {
+                                first[r.Key].AddRange(first[r.Value[i][j]]);
+                                changed = true;
+                            } else
+                                break;
+                        }
+
+                    }
+
+                }
+            } while (changed & runs < 100);
+
+            foreach (var k in first.Keys)
+                first[k] = first[k].Distinct().ToList();
+
+            throw new System.NotImplementedException();
+            return first[Var].ToArray();
+        }
+
+        public char[] FollowSet(char NonTerminal) => throw new System.NotImplementedException();
 
 
         public abstract bool AcceptWord(string w);
