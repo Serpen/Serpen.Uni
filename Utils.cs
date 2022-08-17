@@ -85,10 +85,10 @@ namespace Serpen.Uni {
         internal static eDebugLogLevel DebugLogLevel = eDebugLogLevel.Normal;
 
         [System.Diagnostics.DebuggerStepThrough()]
-        internal static void DebugMessage(string message, eDebugLogLevel level) {
+        internal static void DebugMessage(string message, eDebugLogLevel level, int ignoreStacks = 1) {
             if (DebugLogLevel >= level && System.Diagnostics.Debugger.IsAttached) {
                 var stack = new System.Diagnostics.StackTrace(true);
-                var sframe = stack.GetFrame(1);
+                var sframe = stack.GetFrame(ignoreStacks);
                 var smethod = sframe.GetMethod();
                 System.Diagnostics.Debug.WriteLine(
                     smethod.DeclaringType.Name + "." +
@@ -200,6 +200,10 @@ namespace Serpen.Uni {
                     ret++;
             }
             return ret;
+        }
+
+        public static bool ContainsSubset<T>(this List<T> supset, List<T> subset) {
+            return subset.All(x => supset.Contains(x));
         }
 
         public static string asHex(this long num, bool dots = true, int fillup = 0, bool withPrefix = true) {
