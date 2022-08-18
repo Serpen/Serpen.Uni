@@ -75,6 +75,28 @@ namespace Serpen.Uni {
             return ret;
         }
 
+        public static IEnumerable<IEnumerable<T>> GetPowerSet<T>(this IReadOnlyList<T> list) {
+            var ret = new List<List<T>>();
+
+            int count = Utils.Pow2(list.Count);
+
+            for (int i = 0; i < count; i++) {
+                ret.Add(new List<T>());
+                for (byte j = 0; j < count; j++)
+                    if (i.HasBitSet(j))
+                        ret[i].Add(list[j]);
+            }
+            return ret;
+        }
+
+        public static IEnumerable<IEnumerable<T>> GetPermutations<T>(IEnumerable<T> list, int length) {
+            if (length == 1) return list.Select(t => new T[] { t });
+
+            return GetPermutations(list, length - 1)
+                .SelectMany(t => list.Where(e => !t.Contains(e)),
+                    (t1, t2) => t1.Concat(new T[] { t2 }));
+        }
+
         public static bool[] ToBoolArray(this int integer, int minLen) {
             bool[] ret = new bool[System.Math.Max(Log2(integer), minLen)];
             for (byte i = 0; i < ret.Length; i++)
@@ -85,10 +107,10 @@ namespace Serpen.Uni {
         internal static eDebugLogLevel DebugLogLevel = eDebugLogLevel.Normal;
 
         [System.Diagnostics.DebuggerStepThrough()]
-        internal static void DebugMessage(string message, eDebugLogLevel level, int ignoreStacks = 1) {
+        internal static void DebugMessage(string message, eDebugLogLevel level) {
             if (DebugLogLevel >= level && System.Diagnostics.Debugger.IsAttached) {
                 var stack = new System.Diagnostics.StackTrace(true);
-                var sframe = stack.GetFrame(ignoreStacks);
+                var sframe = stack.GetFrame(1);
                 var smethod = sframe.GetMethod();
                 System.Diagnostics.Debug.WriteLine(
                     smethod.DeclaringType.Name + "." +
@@ -183,7 +205,7 @@ namespace Serpen.Uni {
             for (int r = 0; r < array.GetLength(0); r++) {
                 for (int c = 0; c < array.GetLength(1); c++)
                     if (array[r, c] != null)
-                        sb.Append($"{array[r, c].ToString().PadLeft(2) }, ");
+                        sb.Append($"{array[r, c].ToString().PadLeft(2)}, ");
                     else
                         sb.Append("".ToString().PadLeft(2));
                 sb.AppendLine();
@@ -202,16 +224,16 @@ namespace Serpen.Uni {
             return ret;
         }
 
-        public static bool ContainsSubset<T>(this List<T> supset, List<T> subset) {
+        public static bool ContainsSubset<T>(this IEnumerable<T> supset, IEnumerable<T> subset) {
             return subset.All(x => supset.Contains(x));
         }
 
         public static string asHex(this long num, bool dots = true, int fillup = 0, bool withPrefix = true) {
-            var s = num.ToString("X").PadLeft(fillup, '0');;
+            var s = num.ToString("X").PadLeft(fillup, '0');
             if (dots)
                 for (int i = s.Length - 1; i >= 0; i -= 4)
                     s = s.Insert(i, ".");
-            
+
             return (withPrefix ? "0x" : "") + s;
         }
 

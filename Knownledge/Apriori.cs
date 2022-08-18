@@ -1,194 +1,205 @@
 using System.Collections.Generic;
 using System.Linq;
 
-class Apriori {
+namespace Serpen.Uni.Knownledge {
 
-    internal readonly bool[,] DB;
-    public readonly float MinSupport;
-    public readonly float MinConf;
+    [Serpen.Uni.AlgorithmSource("FUH1656_6.4")]
+    class Apriori {
 
-    public Apriori(bool[,] db, float minsupport, float minconf) {
-        DB = db;
-        MinSupport = minsupport;
-        MinConf = minconf;
+        internal readonly bool[,] DB;
+        public readonly float MinSupport;
+        public readonly float MinConf;
 
-        Transactions = new List<int>[db.GetLength(1)];
-        for (int t = 0; t < db.GetLength(1); t++) {
-            var itms = new List<int>();
-            for (int i = 0; i < db.GetLength(0); i++) {
-                if (db[i, t])
-                    itms.Add(i);
+        public readonly int RowCount;
+        public readonly int TransactionCount;
+
+
+        public Apriori(bool[,] db, float minsupport, float minconf) {
+            DB = db;
+            MinSupport = minsupport;
+            MinConf = minconf;
+
+            RowCount = db.GetLength(0);
+            TransactionCount = db.GetLength(1);
+
+            Transactions = new List<int>[TransactionCount];
+            for (int t = 0; t < TransactionCount; t++) {
+                var itms = new List<int>();
+                for (int i = 0; i < RowCount; i++)
+                    if (db[i, t])
+                        itms.Add(i);
+
+                Transactions[t] = itms;
             }
-            Transactions[t] = itms;
+
+            support = new float[RowCount];
+            for (int i = 0; i < RowCount; i++) {
+                int count = 0;
+                for (int t = 0; t < TransactionCount; t++)
+                    if (db[i, t])
+                        count++;
+                support[i] = (float)count / RowCount;
+            }
         }
 
-        support = new float[db.GetLength(0)];
-        for (int i = 0; i < db.GetLength(0); i++) {
-            int count = 0;
-            for (int t = 0; t < db.GetLength(1); t++) {
-                if (db[i, t])
-                    count++;
+        internal readonly List<int>[] Transactions;
+        readonly float[] support;
+
+        string FormatListOut(List<List<int>> l) {
+            var sb = new System.Text.StringBuilder();
+            foreach (var item in l) {
+                var lst = new List<string>();
+                sb.Append("{");
+                foreach (var subitem in item) {
+                    int num = (char)(65 + subitem);
+                    if (num >= 65 + 8) num++;
+                    lst.Add(((char)num).ToString());
+                }
+                sb.Append(string.Join(",", lst) + "}, ");
             }
-            support[i] = (float)count / db.GetLength(0);
+            if (sb.Length > 2)
+                sb.Remove(sb.Length - 2, 2);
+            return sb.ToString();
         }
-    }
 
-    internal readonly List<int>[] Transactions;
-    readonly float[] support;
+        public List<List<int>> AprioriAlg() {
+            var L = new Dictionary<int, List<List<int>>>();
+            L.Add(1, Frequent1Sets());
 
-    void FormatListOut(string cap, List<List<int>> l) {
-        var sb = new System.Text.StringBuilder(cap + ": ");
-        foreach (var item in l) {
-            sb.Append("{");
-            foreach (var subitem in item) {
-                int num = (char)(65 + subitem);
-                if (num >= 65 + 8) num++;
-                sb.Append((char)num + ", ");
-            }
-            sb.Append("}, ");
-        }
-        Serpen.Uni.Utils.DebugMessage(sb.ToString(), Serpen.Uni.Utils.eDebugLogLevel.Always, 2);
-    }
-    void FormatListOut(string cap, List<int> l) {
-        var newl = new List<List<int>>();
-        foreach (var item in l)
-            newl.Add(new List<int>() { item });
+            Serpen.Uni.Utils.DebugMessage("L1 " + FormatListOut(L[1]), Serpen.Uni.Utils.eDebugLogLevel.Normal);
 
-        FormatListOut(cap, newl);
-    }
+            int k = 2;
+            while (L.ContainsKey(k - 1) && L[k - 1].Any()) {
+                var Ck = AprioriGen(L[k - 1], k - 1);
 
+                var ccountList = new Dictionary<List<int>, int>();
 
-    public List<List<int>> AprioriAlg() {
-        var L = new Dictionary<int, List<List<int>>>();
-        L.Add(1, Frequent1Sets(DB, MinSupport));
+                for (int t = 0; t < TransactionCount; t++) {
+                    var Ct = from x in Ck
+                             where Serpen.Uni.Utils.ContainsSubset(Transactions[t], x)
+                             select x;
 
-        FormatListOut("L1", L[1]);
-
-        int k = 2;
-        while (L.ContainsKey(k - 1) && L[k - 1].Any()) {
-            var Ck = AprioriGen(L[k - 1], k - 1);
-
-            var ccountList = new Dictionary<List<int>, int>();
-
-            for (int t = 0; t < DB.GetLength(1); t++) {
-                var Ct = new List<List<int>>();
-                foreach (var c in Ck) {
-                    if (Serpen.Uni.Utils.ContainsSubset(Transactions[t], c)) {
-                        Ct.Add(c);
-                    }
+                    foreach (var candidate in Ct)
+                        if (!ccountList.ContainsKey(candidate))
+                            ccountList.Add(candidate, 1);
+                        else
+                            ccountList[candidate]++;
                 }
 
-                foreach (var candidate in Ct) {
-                    if (!ccountList.ContainsKey(candidate)) {
-                        ccountList.Add(candidate, 1);
-                    } else {
-                        ccountList[candidate]++;
-                    }
-                }
+                L[k] = new List<List<int>>();
+                foreach (var c in Ck)
+                    if (ccountList.ContainsKey(c) && ccountList[c] >= (float)TransactionCount * MinSupport)
+                        L[k].Add(c);
 
+
+                Serpen.Uni.Utils.DebugMessage("Lk " + FormatListOut(L[k]), Serpen.Uni.Utils.eDebugLogLevel.Normal);
+
+                k++;
             }
-            L[k] = new List<List<int>>();
-            foreach (var c in Ck) {
-                if (ccountList.ContainsKey(c) && ccountList[c] >= (float)DB.GetLength(1) * MinSupport) {
-                    L[k].Add(c);
-                }
+
+            var ret = (from x in L.Values.SelectMany(y => y) select x).ToList();
+            Serpen.Uni.Utils.DebugMessage("Ret " + FormatListOut(ret), Serpen.Uni.Utils.eDebugLogLevel.Normal);
+            return ret;
+        }
+
+        List<List<int>> Frequent1Sets() {
+            var L1 = new List<List<int>>();
+            for (int p = 0; p < RowCount; p++) {
+                int sum = 0;
+                for (int t = 0; t < TransactionCount; t++)
+                    if (DB[p, t]) sum++;
+
+                if ((float)sum / TransactionCount >= MinSupport)
+                    L1.Add(new List<int>() { p });
             }
-            FormatListOut("Lk", L[k]);
-
-            k++;
+            return L1;
         }
-        var ret = new List<List<int>>();
-        foreach (var item in L.Values)
-            ret.AddRange(item); // ?
 
-        FormatListOut("Ret", ret);
-        return ret;
-    }
+        [AlgorithmSource("1696WBS_A6.2_P206")]
+        public List<List<int>> AprioriGen(List<List<int>> L_km1, int k) {
+            Serpen.Uni.Utils.DebugMessage("in " + FormatListOut(L_km1), Serpen.Uni.Utils.eDebugLogLevel.Normal);
 
-    static List<List<int>> Frequent1Sets(bool[,] DB, float min) {
-        var L1 = new List<List<int>>();
-        for (int p = 0; p < DB.GetLength(0); p++) {
-            int sum = 0;
-            for (int t = 0; t < DB.GetLength(1); t++)
-                if (DB[p, t]) sum++;
+            List<List<int>> Ck = new List<List<int>>();
 
-            if ((float)sum / DB.GetLength(1) >= min)
-                L1.Add(new List<int>() { p });
-        }
-        return L1;
-    }
-
-    Dictionary<int, int> DistinctItems(List<List<int>> DB) {
-        var distincts = new Dictionary<int, int>();
-
-        foreach (var item in DB)
-            foreach (var item2 in item)
-                if (!distincts.ContainsKey(item2))
-                    distincts.Add(item2, 1);
-                else
-                    distincts[item2] += 1;
-
-        return distincts;
-    }
-
-    public List<List<int>> AprioriGen(List<List<int>> L, int k) {
-        FormatListOut("in ", L);
-
-        List<List<int>> Ck = new List<List<int>>();
-        foreach (var p in L) {
-            foreach (var q in L) {
-                if (p != q) {
-                    bool itemsEq = true;
-                    for (int i = 0; i <= k - 2; i++)
-                        if (p[i] != q[i]) itemsEq = false;
-
-                    if (itemsEq) {
-                        if (p[k - 1] < q[k - 1]) {
-                            List<int> next = new List<int>();
-                            for (int i = 0; i <= k - 2; i++)
-                                next.Add(p[i]);
-
-                            next.Add(p[k - 1]);
-                            next.Add(q[k - 1]);
-
-                            Ck.Add(next);
+            foreach (var p in L_km1) {
+                foreach (var q in L_km1) {
+                    if (p != q) {
+                        var e1 = p.Take(k - 1); // first k-2 matching elements
+                        if (e1.SequenceEqual(q.Take(k - 1))) {
+                            var p1 = p[k - 1];
+                            var q1 = q[k - 1];
+                            if (p1 < q1)
+                                Ck.Add(new List<int>(e1) { p1, q1 });
                         }
                     }
                 }
             }
+
+            // Teilmengencheck
+            var ret = new List<List<int>>(Ck);
+            foreach (var c in Ck) {
+                var parts = Utils.GetPowerSet(c).Where(x => x.Count() == c.Count - 1).ToArray();
+                foreach (var s in parts) {
+                    bool exist = false;
+                    foreach (var lx in L_km1) {
+                        if (lx.ContainsSubset(s)) {
+                            exist = true;
+                        }
+                    }
+                    if (!exist)
+                        ret.Remove(c);
+                }
+            }
+
+            Serpen.Uni.Utils.DebugMessage("out " + FormatListOut(ret), Serpen.Uni.Utils.eDebugLogLevel.Normal);
+
+            return ret;
         }
 
-        Ck = Teilmengencheck(Ck);
+        public float Support(IEnumerable<int> list) {
+            int sum = 0;
+            foreach (var t in Transactions) {
+                if (Serpen.Uni.Utils.ContainsSubset(t, list)) {
+                    sum++;
+                }
+            }
+            return (float)sum / TransactionCount;
+        }
 
-        FormatListOut("out: ", Ck);
+        public float Confidence(IEnumerable<int> list1, IEnumerable<int> list2)
+            => Support(list1.Concat(list2).ToList()) / Support(list1);
 
-        return Ck;
-    }
+        public void AssocRules(List<List<int>> list) {
+            foreach (var l in list) {
+                var perm = Utils.GetPermutations(l, l.Count);
+                var avoidDoubles = new List<string>();
 
-    private List<List<int>> Teilmengencheck(List<List<int>> L) {
-        return L;
-        throw new System.NotImplementedException();
-    }
+                foreach (var p in perm) {
+                    if (p.Count() > 1) {
+                        var array = p.ToArray();
+                        for (int splitpos = 1; splitpos < p.Count(); splitpos++) {
+                            var left = p.Take(splitpos);
+                            var right = p.Skip(splitpos);
 
-    [Serpen.Uni.AlgorithmSource("FUH1656_6.4")]
-    public float Support(List<int> list) {
-        int sum = 0;
-        foreach (var t in Transactions) {
-            if (Serpen.Uni.Utils.ContainsSubset(t, list)) {
-                sum++;
+                            string text = string.Join(",", left.OrderBy(s => s)) + "->" + string.Join(",", right.OrderBy(s => s));
+                            if (!avoidDoubles.Contains(text)) {
+                                avoidDoubles.Add(text);
+                                float conf = Confidence(left, right);
+                                float supp = Support(p);
+                                if (conf >= MinConf)
+                                    System.Console.WriteLine(text.PadRight(10) + " s:" + supp + " c:" + conf);
+                            }
+
+                        }
+                    }
+                }
+
             }
         }
-        return (float)sum / DB.GetLength(1);
-    }
 
-    [Serpen.Uni.AlgorithmSource("FUH1656_6.4")]
-    public float Confidence(List<int> list1, List<int> list2) {
-        return Support(list1.Concat(list2).ToList()) / Support(list1);
-    }
-
-    public static bool[,] Drogeriemarkt {
-        get { //GetLenght(0)=Produkte, 1=Transationen
-            return new bool[,] {
+        public static bool[,] Drogeriemarkt {
+            get { //GetLenght(0)=Produkte, 1=Transationen
+                return new bool[,] {
                 {true, false, false, false, true, false, true, false, true, false}, // Seife A
                 {true, true, true,true, false, true, false, true, true, true}, // Shampoo B
                 {false, true, true,true,false,true,false,true,true,false}, // Haarspülung C
@@ -201,9 +212,7 @@ class Apriori {
                 {false,false,false,false,false,true,false,true,false,false},
                 {false,true,false,true,false,true,false,true,false,true} // Kosmetikartikel L
             };
+            }
         }
     }
 }
-
-
-
