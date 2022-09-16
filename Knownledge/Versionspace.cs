@@ -1,24 +1,41 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Serpen.Uni.Knownledge {
 
     [AlgorithmSource("FUH1656_A5.13_P184")]
     class Versionspace {
-        public List<Hypothese> S;
-        public List<Hypothese> G;
-
-        Hypothese LastS { get => S[S.Count - 1]; }
+        List<Hypothese> S;
+        List<Hypothese> G;
 
         public Versionspace() {
-            S = new List<Hypothese>() { new Hypothese(Hypothese.Null, Hypothese.Null, Hypothese.Null, Hypothese.Null, Hypothese.Null) };
-            G = new List<Hypothese>() { new Hypothese(Hypothese.Any, Hypothese.Any, Hypothese.Any, Hypothese.Any, Hypothese.Any) };
+
         }
 
-        public void Invoke(Sample[] samples) {
+        string[][] AttAusPraeg;
+
+        public IEnumerable<Hypothese> Invoke(VSSample[] samples) {
+            int AttCount = samples.First().array.Length;
+            String[] Sstr = new string[AttCount];
+            String[] Gstr = new string[AttCount];
+            AttAusPraeg = new string[AttCount][];
+            for (int i = 0; i < AttCount; i++) {
+                Sstr[i] = Hypothese.Null;
+                Gstr[i] = Hypothese.Any;
+            }
+            G = new List<Hypothese>() { new Hypothese(Gstr) };
+            S = new List<Hypothese>() { new Hypothese(Sstr) };
+
+            for (int i = 0; i < AttCount; i++)
+                AttAusPraeg[i] = samples.Select(s => s.array[i]).Distinct().ToArray();
+
+            Utils.DebugMessage("S: " + string.Join(",", S), Utils.eDebugLogLevel.Normal);
+            Utils.DebugMessage("G: " + string.Join(",", G), Utils.eDebugLogLevel.Normal);
             foreach (var sample in samples) {
-                Utils.DebugMessage("S: " + string.Join(",", S), Utils.eDebugLogLevel.Normal);
-                Utils.DebugMessage("G: " + string.Join(",", G), Utils.eDebugLogLevel.Normal);
+
+                Utils.DebugMessage("enter " + sample.Result + " " + sample, Utils.eDebugLogLevel.Normal);
+
                 if (sample.Result) {
                     var newG = new List<Hypothese>(G);
                     foreach (var g in G) {
@@ -45,7 +62,7 @@ namespace Serpen.Uni.Knownledge {
                                 newS.Remove(s2);
                         }
                     }
-                    S = newS;
+                    S = newS.Distinct().ToList();
                 } else { // -sample
                     var newS = new List<Hypothese>(S);
                     foreach (var s in G) {
@@ -58,7 +75,7 @@ namespace Serpen.Uni.Knownledge {
                     foreach (var h in G) {
                         if (h.Match(sample)) {
                             newG.Remove(h);
-                            newG.AddRange(h.minSpecialized(sample, LastS));
+                            newG.AddRange(h.minSpecialized(sample, S.ToArray(), AttAusPraeg));
                         }
                     }
 
@@ -72,24 +89,24 @@ namespace Serpen.Uni.Knownledge {
                             }
                         }
                     }
-                    G = newG;
+                    G = newG.Distinct().ToList();
                 }
+                Utils.DebugMessage("S: " + string.Join(",", S), Utils.eDebugLogLevel.Normal);
+                Utils.DebugMessage("G: " + string.Join(",", G), Utils.eDebugLogLevel.Normal);
+
+                if (S.Count == 0 || G.Count == 0) {
+                    Utils.DebugMessage("VS collapsed", Utils.eDebugLogLevel.Always);
+                    return System.Array.Empty<Hypothese>();
+                }
+
             }
+
+            return S.Union(G);
         }
     }
 
-    static class VSSample {
-        public static Sample[] Sportsendungen = {
-            new Sample(true, "Fußball", "Mannschaft", "draußen", "national","Samstag"),
-            new Sample(true, "Hockey", "Mannschaft", "draußen", "national","Samstag"),
-            new Sample(false, "Bodenturnen", "Einzel", "drinnen", "Welt","Samstag"),
-            new Sample(true, "Handball", "Mannschaft", "drinnen", "national","Samstag"),
-            new Sample(true, "Zehnkampf", "Einzel", "draußen", "Welt","Sonntag")
-        };
-    }
-
-    class Hypothese {
-        private readonly string[] array;
+    class Hypothese : ICloneable {
+        internal readonly string[] array;
 
         public const string Null = "0";
         public const string Any = "*";
@@ -120,7 +137,8 @@ namespace Serpen.Uni.Knownledge {
             bool covers = false;
             if (x.array.Length != y.array.Length) throw new System.ApplicationException("Hypothese Params differ");
             for (int i = 0; i < x.array.Length; i++) {
-                if (x.array[i] != y.array[i] && x.array[i] != Hypothese.Any)
+                // if (x.array[i] != y.array[i] && x.array[i] != Hypothese.Any && y.array[i] != Hypothese.Any)
+                if (x.array[i] != y.array[i] && y.array[i] == Hypothese.Any)
                     covers = true;
                 else if (x[i] != y[i])
                     return false;
@@ -128,7 +146,7 @@ namespace Serpen.Uni.Knownledge {
             return covers;
         }
 
-        public bool Match(Sample s) {
+        public bool Match(VSSample s) {
             bool match = true;
             if (s.array.Length != array.Length) throw new System.ApplicationException("Hypothese Params differ");
             for (int i = 0; i < array.Length; i++) {
@@ -136,6 +154,16 @@ namespace Serpen.Uni.Knownledge {
                     return false;
             }
             return match;
+        }
+
+        public override bool Equals(object obj) {
+            if (obj is Hypothese objh)
+                return objh.ToString() == this.ToString();
+            return false;
+        }
+
+        public override int GetHashCode() {
+            return ToString().GetHashCode();
         }
 
         public override string ToString() {
@@ -155,8 +183,8 @@ namespace Serpen.Uni.Knownledge {
             return sb.ToString();
         }
 
-        internal IEnumerable<Hypothese> minCommon(Sample s) {
-            var ret = new List<Hypothese>() { this };
+        internal IEnumerable<Hypothese> minCommon(Hypothese s) {
+            var ret = new List<Hypothese>() { (Hypothese)this.Clone() };
 
             for (int i = 0; i < array.Length; i++) {
                 if (this[i] == Hypothese.Null) {
@@ -173,28 +201,89 @@ namespace Serpen.Uni.Knownledge {
             return ret;
         }
 
-        internal IEnumerable<Hypothese> minSpecialized(Sample s, Hypothese LastS) { //TODO: LastS[]
+        internal IEnumerable<Hypothese> minSpecialized(Hypothese s, Hypothese[] S, string[][] AttAuspraeg) { //TODO: LastS[]
             var ret = new List<Hypothese>();
-
-            for (int i = 0; i < LastS.array.Length; i++) {
-                if (this[i] != LastS[i] && LastS[i] != s[i]) {
-                    var newH = new Hypothese((string[])array.Clone());
-                    newH[i] = LastS[i];
-                    ret.Add(newH);
+            foreach (var LastS in S) {
+                for (int i = 0; i < LastS.array.Length; i++) {
+                    if (this[i] != LastS[i] && LastS[i] != s[i]) {
+                        if (!LastS.array.All(x => x == Hypothese.Null)) {
+                            var newH = (Hypothese)this.Clone();
+                            newH[i] = LastS[i];
+                            ret.Add(newH);
+                        } else { // if LastS is 0 is opposite attributes instead
+                            for (int j = 0; j < AttAuspraeg[i].Length; j++) {
+                                if (AttAuspraeg[i][j] != s[i]) {
+                                    var newH = (Hypothese)this.Clone();
+                                    newH[i] = AttAuspraeg[i][j];
+                                    ret.Add(newH);
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
 
             return ret;
         }
+
+        public object Clone() {
+            return new Hypothese((string[])this.array.Clone());
+        }
     }
 
-    class Sample : Hypothese {
-        public Sample(bool result, params string[] array) : base(array) {
+    class VSSample : Hypothese {
+        public VSSample(bool result, params string[] array) : base(array) {
             Result = result;
         }
 
         public bool Result { get; }
+
+
+        //////////////////////////// Samples ////////////////////////////
+        public static VSSample[] Sportsendungen = {
+            new VSSample(true, "Fußball", "Mannschaft", "draußen", "national","Samstag"),
+            new VSSample(true, "Hockey", "Mannschaft", "draußen", "national","Samstag"),
+            new VSSample(false, "Bodenturnen", "Einzel", "drinnen", "Welt","Samstag"),
+            new VSSample(true, "Handball", "Mannschaft", "drinnen", "national","Samstag"),
+            new VSSample(false, "Zehnkampf", "Einzel", "draußen", "Welt","Sonntag")
+        };
+
+        public static VSSample[] EA45_2_1 = {
+            new VSSample(false,"Handwerker","groß","gering","gut"),
+            new VSSample(false,"Handwerker","gering","gering","neutral"),
+            new VSSample(true,"Handwerker","mittel","mittel","gut"),
+            new VSSample(false,"Handwerker","mittel","mittel","schlecht"),
+            new VSSample(true,"Beratungsnetz","mittel","hoch","neutral"),
+            new VSSample(false,"Beratungsnetz","gering","mittel","neutral"),
+            new VSSample(true,"Beratungsnetz","groß","mittel","schlecht"),
+            new VSSample(true,"Beratungsnetz","mittel","gering","gut"),
+            new VSSample(false,"Online-Shop","groß","hoch","schlecht"),
+            new VSSample(false,"Online-Shop","mittel","mittel","schlecht"),
+            new VSSample(true,"Online-Shop","mittel","gering","gut"),
+            new VSSample(true,"Online-Shop","groß","hoch","gut")
+        };
+
+        // public static Sample[] EA45_2_2 = {
+        //     new Sample(true, "Feldsalat", "Pute"),
+        //     new Sample(false, "Feldsalat", "Schwein"),
+        //     new Sample(true, "Chicoree", "Huhn"),
+        //     new Sample(false, "Tomate", "Huhn"),
+        //     new Sample(false, "Paprika", "Pute")
+        // };
+
+        // http://www2.cs.uregina.ca/~dbd/cs831/notes/ml/vspace/vs_prob1.html
+        public static VSSample[] JapanCars = {
+            new VSSample(true, "Japan","Honda","Blue","1980","Economy"),
+            new VSSample(false, "Japan","Toyota","Green","1970","Sports"),
+            new VSSample(true, "Japan","Toyota","Blue","1990","Economy"),
+            new VSSample(false, "USA","Chrysler","Red","1980","Economy"),
+            new VSSample(true, "Japan","Honda","White","1980","Economy"),
+            new VSSample(true, "Japan","Toyota","Green","1980","Economy")
+        };
+
+        public static VSSample[] JapanCarsCollapse = JapanCars.Append(new VSSample(false, "Japan", "Honda", "Red", "1990", "Economy")).ToArray();
+
     }
 
 }
