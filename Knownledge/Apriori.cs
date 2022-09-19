@@ -13,8 +13,10 @@ namespace Serpen.Uni.Knownledge {
         public readonly int RowCount;
         public readonly int TransactionCount;
 
+        public readonly string[] ItemNames;
 
-        public Apriori(bool[,] db, float minsupport, float minconf) {
+
+        public Apriori(bool[,] db, float minsupport, float minconf, params string[] itemnames) {
             DB = db;
             MinSupport = minsupport;
             MinConf = minconf;
@@ -40,21 +42,29 @@ namespace Serpen.Uni.Knownledge {
                         count++;
                 support[i] = (float)count / RowCount;
             }
+
+            if (itemnames is null || itemnames.Length == 0) {
+                ItemNames = new string[RowCount];
+                for (int i = 0; i < RowCount; i++) {
+                    int num = (char)(65 + i);
+                    if (num >= 65 + 8) num++;
+                    ItemNames[i] = ((char)num).ToString();
+                }
+            } else
+                ItemNames = itemnames;
         }
 
-        internal readonly List<int>[] Transactions;
+        internal readonly IEnumerable<int>[] Transactions;
         readonly float[] support;
 
-        string FormatListOut(List<List<int>> l) {
+        string FormatListOut(IEnumerable<IEnumerable<int>> l) {
             var sb = new System.Text.StringBuilder();
             foreach (var item in l) {
                 var lst = new List<string>();
                 sb.Append("{");
-                foreach (var subitem in item) {
-                    int num = (char)(65 + subitem);
-                    if (num >= 65 + 8) num++;
-                    lst.Add(((char)num).ToString());
-                }
+                foreach (var subitem in item)
+                    lst.Add(ItemNames[subitem]);
+
                 sb.Append(string.Join(",", lst) + "}, ");
             }
             if (sb.Length > 2)
@@ -62,7 +72,7 @@ namespace Serpen.Uni.Knownledge {
             return sb.ToString();
         }
 
-        public List<List<int>> AprioriAlg() {
+        public IEnumerable<IList<int>> AprioriAlg() {
             var L = new Dictionary<int, List<List<int>>>();
             L.Add(1, Frequent1Sets());
 
@@ -92,13 +102,16 @@ namespace Serpen.Uni.Knownledge {
                         L[k].Add(c);
 
 
-                Serpen.Uni.Utils.DebugMessage("Lk " + FormatListOut(L[k]), Serpen.Uni.Utils.eDebugLogLevel.Normal);
+                Serpen.Uni.Utils.DebugMessage("Lk" + k + " " + FormatListOut(L[k]), Serpen.Uni.Utils.eDebugLogLevel.Normal);
 
                 k++;
             }
 
             var ret = (from x in L.Values.SelectMany(y => y) select x).ToList();
             Serpen.Uni.Utils.DebugMessage("Ret " + FormatListOut(ret), Serpen.Uni.Utils.eDebugLogLevel.Normal);
+
+            AssocRules(ret);
+
             return ret;
         }
 
@@ -109,17 +122,19 @@ namespace Serpen.Uni.Knownledge {
                 for (int t = 0; t < TransactionCount; t++)
                     if (DB[p, t]) sum++;
 
-                if ((float)sum / TransactionCount >= MinSupport)
+                float support = (float)sum / TransactionCount;
+                Utils.DebugMessage($"{ItemNames[p]} support = {support} >= {MinSupport} {support >= MinSupport}", Utils.eDebugLogLevel.Always);
+                if (support >= MinSupport)
                     L1.Add(new List<int>() { p });
             }
             return L1;
         }
 
         [AlgorithmSource("1696WBS_A6.2_P206")]
-        public List<List<int>> AprioriGen(List<List<int>> L_km1, int k) {
+        public IReadOnlyCollection<List<int>> AprioriGen(IReadOnlyCollection<List<int>> L_km1, int k) {
             Serpen.Uni.Utils.DebugMessage("in " + FormatListOut(L_km1), Serpen.Uni.Utils.eDebugLogLevel.Normal);
 
-            List<List<int>> Ck = new List<List<int>>();
+            var Ck = new List<List<int>>();
 
             foreach (var p in L_km1) {
                 foreach (var q in L_km1) {
@@ -169,31 +184,27 @@ namespace Serpen.Uni.Knownledge {
         public float Confidence(IEnumerable<int> list1, IEnumerable<int> list2)
             => Support(list1.Concat(list2).ToList()) / Support(list1);
 
-        public void AssocRules(List<List<int>> list) {
+        void AssocRules(IEnumerable<IList<int>> list) {
             foreach (var l in list) {
-                var perm = Utils.GetPermutations(l, l.Count);
+                var perm = Utils.Splits(Utils.GetPermutations(l, l.Count));
                 var avoidDoubles = new List<string>();
 
                 foreach (var p in perm) {
-                    if (p.Count() > 1) {
-                        var array = p.ToArray();
-                        for (int splitpos = 1; splitpos < p.Count(); splitpos++) {
-                            var left = p.Take(splitpos);
-                            var right = p.Skip(splitpos);
+                    var left = p.Item1;
+                    var right = p.Item2;
 
-                            string text = string.Join(",", left.OrderBy(s => s)) + "->" + string.Join(",", right.OrderBy(s => s));
-                            if (!avoidDoubles.Contains(text)) {
-                                avoidDoubles.Add(text);
-                                float conf = Confidence(left, right);
-                                float supp = Support(p);
-                                if (conf >= MinConf)
-                                    System.Console.WriteLine(text.PadRight(10) + " s:" + supp + " c:" + conf);
-                            }
-
-                        }
+                    string text =
+                        string.Join(",", left.Select(x => ItemNames[x]).OrderBy(s => s)) +
+                        "->" +
+                        string.Join(",", right.Select(x => ItemNames[x]).OrderBy(s => s));
+                    if (!avoidDoubles.Contains(text)) {
+                        avoidDoubles.Add(text);
+                        float conf = Confidence(left, right);
+                        float supp = Support(left.Union(right));
+                        if (conf >= MinConf)
+                            System.Console.WriteLine("{0,-12} s:{1:N1} c:{2:N1}", text, supp, conf);
                     }
                 }
-
             }
         }
 
@@ -213,6 +224,21 @@ namespace Serpen.Uni.Knownledge {
                 {false,true,false,true,false,true,false,true,false,true} // Kosmetikartikel L
             };
             }
+        }
+
+        public static string[] EA34_3_Datamining_Names = new string[] { "E", "D", "R", "N", "E&R", "E&N", "ER", "EN" };
+        public static bool[,] EA34_3_Datamining {
+            get => new bool[,] {
+                {true,true,false,true,true,true,true,true,true,false},
+                {true,false,true,true,false,true,true,false,false,false},
+                {false,true,true,false,true,true,false,true,false,false},
+                {true,true,false,true,true,false,true,false,false,true},
+                {false,true,false,false,true,true,false,true,false,false},
+                {true,true,false,true,true,false,true,false,false,false},
+                {false,true,false,false,true,true,false,false,false,false},
+                {true,true,false,false,false,false,true,false,false,false}
+
+            };
         }
     }
 }
