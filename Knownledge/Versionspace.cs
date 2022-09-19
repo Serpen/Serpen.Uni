@@ -6,8 +6,8 @@ namespace Serpen.Uni.Knownledge {
 
     [AlgorithmSource("FUH1656_A5.13_P184")]
     class Versionspace {
-        List<Hypothese> S;
-        List<Hypothese> G;
+        IReadOnlyCollection<Hypothese> S;
+        IReadOnlyCollection<Hypothese> G;
 
         public Versionspace() {
 
@@ -34,7 +34,7 @@ namespace Serpen.Uni.Knownledge {
             Utils.DebugMessage("G: " + string.Join(",", G), Utils.eDebugLogLevel.Normal);
             foreach (var sample in samples) {
 
-                Utils.DebugMessage("enter " + sample.Result + " " + sample, Utils.eDebugLogLevel.Normal);
+                Utils.DebugMessage("enter " + sample, Utils.eDebugLogLevel.Normal);
 
                 if (sample.Result) {
                     var newG = new List<Hypothese>(G);
@@ -102,6 +102,21 @@ namespace Serpen.Uni.Knownledge {
             }
 
             return S.Union(G);
+        }
+
+        public static void runTest() {
+            var vs = new Versionspace();
+
+            foreach (var s in new VSSample[][] { VSSample.Sportsendungen, VSSample.JapanCars, VSSample.SportWeather, VSSample.JapanCarsCollapse }) {
+                var erg = vs.Invoke(s).OrderBy(x => x.ToString());
+                for (int i = 0; i < s.Length * s.Length; i++) {
+                    var r = s.Randomize();
+                    System.Console.WriteLine();
+                    var erg2 = vs.Invoke(r.ToArray()).OrderBy(x => x.ToString());
+                    if (!erg.All(x => erg2.Contains(x)) || !erg2.All(x => erg.Contains(x)))
+                        throw new System.ApplicationException($"{s} != {r}");
+                }
+            }
         }
     }
 
@@ -239,6 +254,9 @@ namespace Serpen.Uni.Knownledge {
 
         public bool Result { get; }
 
+        public override string ToString() {
+            return (Result ? "+" : "-") + base.ToString();
+        }
 
         //////////////////////////// Samples ////////////////////////////
         public static VSSample[] Sportsendungen = {
@@ -249,7 +267,7 @@ namespace Serpen.Uni.Knownledge {
             new VSSample(false, "Zehnkampf", "Einzel", "draußen", "Welt","Sonntag")
         };
 
-        public static VSSample[] EA45_2_1 = {
+        public static VSSample[] EA45_2_1_collapse = {
             new VSSample(false,"Handwerker","groß","gering","gut"),
             new VSSample(false,"Handwerker","gering","gering","neutral"),
             new VSSample(true,"Handwerker","mittel","mittel","gut"),
@@ -284,6 +302,12 @@ namespace Serpen.Uni.Knownledge {
 
         public static VSSample[] JapanCarsCollapse = JapanCars.Append(new VSSample(false, "Japan", "Honda", "Red", "1990", "Economy")).ToArray();
 
+        public static VSSample[] SportWeather = {
+            new VSSample(true, "Sunny","Warm","Normal","Strong","Warm","Same"),
+            new VSSample(true, "Sunny","Warm","High","Strong","Warm","Same"),
+            new VSSample(false,"Rainy","Cold","High","Strong","Warm","Change"),
+            new VSSample(true, "Sunny","Warm","High","Strong","Cool","Change")
+        };
     }
 
 }
