@@ -72,6 +72,7 @@ namespace Serpen.Uni.Automat {
         }
 
 
+        [AcceptedWordSamples("aaabc")]
         public static DFA DEA_1659_A223_B29_RegExp {
             get {
                 var deaT = new DFATransform {

@@ -1,5 +1,8 @@
 using System.Drawing;
+using System;
 using Math = System.Math;
+
+#pragma warning disable CA1416
 
 namespace Serpen.Uni.Automat {
 
@@ -20,18 +23,16 @@ namespace Serpen.Uni.Automat {
             CompoundArray = new float[] { 0.0f, 0.4f, 0.6f, 1f }
         };
 
-        static readonly Pen PEN_ARROW = PenArrow();
-        static Pen PenArrow() {
+        static readonly Pen PEN_ARROW = new Func<Pen>(() => {
             var tmpPen = new Pen(Color.Black);
             var hPath = new System.Drawing.Drawing2D.GraphicsPath();
             hPath.AddLine(new Point(0, 0), new Point(-ARROW_WIDTH, -ARROW_WIDTH));
             hPath.AddLine(new Point(0, 0), new Point(ARROW_WIDTH, -ARROW_WIDTH));
             tmpPen.CustomEndCap = new System.Drawing.Drawing2D.CustomLineCap(null, hPath);
             return tmpPen;
-        }
+        })();
 
-        static readonly Pen PEN_START_ARROW = PenStartArrow();
-        static Pen PenStartArrow() {
+        static readonly Pen PEN_START_ARROW = new Func<Pen>(() => {
             const int PEN_START_WIDTH = 2;
             var tmpPen = new Pen(Color.Black, PEN_START_WIDTH);
             var hPath = new System.Drawing.Drawing2D.GraphicsPath();
@@ -39,7 +40,8 @@ namespace Serpen.Uni.Automat {
             hPath.AddLine(new Point(0, 0), new Point(ARROW_WIDTH / PEN_START_WIDTH, -ARROW_WIDTH / PEN_START_WIDTH));
             tmpPen.CustomEndCap = new System.Drawing.Drawing2D.CustomLineCap(null, hPath);
             return tmpPen;
-        }
+        })();
+
         static readonly Font CourierNewFont = new Font("Courier New", 14);
 
         static readonly Pen PEN = Pens.Black;

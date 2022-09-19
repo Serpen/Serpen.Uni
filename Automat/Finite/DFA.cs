@@ -18,6 +18,8 @@ namespace Serpen.Uni.Automat.Finite {
 
         protected uint[] GoChar(EATuple eat) => GoChar(eat.q, eat.c.Value);
         protected override uint[] GoChar(uint q, char w) {
+            CheckWordInAlphabet(w.ToString());
+            
             if (((DFATransform)Transforms).TryGetValue(q, w, out uint qNext))
                 return new uint[] { qNext };
             else
@@ -97,7 +99,7 @@ namespace Serpen.Uni.Automat.Finite {
         [AlgorithmSource("1659_D2.9")]
         public bool StatesEqual(uint x, uint y) => StatesEqual(x, y, new List<uint>((int)StatesCount));
 
-        bool StatesEqual(uint x, uint y, List<uint> processed) {
+        bool StatesEqual(uint x, uint y, ICollection<uint> processed) {
             if (!processed.Contains(x)) {
                 processed.Add(x);
 
@@ -126,7 +128,7 @@ namespace Serpen.Uni.Automat.Finite {
 
         #region "Operations"
 
-        public override IAutomat HomomorphismChar(Dictionary<char, char> Translate) {
+        public override IAutomat HomomorphismChar(IDictionary<char, char> Translate) {
             var deat = new DFATransform();
             var Alp = (char[])this.Alphabet.Clone();
 
@@ -256,14 +258,12 @@ namespace Serpen.Uni.Automat.Finite {
 
             var t = new DFATransform();
             for (uint i = 0; i < stateCount; i++) {
-                char[] rndAlph = alphabet.Randomize();
-                for (int j = 0; j < rndAlph.Length; j++)
+                var rndAlph = alphabet.Randomize();
+                for (int j = 0; j < rndAlph.Count; j++)
                     t.Add(i, alphabet[j], (uint)rnd.Next(0, stateCount));
             }
 
-            var ret = new DFA("DFA_Random", (uint)stateCount, alphabet, t, (uint)rnd.Next(0, stateCount), accState);
-            ret.Name = $"DFA_Random_q{stateCount}_a{alphabet.Length}_{ret.GetHashCode()}";
-            return ret;
+            return new DFA($"DFA_Random_q{stateCount}_a{alphabet.Length}_t{t.Count}_a{accState.Length}", (uint)stateCount, alphabet, t, (uint)rnd.Next(0, stateCount), accState);
         }
 
         public override IAutomat PurgeStates() {
@@ -305,7 +305,7 @@ namespace Serpen.Uni.Automat.Finite {
         public static explicit operator DFA(NFAe Ne) => Nea2TeilmengenDea(Ne);
 
         [AlgorithmSource("EAFK-2.3.5", "EAFK-2.5.5", "1659-D-2.8")]
-        public static Finite.DFA Nea2TeilmengenDea(Finite.INFA N) {
+        public static DFA Nea2TeilmengenDea(INFA N) {
             var States = new List<uint[]>((int)N.StatesCount);
             var DeaStatesNames2Index = new Dictionary<string, uint>((int)N.StatesCount);
             var States2Check = new Queue<uint[]>((int)N.StatesCount);
@@ -460,7 +460,7 @@ namespace Serpen.Uni.Automat.Finite {
         /// </summary>
         /// <returns>complete bool Table showing eq pairs</returns>
         [AlgorithmSource("1659_S27_Algo1")]
-        public static bool[,] TableFillingAlg(Finite.DFA D) {
+        public static bool[,] TableFillingAlg(DFA D) {
             bool[,] t = new bool[D.StatesCount, D.StatesCount];
 
             // first, mark all states which differ between accepted and not

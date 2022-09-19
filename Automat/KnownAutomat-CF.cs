@@ -174,6 +174,7 @@ namespace Serpen.Uni.Automat {
             }
         }
 
+        [AcceptedWordSamples("[[]]")]
         public static CFGrammer CFG_1659_B32_G3 {
             get {
                 var rs2 = new RuleSet {
@@ -181,6 +182,40 @@ namespace Serpen.Uni.Automat {
                 };
                 return new CFGrammer(nameof(CFG_1659_B32_G3), new char[] { 'S' }, new char[] { '[', ']' }, rs2, 'S');
                 //b^(2n+1)*a^m*b^(2k+1)
+            }
+        }
+
+        [AcceptedWordSamples("[[]]")]
+        public static CFGrammer CFG_1810_2_P62 {
+            get {
+                var rs2 = new RuleSet {
+                    { 'S', new string[] { "ABcd" }},
+                    { 'A', new string[] { "a", "B" }},
+                    { 'B', new string[] { "b", "" }}
+                };
+                return new CFGrammer(nameof(CFG_1810_2_P62), new char[] { 'S', 'A', 'B' }, new char[] { 'a', 'b', 'c', 'd' }, rs2, 'S');
+            }
+        }
+
+        public static CFGrammer CFG_HHU_4_NFF {
+            get {
+                var rs2 = new RuleSet {
+                    { 'Z', new string[] { "d", "XYZ" }},
+                    { 'Y', new string[] { "c", "" }},
+                    { 'X', new string[] { "Y", "a" }}
+                };
+                return new CFGrammer(nameof(CFG_HHU_4_NFF), new char[] { 'Z', 'Y', 'X' }, new char[] { 'a', 'c', 'd' }, rs2, 'Z');
+            }
+        }
+
+        public static CFGrammer CFG_LR_G1 {
+            get {
+                var rs2 = new RuleSet {
+                    { 'Z', new string[] { "S" }},
+                    { 'S', new string[] { "Sb", "bAa" }},
+                    { 'A', new string[] { "aSc", "a", "aSb" }}
+                };
+                return new CFGrammer(nameof(CFG_LR_G1), new char[] { 'Z', 'S', 'A' }, new char[] { 'a', 'b', 'c' }, rs2, 'Z');
             }
         }
 
@@ -315,7 +350,7 @@ namespace Serpen.Uni.Automat {
                     { 'A', new string[] { "BB", "a" } },
                     { 'B', new string[] { "CA", "b" } },
                     { 'C', new string[] { "AC", "b" } },
-                }, 'S') {IsChomskey = true};
+                }, 'S') { IsChomskey = true };
             }
         }
     }

@@ -7,7 +7,7 @@ namespace Serpen.Uni.Automat {
     [System.Serializable]
     public class RuleSet
         : IEnumerable<KeyValuePair<char, string[]>>, IReadOnlyDictionary<char, string[]> {
-        private readonly Dictionary<char, string[]> dic = new Dictionary<char, string[]>();
+        private readonly IDictionary<char, string[]> dic = new Dictionary<char, string[]>();
 
         public int Count => dic.Count;
 

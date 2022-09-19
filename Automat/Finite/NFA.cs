@@ -105,15 +105,13 @@ namespace Serpen.Uni.Automat.Finite {
                 }
             }
 
-            var ret = new NFA("NFA_Random", (uint)stateCount, alphabet, t, (uint)rnd.Next(0, stateCount), accState);
-            ret.Name = $"NFA_Random_{ret.GetHashCode()}";
-            return ret;
+            return new NFA( $"NFA_Random_q{stateCount}_a{alphabet.Length}_t{t.Count}_a{accState.Length}", (uint)stateCount, alphabet, t, (uint)rnd.Next(0, stateCount), accState);
 
         }
 
         #region Operations
 
-        public override IAutomat HomomorphismChar(Dictionary<char, char> translate) {
+        public override IAutomat HomomorphismChar(IDictionary<char, char> translate) {
             var neat = new NFAeTransform();
             char[] Alp = this.Alphabet.Clone() as char[];
 

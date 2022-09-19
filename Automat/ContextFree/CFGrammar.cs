@@ -154,7 +154,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         /// <param name="rs">Old RuleSet</param>
         /// <param name="newVars">Reference to new Variables</param>
         /// <returns>CNF Step 1</returns>
-        RuleSet Chomskey1_StartSymbol(RuleSet rs, List<char> newVars) {
+        RuleSet Chomskey1_StartSymbol(RuleSet rs, ICollection<char> newVars) {
             var newRS = new RuleSet();
 
             char? newStartSymbol = null;
@@ -257,7 +257,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         /// <summary>
         /// Eliminate Rules Single Var->Single Var
         /// </summary>
-        RuleSet Chomskey3_UnitRules(RuleSet rs, List<char> newVars) {
+        RuleSet Chomskey3_UnitRules(RuleSet rs, IEnumerable<char> newVars) {
             RuleSet newRS = new RuleSet();
             RuleSet roRS = null;
 
@@ -316,7 +316,7 @@ namespace Serpen.Uni.Automat.ContextFree {
         /// <summary>
         /// Length <= 2, introduce new Var for all |body|>2
         /// </summary>
-        RuleSet Chomskey4_Length(RuleSet rs, List<char> newVars) {
+        RuleSet Chomskey4_Length(RuleSet rs, ICollection<char> newVars) {
             var newRs = new RuleSet();
             var translate = new Dictionary<string, char>();
 
@@ -362,7 +362,7 @@ namespace Serpen.Uni.Automat.ContextFree {
             return newRs;
         }
 
-        RuleSet Chomskey5_Terminals(RuleSet rs, List<char> newVars) {
+        RuleSet Chomskey5_Terminals(RuleSet rs, ICollection<char> newVars) {
             var newRs = new RuleSet();
             var translate = new Dictionary<char, char>();
 
@@ -471,8 +471,8 @@ namespace Serpen.Uni.Automat.ContextFree {
 
             var newRules = new RuleSet();
 
-            List<char> finalVars = this.Variables.ToList();
-            List<char> finalTerms = this.Terminals.ToList();
+            var finalVars = this.Variables.ToList();
+            var finalTerms = this.Terminals.ToList();
             char newStart = Utils.NextFreeCapitalLetter(this.VarAndTerm.Union(cfg2.VarAndTerm), this.StartSymbol);
 
             finalVars.Add(newStart);

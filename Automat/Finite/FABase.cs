@@ -196,7 +196,7 @@ namespace Serpen.Uni.Automat.Finite {
             return new NFAe($"NFAe_KleeneStern({Name})", this.StatesCount + 1, this.Alphabet, neaET, 0, acceptedStates);
         }
 
-        public abstract IAutomat HomomorphismChar(System.Collections.Generic.Dictionary<char, char> Translate);
+        public abstract IAutomat HomomorphismChar(System.Collections.Generic.IDictionary<char, char> Translate);
 
         public abstract override bool Equals(object obj);
         public abstract override string ToString();

@@ -61,9 +61,8 @@ namespace Serpen.Uni.Automat {
         }
 
         public AutomatBase(string name, string[] states, char[] alphabet, uint startState, uint[] acceptedStates)
-            : this(name, (uint)states.Length, alphabet, startState, acceptedStates) {
-            States = states;
-        }
+            : this(name, (uint)states.Length, alphabet, startState, acceptedStates) => States = states;
+
         protected virtual void CheckConstraints() {
             if (StatesCount == 0)
                 throw new Automat.StateException(StatesCount, "automat must have at least a startstate", this);
@@ -179,6 +178,7 @@ namespace Serpen.Uni.Automat {
 
         public abstract override string ToString();
 
+        public string[] GetRandomWords(int count) => GetRandomWords(10, 1, 10, new string[0]);
         public string[] GetRandomWords(int count, int minLen, int maxLen, string[] blocked) {
             var words = new List<string>();
             var rnd = Uni.Utils.RND;

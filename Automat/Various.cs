@@ -8,7 +8,7 @@ namespace Serpen.Uni.Automat {
     public interface IJoin : IAcceptWord { IAcceptWord Join(IJoin A); }
     public interface IReverse : IAcceptWord { IAcceptWord Reverse(); }
     public interface IKleeneStern : IAutomat { IAutomat KleeneStern(); }
-    public interface IHomomorphismChar : IAutomat { IAutomat HomomorphismChar(System.Collections.Generic.Dictionary<char, char> Translate); }
+    public interface IHomomorphismChar : IAutomat { IAutomat HomomorphismChar(System.Collections.Generic.IDictionary<char, char> Translate); }
 
     enum JoinConcatUnionKind {Join, Concat, Union}
     

@@ -92,7 +92,7 @@ namespace Serpen.Uni.Automat {
         }
 
 
-        protected readonly List<char> VarAndTerm;
+        internal readonly ICollection<char> VarAndTerm;
 
         protected virtual void CheckConstraints() {
             if (this.Variables.Intersect(this.Terminals).Any())

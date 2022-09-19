@@ -22,6 +22,7 @@ namespace Serpen.Uni.Automat.Finite {
 
         public override int GetHashCode() => ToString().GetHashCode();
 
-        public override bool Equals(object obj) => (obj is EATuple eat) && (eat.q == this.q && eat.c == this.c);
+        public override bool Equals(object obj)
+            => (obj is EATuple eat) && (eat.q == this.q && eat.c == this.c);
     }
 }

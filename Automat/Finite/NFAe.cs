@@ -140,7 +140,7 @@ namespace Serpen.Uni.Automat.Finite {
                     t.AddM(i, alphabet.RndElement(), (uint)rnd.Next(0, stateCount));
             }
 
-            return new NFAe($"NFAe_Random_Q{stateCount}_T{t.Count}", (uint)stateCount, alphabet, t, (uint)rnd.Next(0, stateCount), accState) { Name = $"NFAe_Random_q{stateCount}_a{alphabet.Length}_t{t.Count}_a{accState.Length}" };
+            return new NFAe( $"NFAe_Random_q{stateCount}_a{alphabet.Length}_t{t.Count}_a{accState.Length}", (uint)stateCount, alphabet, t, (uint)rnd.Next(0, stateCount), accState);
         }
 
         public override IAutomat PurgeStates() {
@@ -157,7 +157,7 @@ namespace Serpen.Uni.Automat.Finite {
         }
 
         #region "Operations"
-        public override IAutomat HomomorphismChar(Dictionary<char, char> Translate) {
+        public override IAutomat HomomorphismChar(IDictionary<char, char> Translate) {
             var neat = new NFAeTransform();
             var Alp = (char[])this.Alphabet.Clone();
 
