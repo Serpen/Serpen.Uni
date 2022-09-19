@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Serpen.Uni.CompSys.Digital {
     public abstract class Gatter {
-        public readonly List<Gatter> OutputsTo = new List<Gatter>();
+        public readonly IList<Gatter> OutputsTo = new List<Gatter>();
 
         public abstract bool[] Calculate(params bool[] inputs);
     }

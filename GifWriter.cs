@@ -4,6 +4,8 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 
+#pragma warning disable CA1416
+
 namespace BumpKit
 {
     /// <summary>

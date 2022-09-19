@@ -8,11 +8,13 @@ namespace Serpen.Uni.Security {
             public long e;
             public long d;
         }
-        public static RsaParams generateRSAPair() {
+        public static RsaParams generateRSAPair(long defp = 0, long defq = 0, long defe = 2) {
             var rnds = new System.Collections.Generic.List<long>();
 
             var ps = PrimeTests.generatePrimes(2, short.MaxValue);
             long p = ps[0], q = ps[1];
+            if (defp > 0) p = defp;
+            if (defq > 0) q = defq;
 
             long n = p * q;
             long phiN = (p - 1) * (q - 1);
@@ -22,6 +24,8 @@ namespace Serpen.Uni.Security {
             while (BigInteger.GreatestCommonDivisor(e, phiN) != 1) {
                 e = Utils.PseudoRandoms(1, phiN, 2)[0];
             }
+
+            if (defe > 0) e = defe;
 
             long k = 1;
             while (((k * phiN + 1) % e) != 0) // || ((k * phiN + 1) / e) == e)

@@ -55,13 +55,11 @@ namespace Serpen.Uni {
                 + E(j, i, rowsAndCols);
         }
 
-        public static IntMatrix D(uint i, int r, uint rowsAndCols) { //Di(r) = Im + (r − 1)Eii.
-            return EinheitsMatrix(rowsAndCols) + ((r - 1) * E(i, i, rowsAndCols));
-        }
+        public static IntMatrix D(uint i, int r, uint rowsAndCols)
+            => EinheitsMatrix(rowsAndCols) + ((r - 1) * E(i, i, rowsAndCols)); //Di(r) = Im + (r − 1)Eii.
 
-        public static IntMatrix T(uint i, uint j, int s, uint rowsAndCols) { //Tij(s) = Im + sEij
-            return EinheitsMatrix(rowsAndCols) + (s * E(i, j, rowsAndCols));
-        }
+        public static IntMatrix T(uint i, uint j, int s, uint rowsAndCols)
+            => EinheitsMatrix(rowsAndCols) + (s * E(i, j, rowsAndCols)); //Tij(s) = Im + sEij
 
         /*
         public int[][] ToRaggedArray() {
@@ -122,19 +120,37 @@ namespace Serpen.Uni {
                 return newM;
             }
         }
-
         public static IntMatrix operator -(IntMatrix a, IntMatrix b) {
             if (a.Rows != b.Rows ||
                 a.Cols != b.Cols)
                 throw new System.NotSupportedException();
             else {
                 IntMatrix newM = new IntMatrix(a.Rows, a.Cols);
-                for (int r = 0; r < a.Cols; r++)
+                for (int r = 0; r < a.Rows; r++)
                     for (int c = 0; c < a.Cols; c++)
                         newM.M[r, c] = a.M[r, c] - b.M[r, c];
                 return newM;
             }
         }
+
+        public static bool operator ==(IntMatrix a, IntMatrix b) {
+            if (a.Rows != b.Rows ||
+                a.Cols != b.Cols)
+                return false;
+            else {
+                for (int r = 0; r < a.Cols; r++)
+                    for (int c = 0; c < a.Cols; c++)
+                        if (a.M[r, c] != b.M[r, c])
+                            return false;
+                return true;
+            }
+        }
+
+        public static bool operator !=(IntMatrix a, IntMatrix b) => !(a == b);
+
+        public override bool Equals(object obj) =>
+            obj is IntMatrix m && this == m;
+
         public static IntMatrix operator -(IntMatrix M) => -1 * M;
 
         public static IntMatrix operator *(IntMatrix a, IntMatrix b) {
@@ -193,5 +209,11 @@ namespace Serpen.Uni {
                 newM[rDst, c] += factor * newM[rSrc, c];
             return newM;
         }
+
+        public bool isTNF() {
+            throw new System.NotImplementedException();
+        }
+
+        public override int GetHashCode() => this.M.GetHashCode();
     }
 }

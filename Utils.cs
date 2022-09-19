@@ -97,6 +97,13 @@ namespace Serpen.Uni {
                     (t1, t2) => t1.Concat(new T[] { t2 }));
         }
 
+        public static IEnumerable<System.Tuple<IEnumerable<T>, IEnumerable<T>>> Splits<T>(IEnumerable<IEnumerable<T>> list) {
+            foreach (var p in list)
+                for (int splitpos = 1; splitpos < p.Count(); splitpos++)
+                    yield return new System.Tuple<IEnumerable<T>, IEnumerable<T>>
+                        (p.Take(splitpos), p.Skip(splitpos));
+        }
+
         public static bool[] ToBoolArray(this int integer, int minLen) {
             bool[] ret = new bool[System.Math.Max(Log2(integer), minLen)];
             for (byte i = 0; i < ret.Length; i++)
@@ -120,10 +127,10 @@ namespace Serpen.Uni {
             }
         }
 
-        public static T[] Randomize<T>(this T[] array) {
+        public static IList<T> Randomize<T>(this IList<T> array) {
             var rnd = Uni.Utils.RND;
-            for (int i = 0; i < array.Length * 2 / 3; i++) {
-                int swapi = rnd.Next(0, array.Length);
+            for (int i = 0; i < array.Count * 2 / 3; i++) {
+                int swapi = rnd.Next(0, array.Count);
                 (array[i], array[swapi]) = (array[swapi], array[i]);
             }
             return array;
@@ -137,13 +144,13 @@ namespace Serpen.Uni {
 
         public static int IndexToCantorIndex(int r, int c) => (r + c) * (r + c + 1) / 2 + c;
 
-        internal static Dictionary<T, T[]> EqualityClasses<T>(T[] array, System.Func<T, T, bool> comparer) {
+        internal static Dictionary<T, T[]> EqualityClasses<T>(IReadOnlyList<T> array, System.Func<T, T, bool> comparer) {
 
-            var ret2 = new Dictionary<T, List<T>>(array.Length) {
+            var ret2 = new Dictionary<T, List<T>>(array.Count) {
                 { array[0], new List<T>(new T[] { array[0] }) }
             };
 
-            for (int i = 1; i < array.Length; i++) {
+            for (int i = 1; i < array.Count; i++) {
                 int eqIndex = -1;
                 for (int j = 0; j < ret2.Keys.Count; j++) {
                     if (comparer(array[i], ret2.Keys.ElementAt(j))) {
@@ -174,7 +181,7 @@ namespace Serpen.Uni {
             return index;
         }
 
-        public static T RndElement<T>(this T[] array) => array[Utils.RND.Next(0, array.Length)];
+        public static T RndElement<T>(this IList<T> array) => array[Utils.RND.Next(0, array.Count)];
 
         public static T[,] RemoveArrayCol<T>(this T[,] table, int column) {
             var newTable = new T[table.GetLength(0), table.GetLength(1) - 1];
@@ -245,6 +252,13 @@ namespace Serpen.Uni {
                     s = s.Insert(i, ".");
 
             return (withPrefix ? "0b" : "") + s;
+        }
+
+        public static string[] intArraytoAlphabet(this IReadOnlyList<int> intarray) {
+            string[] strarray = new string[intarray.Count];
+            for (int i = 0; i < strarray.Length; i++)
+                strarray[i] += (char)(intarray[i] + 65);
+            return strarray;
         }
 
     } //end class Utils 
