@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Serpen.Uni.Compiler {
     public class LR0Element {
@@ -52,7 +53,7 @@ namespace Serpen.Uni.Compiler {
 
     public class LR0Closure : IEnumerable<LR0Element> {
 
-        private List<LR0Element> list = new List<LR0Element>();
+        private IList<LR0Element> list = new List<LR0Element>();
         private HashSet<int> hashset = new HashSet<int>();
 
         private Serpen.Uni.Automat.ContextFree.CFGrammer Grammar;

@@ -18,7 +18,7 @@ namespace Serpen.Uni.DesignPattern {
     }
 
     class Variable : IEntry {
-        List<IEntry> List;
+        IList<IEntry> List;
 
         Variable(params IEntry[] entries) {
             List = new List<IEntry>(entries);
