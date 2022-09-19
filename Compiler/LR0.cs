@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Serpen.Uni.Compiler {
     public class LR0Element {
@@ -103,7 +104,7 @@ namespace Serpen.Uni.Compiler {
         }
 
         public LR0Closure[] Gotos() {
-            throw new NotImplementedException();
+            throw new System.NotImplementedException();
 
             var lr0clst = new List<LR0Closure>();
             foreach (var item in list) {

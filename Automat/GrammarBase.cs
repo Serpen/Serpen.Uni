@@ -163,7 +163,7 @@ namespace Serpen.Uni.Automat {
         [AlgorithmSource("1810_A3.14_P61")]
         public string[] FirstSet(char Var) {
             if (Terminals.Contains(Var))
-                return new String[] {Var.ToString()};
+                return new System.String[] {Var.ToString()};
 
             var first = new Dictionary<char, List<string>>();
 
