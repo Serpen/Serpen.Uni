@@ -52,7 +52,7 @@ namespace Serpen.Uni.Automat {
 
         public static Bitmap DrawAutomat(IAutomat A, uint? highlightState = null) {
 
-            var alreadyDrawn = new IncDictionary<int>();
+            var alreadyDrawn = new IncDictionaryF<int>();
 
             int lastCurveHeigth = 3 * CURVE_BONUS;
 
@@ -130,7 +130,7 @@ namespace Serpen.Uni.Automat {
             return bmp;
         }
 
-        static void DrawTransformLine(ref Graphics g, int qStart, int qEnd, string desc, int vCenter, ref int lastCurveHeigth, ref IncDictionary<int> alreadyDrawn) {
+        static void DrawTransformLine(ref Graphics g, int qStart, int qEnd, string desc, int vCenter, ref int lastCurveHeigth, ref IncDictionaryF<int> alreadyDrawn) {
             var descSize = g.MeasureString(desc, CourierNewFont);
 
             var penArrow = PEN_ARROW;
