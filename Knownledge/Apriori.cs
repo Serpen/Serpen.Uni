@@ -78,36 +78,33 @@ namespace Serpen.Uni.Knownledge {
 
             Serpen.Uni.Utils.DebugMessage("L1 " + FormatListOut(L[1]), Serpen.Uni.Utils.eDebugLogLevel.Normal);
 
-            int k = 2;
-            while (L.ContainsKey(k - 1) && L[k - 1].Any()) {
-                var Ck = AprioriGen(L[k - 1], k - 1);
+            int k = 1;
+            while (L.ContainsKey(k) && L[k].Any()) {
+                var Ck = AprioriGen(L[k], k);
 
-                var ccountList = new Dictionary<List<int>, int>();
+                var ccountList = new Serpen.Uni.Automat.IncDictionary<List<int>>();
 
                 for (int t = 0; t < TransactionCount; t++) {
                     var Ct = from x in Ck
-                             where Serpen.Uni.Utils.ContainsSubset(Transactions[t], x)
+                             where Transactions[t].ContainsSubset(x)
                              select x;
 
                     foreach (var candidate in Ct)
-                        if (!ccountList.ContainsKey(candidate))
-                            ccountList.Add(candidate, 1);
-                        else
-                            ccountList[candidate]++;
+                        ccountList.AddOrInc(candidate);
                 }
 
+                k++;
                 L[k] = new List<List<int>>();
-                foreach (var c in Ck)
+                foreach (var c in Ck) // only add >minSupport
                     if (ccountList.ContainsKey(c) && ccountList[c] >= (float)TransactionCount * MinSupport)
                         L[k].Add(c);
 
 
-                Serpen.Uni.Utils.DebugMessage("Lk" + k + " " + FormatListOut(L[k]), Serpen.Uni.Utils.eDebugLogLevel.Normal);
+                Serpen.Uni.Utils.DebugMessage($"L[{k}] " + FormatListOut(L[k]), Serpen.Uni.Utils.eDebugLogLevel.Normal);
 
-                k++;
             }
 
-            var ret = (from x in L.Values.SelectMany(y => y) select x).ToList();
+            var ret = from x in L.Values.Skip(1).SelectMany(y => y) select x;
             Serpen.Uni.Utils.DebugMessage("Ret " + FormatListOut(ret), Serpen.Uni.Utils.eDebugLogLevel.Normal);
 
             AssocRules(ret);
@@ -118,12 +115,13 @@ namespace Serpen.Uni.Knownledge {
         List<List<int>> Frequent1Sets() {
             var L1 = new List<List<int>>();
             for (int p = 0; p < RowCount; p++) {
-                int sum = 0;
+                int sum = 0; // count occurences for support
                 for (int t = 0; t < TransactionCount; t++)
                     if (DB[p, t]) sum++;
 
                 float support = (float)sum / TransactionCount;
-                Utils.DebugMessage($"{ItemNames[p]} support = {support} >= {MinSupport} {support >= MinSupport}", Utils.eDebugLogLevel.Always);
+
+                Utils.DebugMessage($"{ItemNames[p]} support = {support} >= {MinSupport} {support >= MinSupport}", Utils.eDebugLogLevel.Verbose);
                 if (support >= MinSupport)
                     L1.Add(new List<int>() { p });
             }
@@ -132,11 +130,10 @@ namespace Serpen.Uni.Knownledge {
 
         [AlgorithmSource("1696WBS_A6.2_P206")]
         public IReadOnlyCollection<List<int>> AprioriGen(IReadOnlyCollection<List<int>> L_km1, int k) {
-            Serpen.Uni.Utils.DebugMessage("in " + FormatListOut(L_km1), Serpen.Uni.Utils.eDebugLogLevel.Normal);
 
             var Ck = new List<List<int>>();
 
-            foreach (var p in L_km1) {
+            foreach (var p in L_km1) { // L_km1 x L_km1 
                 foreach (var q in L_km1) {
                     if (p != q) {
                         var e1 = p.Take(k - 1); // first k-2 matching elements
@@ -149,24 +146,19 @@ namespace Serpen.Uni.Knownledge {
                     }
                 }
             }
+            Serpen.Uni.Utils.DebugMessage($"c[{k}] +SS " + FormatListOut(Ck), Serpen.Uni.Utils.eDebugLogLevel.Verbose);
 
-            // Teilmengencheck
+            // Teilmengencheck / SS
             var ret = new List<List<int>>(Ck);
             foreach (var c in Ck) {
                 var parts = Utils.GetPowerSet(c).Where(x => x.Count() == c.Count - 1).ToArray();
                 foreach (var s in parts) {
-                    bool exist = false;
-                    foreach (var lx in L_km1) {
-                        if (lx.ContainsSubset(s)) {
-                            exist = true;
-                        }
-                    }
-                    if (!exist)
+                    if (!L_km1.Any(lx => lx.ContainsSubset(s)))
                         ret.Remove(c);
                 }
             }
 
-            Serpen.Uni.Utils.DebugMessage("out " + FormatListOut(ret), Serpen.Uni.Utils.eDebugLogLevel.Normal);
+            Serpen.Uni.Utils.DebugMessage($"c[{k}] -SS " + FormatListOut(ret), Serpen.Uni.Utils.eDebugLogLevel.Normal);
 
             return ret;
         }
@@ -202,7 +194,7 @@ namespace Serpen.Uni.Knownledge {
                         float conf = Confidence(left, right);
                         float supp = Support(left.Union(right));
                         if (conf >= MinConf)
-                            System.Console.WriteLine("{0,-12} s:{1:N1} c:{2:N1}", text, supp, conf);
+                            System.Console.WriteLine("{0,-12} s:{1:N2} c:{2:N2}", text, supp, conf);
                     }
                 }
             }
