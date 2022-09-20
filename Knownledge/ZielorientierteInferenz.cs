@@ -1,9 +1,9 @@
 using System.Linq;
 
-namespace Serpen.Uni.Knownledge {
+namespace Serpen.Uni.Knownledge.Inferenz {
 
     [AlgorithmSource("1696_A4.5")]
-    class ZielorientierteInferenz {
+    public class ZielorientierteInferenz {
 
         public readonly int[] Facts;
         public readonly Rule[] RuleSet;

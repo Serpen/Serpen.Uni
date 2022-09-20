@@ -4,7 +4,7 @@ using System.Linq;
 namespace Serpen.Uni.Knownledge {
 
     [Serpen.Uni.AlgorithmSource("FUH1656_6.4")]
-    class Apriori {
+    public class Apriori {
 
         internal readonly bool[,] DB;
         public readonly float MinSupport;
@@ -76,7 +76,7 @@ namespace Serpen.Uni.Knownledge {
             var L = new Dictionary<int, List<List<int>>>();
             L.Add(1, Frequent1Sets());
 
-            Serpen.Uni.Utils.DebugMessage("L1 " + FormatListOut(L[1]), Serpen.Uni.Utils.eDebugLogLevel.Normal);
+            Serpen.Uni.Utils.DebugMessage("L[1] " + FormatListOut(L[1]), Serpen.Uni.Utils.eDebugLogLevel.Normal);
 
             int k = 1;
             while (L.ContainsKey(k) && L[k].Any()) {
@@ -107,7 +107,7 @@ namespace Serpen.Uni.Knownledge {
             var ret = from x in L.Values.Skip(1).SelectMany(y => y) select x;
             Serpen.Uni.Utils.DebugMessage("Ret " + FormatListOut(ret), Serpen.Uni.Utils.eDebugLogLevel.Normal);
 
-            AssocRules(ret);
+            ToConsoleErg(ret);
 
             return ret;
         }
@@ -176,7 +176,7 @@ namespace Serpen.Uni.Knownledge {
         public float Confidence(IEnumerable<int> list1, IEnumerable<int> list2)
             => Support(list1.Concat(list2).ToList()) / Support(list1);
 
-        void AssocRules(IEnumerable<IList<int>> list) {
+        void ToConsoleErg(IEnumerable<IList<int>> list) {
             foreach (var l in list) {
                 var perm = Utils.Splits(Utils.GetPermutations(l, l.Count));
                 var avoidDoubles = new List<string>();
@@ -194,7 +194,7 @@ namespace Serpen.Uni.Knownledge {
                         float conf = Confidence(left, right);
                         float supp = Support(left.Union(right));
                         if (conf >= MinConf)
-                            System.Console.WriteLine("{0,-12} s:{1:N2} c:{2:N2}", text, supp, conf);
+                            System.Console.WriteLine("{0,-25} s:{1:N2} c:{2:N2}", text, supp, conf);
                     }
                 }
             }
@@ -217,6 +217,7 @@ namespace Serpen.Uni.Knownledge {
             };
             }
         }
+        public static string[] Drogeriemarkt_Names = new string[] { "Seife", "Shampoo", "Haarspülung", "Duschgel", "Zahnpaste", "Zahnbürste", "Haarfärbemittel", "Haargel", "Deo", "Perform", "Kosmetikartikel" };
 
         public static string[] EA34_3_Datamining_Names = new string[] { "E", "D", "R", "N", "E&R", "E&N", "ER", "EN" };
         public static bool[,] EA34_3_Datamining {
@@ -229,7 +230,6 @@ namespace Serpen.Uni.Knownledge {
                 {true,true,false,true,true,false,true,false,false,false},
                 {false,true,false,false,true,true,false,false,false,false},
                 {true,true,false,false,false,false,true,false,false,false}
-
             };
         }
     }

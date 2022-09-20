@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Serpen.Uni.Knownledge {
+namespace Serpen.Uni.Knownledge.Inferenz {
 
     [AlgorithmSource("1696_A4.3")]
     public class DataDrivenInferenz {

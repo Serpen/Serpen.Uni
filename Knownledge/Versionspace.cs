@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Serpen.Uni.Knownledge {
+namespace Serpen.Uni.Knownledge.Versionspace {
 
     [AlgorithmSource("FUH1656_A5.13_P184")]
-    class Versionspace {
+    public class Versionspace {
         IReadOnlyCollection<Hypothese> S;
         IReadOnlyCollection<Hypothese> G;
 
@@ -15,7 +15,7 @@ namespace Serpen.Uni.Knownledge {
 
         string[][] AttAusPraeg;
 
-        public IEnumerable<Hypothese> Invoke(VSSample[] samples) {
+        public IEnumerable<Hypothese> Invoke(Sample[] samples) {
             int AttCount = samples.First().array.Length;
             String[] Sstr = new string[AttCount];
             String[] Gstr = new string[AttCount];
@@ -107,7 +107,7 @@ namespace Serpen.Uni.Knownledge {
         public static void runTest() {
             var vs = new Versionspace();
 
-            foreach (var s in new VSSample[][] { VSSample.Sportsendungen, VSSample.JapanCars, VSSample.SportWeather, VSSample.JapanCarsCollapse }) {
+            foreach (var s in new Sample[][] { Sample.Sportsendungen, Sample.JapanCars, Sample.SportWeather, Sample.JapanCarsCollapse }) {
                 var erg = vs.Invoke(s).OrderBy(x => x.ToString());
                 for (int i = 0; i < s.Length * s.Length; i++) {
                     var r = s.Randomize();
@@ -120,7 +120,7 @@ namespace Serpen.Uni.Knownledge {
         }
     }
 
-    class Hypothese : ICloneable {
+    public class Hypothese : ICloneable {
         internal readonly string[] array;
 
         public const string Null = "0";
@@ -161,7 +161,7 @@ namespace Serpen.Uni.Knownledge {
             return covers;
         }
 
-        public bool Match(VSSample s) {
+        public bool Match(Sample s) {
             bool match = true;
             if (s.array.Length != array.Length) throw new System.ApplicationException("Hypothese Params differ");
             for (int i = 0; i < array.Length; i++) {
@@ -247,8 +247,8 @@ namespace Serpen.Uni.Knownledge {
         }
     }
 
-    class VSSample : Hypothese {
-        public VSSample(bool result, params string[] array) : base(array) {
+    public class Sample : Hypothese {
+        public Sample(bool result, params string[] array) : base(array) {
             Result = result;
         }
 
@@ -259,27 +259,27 @@ namespace Serpen.Uni.Knownledge {
         }
 
         //////////////////////////// Samples ////////////////////////////
-        public static VSSample[] Sportsendungen = {
-            new VSSample(true, "Fußball", "Mannschaft", "draußen", "national","Samstag"),
-            new VSSample(true, "Hockey", "Mannschaft", "draußen", "national","Samstag"),
-            new VSSample(false, "Bodenturnen", "Einzel", "drinnen", "Welt","Samstag"),
-            new VSSample(true, "Handball", "Mannschaft", "drinnen", "national","Samstag"),
-            new VSSample(false, "Zehnkampf", "Einzel", "draußen", "Welt","Sonntag")
+        public static Sample[] Sportsendungen = {
+            new Sample(true, "Fußball", "Mannschaft", "draußen", "national","Samstag"),
+            new Sample(true, "Hockey", "Mannschaft", "draußen", "national","Samstag"),
+            new Sample(false, "Bodenturnen", "Einzel", "drinnen", "Welt","Samstag"),
+            new Sample(true, "Handball", "Mannschaft", "drinnen", "national","Samstag"),
+            new Sample(false, "Zehnkampf", "Einzel", "draußen", "Welt","Sonntag")
         };
 
-        public static VSSample[] EA45_2_1_collapse = {
-            new VSSample(false,"Handwerker","groß","gering","gut"),
-            new VSSample(false,"Handwerker","gering","gering","neutral"),
-            new VSSample(true,"Handwerker","mittel","mittel","gut"),
-            new VSSample(false,"Handwerker","mittel","mittel","schlecht"),
-            new VSSample(true,"Beratungsnetz","mittel","hoch","neutral"),
-            new VSSample(false,"Beratungsnetz","gering","mittel","neutral"),
-            new VSSample(true,"Beratungsnetz","groß","mittel","schlecht"),
-            new VSSample(true,"Beratungsnetz","mittel","gering","gut"),
-            new VSSample(false,"Online-Shop","groß","hoch","schlecht"),
-            new VSSample(false,"Online-Shop","mittel","mittel","schlecht"),
-            new VSSample(true,"Online-Shop","mittel","gering","gut"),
-            new VSSample(true,"Online-Shop","groß","hoch","gut")
+        public static Sample[] EA45_2_1_collapse = {
+            new Sample(false,"Handwerker","groß","gering","gut"),
+            new Sample(false,"Handwerker","gering","gering","neutral"),
+            new Sample(true,"Handwerker","mittel","mittel","gut"),
+            new Sample(false,"Handwerker","mittel","mittel","schlecht"),
+            new Sample(true,"Beratungsnetz","mittel","hoch","neutral"),
+            new Sample(false,"Beratungsnetz","gering","mittel","neutral"),
+            new Sample(true,"Beratungsnetz","groß","mittel","schlecht"),
+            new Sample(true,"Beratungsnetz","mittel","gering","gut"),
+            new Sample(false,"Online-Shop","groß","hoch","schlecht"),
+            new Sample(false,"Online-Shop","mittel","mittel","schlecht"),
+            new Sample(true,"Online-Shop","mittel","gering","gut"),
+            new Sample(true,"Online-Shop","groß","hoch","gut")
         };
 
         // public static Sample[] EA45_2_2 = {
@@ -291,22 +291,22 @@ namespace Serpen.Uni.Knownledge {
         // };
 
         // http://www2.cs.uregina.ca/~dbd/cs831/notes/ml/vspace/vs_prob1.html
-        public static VSSample[] JapanCars = {
-            new VSSample(true, "Japan","Honda","Blue","1980","Economy"),
-            new VSSample(false, "Japan","Toyota","Green","1970","Sports"),
-            new VSSample(true, "Japan","Toyota","Blue","1990","Economy"),
-            new VSSample(false, "USA","Chrysler","Red","1980","Economy"),
-            new VSSample(true, "Japan","Honda","White","1980","Economy"),
-            new VSSample(true, "Japan","Toyota","Green","1980","Economy")
+        public static Sample[] JapanCars = {
+            new Sample(true, "Japan","Honda","Blue","1980","Economy"),
+            new Sample(false, "Japan","Toyota","Green","1970","Sports"),
+            new Sample(true, "Japan","Toyota","Blue","1990","Economy"),
+            new Sample(false, "USA","Chrysler","Red","1980","Economy"),
+            new Sample(true, "Japan","Honda","White","1980","Economy"),
+            new Sample(true, "Japan","Toyota","Green","1980","Economy")
         };
 
-        public static VSSample[] JapanCarsCollapse = JapanCars.Append(new VSSample(false, "Japan", "Honda", "Red", "1990", "Economy")).ToArray();
+        public static Sample[] JapanCarsCollapse = JapanCars.Append(new Sample(false, "Japan", "Honda", "Red", "1990", "Economy")).ToArray();
 
-        public static VSSample[] SportWeather = {
-            new VSSample(true, "Sunny","Warm","Normal","Strong","Warm","Same"),
-            new VSSample(true, "Sunny","Warm","High","Strong","Warm","Same"),
-            new VSSample(false,"Rainy","Cold","High","Strong","Warm","Change"),
-            new VSSample(true, "Sunny","Warm","High","Strong","Cool","Change")
+        public static Sample[] SportWeather = {
+            new Sample(true, "Sunny","Warm","Normal","Strong","Warm","Same"),
+            new Sample(true, "Sunny","Warm","High","Strong","Warm","Same"),
+            new Sample(false,"Rainy","Cold","High","Strong","Warm","Change"),
+            new Sample(true, "Sunny","Warm","High","Strong","Cool","Change")
         };
     }
 

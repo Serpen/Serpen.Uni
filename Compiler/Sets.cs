@@ -5,10 +5,10 @@ using System.Linq;
 using System;
 
 namespace Serpen.Uni.Compiler {
-    class FirstSet {
+    public class FirstSet {
         private readonly CFGrammer grammar;
 
-        private IDictionary<char, List<string>> first = new Dictionary<char, List<string>>(); 
+        private IDictionary<char, List<string>> first = new Dictionary<char, List<string>>();
 
         public FirstSet(CFGrammer Grammar) {
             grammar = Grammar;
@@ -200,7 +200,7 @@ namespace Serpen.Uni.Compiler {
         }
 
         public IList<string> python_FIRST(string X) {
-            if (X == "") return new List<string>() {""};
+            if (X == "") return new List<string>() { "" };
 
             var F = python_FIRST_Mengen();
             var f = new List<string>();

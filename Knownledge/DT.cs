@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Serpen.Uni.Knownledge {
 
-    class DT {
+    public class DT {
         private readonly Sample[] samples;
         private readonly string[] attNames;
 

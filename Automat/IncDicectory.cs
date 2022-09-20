@@ -17,7 +17,7 @@ namespace Serpen.Uni.Automat {
         }
     }
 
-    class IncDictionary<TKey> : System.Collections.Generic.Dictionary<TKey, int> {
+    public class IncDictionary<TKey> : System.Collections.Generic.Dictionary<TKey, int> {
         public void AddOrInc(TKey key, int val) {
             if (base.ContainsKey(key))
                 base[key] += val;

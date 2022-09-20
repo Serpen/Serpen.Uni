@@ -4,7 +4,7 @@ using System.Linq;
 namespace Serpen.Uni.CompSys {
     public class Schaltwerkzustandstabelle {
 
-        class StatePair {
+        public class StatePair {
             public StatePair(int first, int second) {
                 if (first > second) {
                     First = second;
@@ -46,7 +46,7 @@ namespace Serpen.Uni.CompSys {
                             pair = outPair;
                         else
                             stupidRefCollection.Add(pair);
-                            
+
                         if (!col.ContainsKey(pair))
                             col.Add(pair, new List<StatePair>());
 
@@ -55,7 +55,7 @@ namespace Serpen.Uni.CompSys {
                             nextpair = outPair;
                         else
                             stupidRefCollection.Add(nextpair);
-                        
+
                         if (!col[pair].Contains(nextpair) && !pair.Equals(nextpair))
                             col[pair].Add(nextpair);
 
@@ -64,7 +64,7 @@ namespace Serpen.Uni.CompSys {
                             nextpair = outPair;
                         else
                             stupidRefCollection.Add(nextpair);
-                        
+
                         if (!col[pair].Contains(nextpair) && !pair.Equals(nextpair))
                             col[pair].Add(nextpair);
                     } // end if
