@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Serpen.Uni.Knownledge {
 
+    // TODO: doppelte Att auf gleicher Baumebene
     public class DT {
         private readonly Sample[] samples;
         private readonly string[] attNames;
@@ -23,7 +24,7 @@ namespace Serpen.Uni.Knownledge {
 
         [AlgorithmSource("1696_A5.6_P166", "KI_A18.5_P803")]
         dynamic Invoke(IReadOnlyCollection<DT.Sample> examples, IEnumerable<string> attributes, dynamic def) {
-            Utils.DebugMessage("E: " + string.Join(",", examples) + ", A: " + string.Join(",", attributes), Utils.eDebugLogLevel.Always);
+            Utils.DebugMessage("E: " + string.Join(",", examples) + ", A: " + string.Join(",", attributes), Utils.eDebugLogLevel.Normal);
             if (examples.Count() == 0) {
                 return def;
             } else if (examples.All(x => x.Result == true)) {
@@ -47,15 +48,16 @@ namespace Serpen.Uni.Knownledge {
             }
         }
 
-        string ChooseAttribut(IEnumerable<string> A, IReadOnlyCollection<Sample> E) {
+        string ChooseAttribut(IEnumerable<string> Attributes, IReadOnlyCollection<Sample> Examples) {
             var max = new System.Tuple<string, float>(string.Empty, 0f);
-            foreach (var i in A) {
+            foreach (var at in Attributes) {
                 // var y = gains[attNames.ArrayIndex(i)];
-                var y = gainRation(E.ToArray(), i);
+                var gr = gainRation(Examples.ToArray(), at);
                 // var x = SplitNodes(E, i);
-                if (y > max.Item2)
-                    max = new System.Tuple<string, float>(i, y);
+                if (gr > max.Item2)
+                    max = new System.Tuple<string, float>(at, gr);
             }
+            Utils.DebugMessage($"best Attr {max.Item1} {max.Item2:N2} with {Examples.Count} samples and {Attributes.Count()} attributes", Utils.eDebugLogLevel.Normal);
             return max.Item1;
         }
 
@@ -64,20 +66,20 @@ namespace Serpen.Uni.Knownledge {
 
         [AlgorithmSource("FUH1656_5.3.5")]
         public float gain(Sample[] samples, string att) {
-            var nodes = SplitNodes(samples, attNameToNum(att)).GroupBy(x => x.Key.Item1);
+            var nodes = SplitNodes(samples, attNameToNum(att));
             var pos = samples.Where(x => x.Result).Count();
-            var ie = Informationsgehalt((float)pos / samples.Length, (float)(samples.Length - pos) / samples.Length);
+            var ie = Informationsgehalt(pos, samples.Length);
             var z = 0f;
-            var swdebug = new System.Text.StringBuilder(att + " " + ie.ToString("0.0000") + "-[");
+            var swdebug = new System.Text.StringBuilder(att + " " + ie.ToString("0.00") + "-[");
             foreach (var item in nodes) {
                 int count = item.Sum(x => x.Value.Count);
                 int ipos = item.SelectMany(x => x.Value).Where(x => x.Result == true).Count();
                 int ineg = item.SelectMany(x => x.Value).Where(x => x.Result == false).Count();
-                z += (float)count / samples.Length * Informationsgehalt((float)ipos / count, (float)ineg / count);
+                z += (float)count / samples.Length * Informationsgehalt(ipos, count);
                 swdebug.AppendFormat("+{0}/{1}*H({2}/{0}; {3}/{0})", count, samples.Length, ipos, ineg);
             }
-            swdebug.Append("] = " + (ie - z));
-            Utils.DebugMessage(swdebug.ToString(), Utils.eDebugLogLevel.Always);
+            swdebug.Append("] = " + (ie - z).ToString("0.00"));
+            Utils.DebugMessage(swdebug.ToString(), Utils.eDebugLogLevel.Verbose);
             return ie - z;
         }
 
@@ -87,14 +89,15 @@ namespace Serpen.Uni.Knownledge {
                             .Select(x => x[attNameToNum(att)])
                             .GroupBy(x => x)
                             .Select(x => (float)x.Count() / samples.Count());
-            Utils.DebugMessage("H(" + string.Join(";", distinctValRatio) + ")", Utils.eDebugLogLevel.Verbose);
-            return Informationsgehalt(distinctValRatio.ToArray());
+            var ret = Informationsgehalt(distinctValRatio.ToArray());
+            Utils.DebugMessage("H(" + string.Join(";", distinctValRatio) + ") = " + ret, Utils.eDebugLogLevel.Verbose);
+            return ret;
         }
 
         [AlgorithmSource("FUH1656_5.3.5")]
         public float gainRation(Sample[] samples, string att) {
             var ret = gain(samples, att) / splitInfo(samples, att);
-            Utils.DebugMessage($"{att}, S#{samples.Length}: " + ret, Utils.eDebugLogLevel.Always);
+            Utils.DebugMessage($"{att}, S#{samples.Length}: " + ret, Utils.eDebugLogLevel.Verbose);
             return ret;
         }
 
@@ -110,23 +113,26 @@ namespace Serpen.Uni.Knownledge {
             return (float)ret;
         }
 
+        public float Informationsgehalt(int pos, int total)
+            => Informationsgehalt((float)pos/total, (float)(total-pos)/total);
+
         dynamic MajorityVal(IEnumerable<Sample> E) {
             return false;
             throw new System.NotImplementedException();
         }
 
-        public IDictionary<System.Tuple<string, bool>, List<Sample>> SplitNodes(IList<Sample> samples, int intcat) {
+        public IEnumerable<IGrouping<string, KeyValuePair<System.Tuple<string, bool>, List<Sample>>>> SplitNodes(IList<Sample> samples, int intcat) {
             var parts = new Dictionary<System.Tuple<string, bool>, List<Sample>>();
-            for (int i = 0; i < samples.Count; i++) {
-                var s = samples[i];
+            foreach (var s in samples)
+            {
                 var t = new System.Tuple<string, bool>(s[intcat], s.Result);
                 if (parts.ContainsKey(t))
                     parts[t].Add(s);
                 else
                     parts.Add(t, new List<Sample>() { s });
-
             }
-            return parts;
+            Utils.DebugMessage($"{attNames[intcat]} splits {samples.Count} samples into {parts.Count} distinct {parts.GroupBy(x=>x.Key.Item1).Count()}", Utils.eDebugLogLevel.Verbose);
+            return parts.GroupBy(x=>x.Key.Item1);
         }
 
         public class Sample {

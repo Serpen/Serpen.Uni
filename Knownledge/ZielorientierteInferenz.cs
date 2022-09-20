@@ -14,7 +14,7 @@ namespace Serpen.Uni.Knownledge.Inferenz {
         }
 
         public bool Backchain(params int[] q) {
-            Utils.DebugMessage(string.Join(",", Utils.intArraytoAlphabet(q)), Utils.eDebugLogLevel.Always);
+            Utils.DebugMessage("in:" + string.Join(",", Utils.intArraytoAlphabet(q)), Utils.eDebugLogLevel.Normal);
 
             if (q.Length == 0) return true;
             if (Facts.Contains(q[0])) {

@@ -5,7 +5,7 @@ namespace Serpen.Uni.Knownledge.Inferenz {
     [AlgorithmSource("1696_A4.3")]
     public class DataDrivenInferenz {
 
-        public static IEnumerable<int> Invoke(Rule[] RuleSet, params int[] facts) {
+        public static IEnumerable<string> Invoke(Rule[] RuleSet, params int[] facts) {
             bool changed;
             var Facts = new List<int>(facts);
             
@@ -19,7 +19,8 @@ namespace Serpen.Uni.Knownledge.Inferenz {
                     }
                 }
             } while (changed);
-            return Facts;
+            Facts.Sort();
+            return Facts.intArraytoAlphabet();
         }
 
     }

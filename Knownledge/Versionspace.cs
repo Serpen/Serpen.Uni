@@ -101,7 +101,7 @@ namespace Serpen.Uni.Knownledge.Versionspace {
 
             }
 
-            return S.Union(G);
+            return S.Union(G).Distinct();
         }
 
         public static void runTest() {
@@ -213,6 +213,7 @@ namespace Serpen.Uni.Knownledge.Versionspace {
                 }
 
             }
+            Utils.DebugMessage($"minCommon({this}, {s}) = {String.Join(",", ret)}", Utils.eDebugLogLevel.Normal);
             return ret;
         }
 
@@ -237,8 +238,8 @@ namespace Serpen.Uni.Knownledge.Versionspace {
                     }
                 }
             }
-
-
+            Utils.DebugMessage($"({this}, {s}) = {String.Join(",", ret)}", Utils.eDebugLogLevel.Normal);
+            
             return ret;
         }
 
